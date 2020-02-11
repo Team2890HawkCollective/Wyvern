@@ -15,16 +15,15 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 
 public class TestSubsystem extends SubsystemBase {
 
-    NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
-    NetworkTableEntry tx = table.getEntry("tx");
-    NetworkTableEntry ty = table.getEntry("ty");
-    NetworkTableEntry ta = table.getEntry("ta");
+    private NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
+    private NetworkTableEntry tx = table.getEntry("tx");
+    private NetworkTableEntry ty = table.getEntry("ty");
+    private NetworkTableEntry ta = table.getEntry("ta");
   
   /**
    * Creates a new TestSubsystem.
    */
   public TestSubsystem() {
-     
   }
 
   @Override
@@ -34,8 +33,6 @@ public class TestSubsystem extends SubsystemBase {
     double y = ty.getDouble(0.0);
     double area = ta.getDouble(0.0);
 
-    Shuffleboard.getTab("Main").add("tx", x);
-    Shuffleboard.getTab("Main").add("ty", y);
-    Shuffleboard.getTab("Main").add("ta", area);
+    System.out.println("x:" + x);
   }
 }
