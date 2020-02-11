@@ -19,6 +19,7 @@ public class TestSubsystem extends SubsystemBase {
     private NetworkTableEntry tx = table.getEntry("tx");
     private NetworkTableEntry ty = table.getEntry("ty");
     private NetworkTableEntry ta = table.getEntry("ta");
+    private NetworkTableEntry pipeline = table.getEntry("getpipe");
   
   /**
    * Creates a new TestSubsystem.
@@ -32,7 +33,13 @@ public class TestSubsystem extends SubsystemBase {
     double x = tx.getDouble(0.0);
     double y = ty.getDouble(0.0);
     double area = ta.getDouble(0.0);
+    Number pipeValue = pipeline.getNumber(100);
+
+    table.getEntry("pipeline").setNumber(0);
+    table.getEntry("ledMode").setNumber(3);
 
     System.out.println("x:" + x);
+    System.out.println("y:" + y);
+    System.out.println("Pipeline:" + pipeValue);
   }
 }
