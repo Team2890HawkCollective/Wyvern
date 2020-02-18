@@ -9,13 +9,14 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
+import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class ManipulatorSubsystem extends SubsystemBase {
   private WPI_TalonSRX liftTalon = new WPI_TalonSRX(Constants.LIFT_TALON_ID);
-  
-  
+
+  private Compressor liftCompressor = new Compressor();
   /**
    * Creates a new ManipulatorSubsystem.
    */
