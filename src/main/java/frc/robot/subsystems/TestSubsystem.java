@@ -20,7 +20,7 @@ public class TestSubsystem extends SubsystemBase {
     private NetworkTableEntry ty = table.getEntry("ty");
     private NetworkTableEntry ta = table.getEntry("ta");
     private NetworkTableEntry pipeline = table.getEntry("getpipe");
-  
+
   /**
    * Creates a new TestSubsystem.
    */
