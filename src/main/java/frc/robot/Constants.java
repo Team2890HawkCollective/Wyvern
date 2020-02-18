@@ -17,4 +17,6 @@ package frc.robot;
  */
 public final class Constants {
     public static int LIFT_TALON_ID = 0;
+    public static int LIFE_SOLENOID_ID = 1;
+    public static int XBOX_ASSISTANT_DRIVER_CONTROLLER_PORT_ID = 0;
 }
