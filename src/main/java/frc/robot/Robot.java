@@ -14,6 +14,8 @@ import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.ctre.phoenix.sensors.PigeonIMU;
 import com.revrobotics.ColorSensorV3;
 
 
@@ -29,9 +31,16 @@ public class Robot extends TimedRobot {
 
   private RobotContainer m_robotContainer;
 
-  private final I2C.Port i2cPort = I2C.Port.kOnboard;
+  private WPI_TalonSRX pidgeonTalon = new WPI_TalonSRX(1);
 
-  private final ColorSensorV3 m_colorSensor = new ColorSensorV3(i2cPort);
+  private double [] ypr = new double[3];
+
+  private PigeonIMU _pigeon = new PigeonIMU(pidgeonTalon);
+
+  //Color sensor stuff
+  /*private final I2C.Port i2cPort = I2C.Port.kOnboard;
+
+  private final ColorSensorV3 m_colorSensor = new ColorSensorV3(i2cPort);*/
   
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -71,6 +80,8 @@ public class Robot extends TimedRobot {
     // block in order for anything in the Command-based framework to work.
     //CommandScheduler.getInstance().run();
 
+    //Color sensor stuff
+    /*
     Color detectedColor = m_colorSensor.getColor();
 
     double IR = m_colorSensor.getIR();
@@ -78,7 +89,15 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Red", detectedColor.red);
     SmartDashboard.putNumber("Green", detectedColor.green);
     SmartDashboard.putNumber("Blue", detectedColor.blue);
-    SmartDashboard.putNumber("IR", IR);
+    SmartDashboard.putNumber("IR", IR);*/
+
+    _pigeon.getYawPitchRoll(ypr);
+    //System.out.print("Yaw: " + ypr[0] + " | ");
+    //System.out.println("Pitch: " + ypr[1] + " | Roll: " + ypr[2]);
+
+    SmartDashboard.putNumber("Yaw", ypr[0]);
+    SmartDashboard.putNumber("Pitch", ypr[1]);
+    SmartDashboard.putNumber("Roll", ypr[2]);
 
   }
 
