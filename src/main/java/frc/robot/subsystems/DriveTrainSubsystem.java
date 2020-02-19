@@ -7,8 +7,11 @@
 
 package frc.robot.subsystems;
 
+import javax.lang.model.util.ElementScanner6;
+
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
+import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
@@ -26,6 +29,12 @@ public WPI_TalonSRX rightBackTalon = new WPI_TalonSRX(Constants.RIGHT_BACK_TALON
 public WPI_TalonSRX leftBackTalon = new WPI_TalonSRX(Constants.LEFT_BACK_TALON_ID);
 
 public XboxController driverController = new XboxController(Constants.DRIVER_CONTROLLER_PORT_ID);
+
+public Joystick yJoystick = new Joystick(Constants.DRIVER_CONTROLLER_PORT_ID);
+
+public Joystick xJoystick = new Joystick(Constants.DRIVER_CONTROLLER_PORT_ID);
+
+
   
   /**
    * Creates a new driveTrainSubsystem.
@@ -69,26 +78,64 @@ public XboxController driverController = new XboxController(Constants.DRIVER_CON
     rightFrontTalon.set(Constants.BACKWARDS_SPEED_MODIFIER);
   }
 
+  public void stopMove()
+  {
+    leftBackTalon.set(Constants.NOT_MOVING);
+    leftFrontTalon.set(Constants.NOT_MOVING);
+    rightBackTalon.set(Constants.NOT_MOVING);
+    rightFrontTalon.set(Constants.NOT_MOVING);
+  }
+
 
 
   
   public void xboxArcadeDrive()
   {
-    if(driverController.getY(Hand kLeft) > 0.1)
+    
+    //System.out.println("Hello");
+    if(driverController.getY(Hand.kRight) > 0.05)
     {
       moveForward();
     }
-    if(driverController.getY(Hand kLeft) < -0.1)
+    else if(driverController.getY(Hand.kRight) < -0.05)
     {
       moveBackwards();
     }
-    if(driverController.getX(Hand kLeft) > 0.1)
+    else if(driverController.getX(Hand.kLeft) > 0.05)
     {
       moveLeft();
     }
-    if(driverController.getX(Hand kLeft) < -0.1)
+    else if(driverController.getX(Hand.kLeft) < -0.05)
     {
       moveRight();
+    }
+    else
+    {
+      stopMove();
+    }
+  }
+
+  public void joystickArcadeDrive()
+  {
+    if(xJoystick.getX() > 0.05)
+    {
+      moveLeft();
+    }
+    else if(xJoystick.getX() < -0.05)
+    {
+      moveRight();
+    }
+    else if(yJoystick.getY() > 0.05)
+    {
+      moveForward();
+    }
+    else if(yJoystick.getY() < -0.05)
+    {
+      moveBackwards();
+    }
+    else
+    {
+      stopMove();
     }
   }
 

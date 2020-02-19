@@ -9,7 +9,9 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import frc.robot.commands.DriveTrainCommand;
 import frc.robot.commands.ExampleCommand;
+import frc.robot.subsystems.DriveTrainSubsystem;
 import frc.robot.subsystems.ExampleSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 
@@ -24,6 +26,10 @@ public class RobotContainer {
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
 
   private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
+
+  private final DriveTrainSubsystem m_driveTrainSubsystem = new DriveTrainSubsystem();
+
+  private final DriveTrainCommand m_driveTrainCommand = new DriveTrainCommand(m_driveTrainSubsystem);
 
 
 
@@ -42,6 +48,12 @@ public class RobotContainer {
    * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
+  }
+
+  public Command getDriveTrainCommand()
+  {
+    //System.out.println("DRIVE TRAIN");
+    return m_driveTrainCommand;
   }
 
 
