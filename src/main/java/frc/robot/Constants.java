@@ -16,4 +16,11 @@ package frc.robot;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
+    public static int LEFT_FRONT_TALON_ID = 1;
+    public static int LEFT_BACK_TALON_ID = 3;
+    public static int RIGHT_FRONT_TALON_ID = 2;
+    public static int RIGHT_BACK_TALON_ID = 4;
+
+    public static final double MOVEMENT_SPEED = 0.35;
+    public static final double MOVEMENT_SPEED_SLOW = 0.2;
 }
