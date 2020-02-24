@@ -15,5 +15,17 @@ package frc.robot;
  * <p>It is advised to statically import this class (or one of its inner classes) wherever the
  * constants are needed, to reduce verbosity.
  */
-public final class Constants {
+public final class Constants 
+{
+    public static final int PIGEON_TALON_PORT_ID = 1;
+
+    public static final double PIGEON_TALON_SPEED_RIGHT = 0.01;
+
+    public static final double PIGEON_SLOW_TALON_SPEED_RIGHT = 0.001;
+
+    public static final double PIGEON_TALON_SPEED_LEFT = -0.01;
+
+    public static final double PIGEON_SLOW_TALON_SPEED_LEFT = -0.001;
+
+    public static final double PIGEON_STATIONARY_SPEED = 0.0;
 }

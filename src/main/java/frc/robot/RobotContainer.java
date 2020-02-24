@@ -12,6 +12,8 @@ import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.ExampleSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.SensorSubsystem;
+import frc.robot.commands.SensorCommand;
 
 /**
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -24,6 +26,10 @@ public class RobotContainer {
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
 
   private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
+
+  private final SensorSubsystem m_sensorSubsystem = new SensorSubsystem();
+
+  private final SensorCommand m_sensorCommand = new SensorCommand(m_sensorSubsystem);
 
 
 
@@ -44,6 +50,11 @@ public class RobotContainer {
   private void configureButtonBindings() {
   }
 
+  public SensorSubsystem getSensorSubsystem()
+  {
+    return m_sensorSubsystem;
+  }
+
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
@@ -53,5 +64,10 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
     return m_autoCommand;
+  }
+
+  public SensorCommand getSensorCommand()
+  {
+    return m_sensorCommand;
   }
 }

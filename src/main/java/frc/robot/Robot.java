@@ -17,6 +17,8 @@ import edu.wpi.first.wpilibj.util.Color;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.sensors.PigeonIMU;
 import com.revrobotics.ColorSensorV3;
+import frc.robot.Constants;
+import frc.robot.subsystems.SensorSubsystem;
 
 
 
@@ -31,11 +33,6 @@ public class Robot extends TimedRobot {
 
   private RobotContainer m_robotContainer;
 
-  private WPI_TalonSRX pidgeonTalon = new WPI_TalonSRX(1);
-
-  private double [] ypr = new double[3];
-
-  private PigeonIMU _pigeon = new PigeonIMU(pidgeonTalon);
 
   //Color sensor stuff
   /*private final I2C.Port i2cPort = I2C.Port.kOnboard;
@@ -91,13 +88,13 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Blue", detectedColor.blue);
     SmartDashboard.putNumber("IR", IR);*/
 
-    _pigeon.getYawPitchRoll(ypr);
+    //m_robotContainer.getSensorSubsystem().getPidgeonYpr();
     //System.out.print("Yaw: " + ypr[0] + " | ");
     //System.out.println("Pitch: " + ypr[1] + " | Roll: " + ypr[2]);
 
-    SmartDashboard.putNumber("Yaw", ypr[0]);
-    SmartDashboard.putNumber("Pitch", ypr[1]);
-    SmartDashboard.putNumber("Roll", ypr[2]);
+    SmartDashboard.putNumber("Yaw", m_robotContainer.getSensorSubsystem().getPidgeonYpr()[0]);
+    SmartDashboard.putNumber("Pitch", m_robotContainer.getSensorSubsystem().getPidgeonYpr()[1]);
+    SmartDashboard.putNumber("Roll", m_robotContainer.getSensorSubsystem().getPidgeonYpr()[2]);
 
   }
 
@@ -145,6 +142,8 @@ public class Robot extends TimedRobot {
     {
       m_autonomousCommand.cancel();
     }
+
+    m_robotContainer.getSensorCommand();
   }
 
   /**
