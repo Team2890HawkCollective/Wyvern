@@ -9,9 +9,11 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -27,6 +29,8 @@ public class Robot extends TimedRobot {
   private Command m_teleopCommand;
 
   private RobotContainer m_robotContainer;
+
+  public static SendableChooser<String> startingPositionChooser = new SendableChooser<>();
 
   private NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
     private NetworkTableEntry tx = table.getEntry("tx");
@@ -44,6 +48,12 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
+
+    startingPositionChooser.addOption("Left Position", "Left");
+    startingPositionChooser.addOption("Center Position", "Center");
+    startingPositionChooser.addOption("Right Position", "Right");
+
+    Shuffleboard.getTab("Main").add("Robot Starting Position", startingPositionChooser);
 
   }
 

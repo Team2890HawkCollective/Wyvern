@@ -21,6 +21,9 @@ public final class Constants {
     public static int RIGHT_FRONT_TALON_ID = 2;
     public static int RIGHT_BACK_TALON_ID = 4;
 
-    public static final double MOVEMENT_SPEED = 0.35;
-    public static final double MOVEMENT_SPEED_SLOW = 0.2;
+    public static final double AUTONOMOUS_MOVEMENT_SPEED = 0.35;
+    public static final double AUTONOMOUS_MOVEMENT_SPEED_SLOW = 0.2;
+    public static final double AUTONOMOUS_SHOOTER_SPEED_POSITION_ONE = 0.4;
+    public static final double AUTONOMOUS_SHOOTER_SPEED_POSITION_TWO = 0.4;
+    public static final double AUTONOMOUS_SHOOTER_SPEED_POSITION_THREE = 0.4;
 }
