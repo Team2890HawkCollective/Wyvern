@@ -90,9 +90,11 @@ public class Robot extends TimedRobot {
 
     double sparkPosition = movementEncoder.getPosition();
     double sparkVelocity = movementEncoder.getVelocity();
+    double sparkRotations = movementEncoder.getCountsPerRevolution();
 
     System.out.println("Position: " + sparkPosition);
     System.out.println("Velocity: " + sparkVelocity);
+    System.out.println("Rotations: " + sparkRotations);
 
   }
 
