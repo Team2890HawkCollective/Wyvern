@@ -11,7 +11,12 @@ import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+
+import com.revrobotics.CANEncoder;
+import com.revrobotics.CANSparkMax;
 import com.revrobotics.ColorSensorV3;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -28,6 +33,9 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
+
+  private CANSparkMax testSpark = new CANSparkMax(2, MotorType.kBrushless);
+  private CANEncoder movementEncoder = new CANEncoder(testSpark);
 
   /*private final I2C.Port i2cPort = I2C.Port.kOnboard;
 
@@ -79,6 +87,12 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Green", detectedColor.green);
     SmartDashboard.putNumber("Blue", detectedColor.blue);
     SmartDashboard.putNumber("IR", IR);*/
+
+    double sparkPosition = movementEncoder.getPosition();
+    double sparkVelocity = movementEncoder.getVelocity();
+
+    System.out.println("Position: " + sparkPosition);
+    System.out.println("Velocity: " + sparkVelocity);
 
   }
 
