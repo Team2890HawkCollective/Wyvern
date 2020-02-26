@@ -33,7 +33,7 @@ public class AutonomousSubsystem extends SubsystemBase {
   private WPI_TalonSRX leftBackTalon = new WPI_TalonSRX(Constants.LEFT_BACK_TALON_ID);
   private WPI_TalonSRX rightBackTalon = new WPI_TalonSRX(Constants.RIGHT_BACK_TALON_ID);
 
-  private SparkMax leftFrontSparkController= new SparkMax(Constants.LEFT_FRONT_SPARK_CONTROLLER_ID, Constants.BRUSHLESS_MOTOR);
+  private SparkMax leftFrontSparkController = new SparkMax(Constants.LEFT_FRONT_SPARK_CONTROLLER_ID, MotorType.kBrushless);
   
   /**
    * Creates a new AutonomousSubsystem.
