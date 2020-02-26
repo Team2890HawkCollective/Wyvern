@@ -36,4 +36,6 @@ public final class Constants {
     public static final double AUTONOMOUS_SHOOTER_SPEED_POSITION_ONE = 0.4;
     public static final double AUTONOMOUS_SHOOTER_SPEED_POSITION_TWO = 0.4;
     public static final double AUTONOMOUS_SHOOTER_SPEED_POSITION_THREE = 0.4;
+
+    public static final double NO_SPEED = 0.0;
 }

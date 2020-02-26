@@ -14,6 +14,7 @@ import frc.robot.Robot;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.revrobotics.SparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
@@ -33,7 +34,11 @@ public class AutonomousSubsystem extends SubsystemBase {
   private WPI_TalonSRX leftBackTalon = new WPI_TalonSRX(Constants.LEFT_BACK_TALON_ID);
   private WPI_TalonSRX rightBackTalon = new WPI_TalonSRX(Constants.RIGHT_BACK_TALON_ID);
 
-  private SparkMax leftFrontSparkController = new SparkMax(Constants.LEFT_FRONT_SPARK_CONTROLLER_ID, MotorType.kBrushless);
+  private CANSparkMax leftFrontSparkController = new CANSparkMax(Constants.LEFT_FRONT_SPARK_CONTROLLER_ID, Constants.BRUSHLESS_MOTOR);
+  private CANSparkMax rightFrontSparkController = new CANSparkMax(Constants.RIGHT_FRONT_SPARK_CONTROLLER_ID, Constants.BRUSHLESS_MOTOR);
+  private CANSparkMax leftBackSparkController = new CANSparkMax(Constants.LEFT_FRONT_SPARK_CONTROLLER_ID, MotorType.kBrushless);
+  private CANSparkMax rightBackSparkController = new CANSparkMax(Constants.LEFT_FRONT_SPARK_CONTROLLER_ID, MotorType.kBrushless);
+
   
   /**
    * Creates a new AutonomousSubsystem.
@@ -42,6 +47,10 @@ public class AutonomousSubsystem extends SubsystemBase {
     //Sets two motors inverted to prevent motors from turning against each other
     rightFrontTalon.setInverted(true);
     rightBackTalon.setInverted(true);
+
+    /* Spark max inversions to replace Talons when chassis is ready
+    rightFrontSparkController.setInverted(true);
+    rightBackSparkController.setInverted(true);*/
   }
 
   @Override
@@ -250,6 +259,13 @@ public class AutonomousSubsystem extends SubsystemBase {
     rightFrontTalon.set(-Constants.AUTONOMOUS_MOVEMENT_SPEED);
     leftBackTalon.set(Constants.AUTONOMOUS_MOVEMENT_SPEED);
     rightBackTalon.set(-Constants.AUTONOMOUS_MOVEMENT_SPEED);
+
+    /* Spark Maxs' to replace talons when chassis is ready
+    leftFrontSparkController.set(Constants.AUTONOMOUS_MOVEMENT_SPEED);
+    rightFrontSparkController.set(-Constants.AUTONOMOUS_MOVEMENT_SPEED);
+    leftBackSparkController.set(Constants.AUTONOMOUS_MOVEMENT_SPEED);
+    rightBackSparkController.set(-Constants.AUTONOMOUS_MOVEMENT_SPEED);*/
+
   }
 
   //Turns robot left
@@ -259,6 +275,12 @@ public class AutonomousSubsystem extends SubsystemBase {
     rightFrontTalon.set(Constants.AUTONOMOUS_MOVEMENT_SPEED);
     leftBackTalon.set(-Constants.AUTONOMOUS_MOVEMENT_SPEED);
     rightBackTalon.set(Constants.AUTONOMOUS_MOVEMENT_SPEED);
+
+    /* Spark Max
+    leftFrontSparkController.set(-Constants.AUTONOMOUS_MOVEMENT_SPEED);
+    rightFrontSparkController.set(Constants.AUTONOMOUS_MOVEMENT_SPEED);
+    leftBackSparkController.set(-Constants.AUTONOMOUS_MOVEMENT_SPEED);
+    rightBackSparkController.set(Constants.AUTONOMOUS_MOVEMENT_SPEED);*/
   }
 
   //Moves robot forward
@@ -268,6 +290,12 @@ public class AutonomousSubsystem extends SubsystemBase {
     rightFrontTalon.set(Constants.AUTONOMOUS_MOVEMENT_SPEED_SLOW);
     leftBackTalon.set(Constants.AUTONOMOUS_MOVEMENT_SPEED_SLOW);
     rightBackTalon.set(Constants.AUTONOMOUS_MOVEMENT_SPEED_SLOW);
+
+    /* Spark Max
+    leftFrontSparkController.set(Constants.AUTONOMOUS_MOVEMENT_SPEED);
+    rightFrontSparkController.set(Constants.AUTONOMOUS_MOVEMENT_SPEED);
+    leftBackSparkController.set(Constants.AUTONOMOUS_MOVEMENT_SPEED);
+    rightBackSparkController.set(Constants.AUTONOMOUS_MOVEMENT_SPEED);*/
   }
 
   //Moves robot backward
@@ -277,15 +305,27 @@ public class AutonomousSubsystem extends SubsystemBase {
     rightFrontTalon.set(-Constants.AUTONOMOUS_MOVEMENT_SPEED_SLOW);
     leftBackTalon.set(-Constants.AUTONOMOUS_MOVEMENT_SPEED_SLOW);
     rightBackTalon.set(-Constants.AUTONOMOUS_MOVEMENT_SPEED_SLOW);
+
+    /* Spark Max
+    leftFrontSparkController.set(-Constants.AUTONOMOUS_MOVEMENT_SPEED);
+    rightFrontSparkController.set(-Constants.AUTONOMOUS_MOVEMENT_SPEED);
+    leftBackSparkController.set(-Constants.AUTONOMOUS_MOVEMENT_SPEED);
+    rightBackSparkController.set(-Constants.AUTONOMOUS_MOVEMENT_SPEED);*/
   }
 
   //Stops the robot from moving
   private void stopMoving()
   {
-    leftFrontTalon.set(0.0);
-    rightFrontTalon.set(0.0);
-    leftBackTalon.set(0.0);
-    rightBackTalon.set(0.0);
+    leftFrontTalon.set(Constants.NO_SPEED);
+    rightFrontTalon.set(Constants.NO_SPEED);
+    leftBackTalon.set(Constants.NO_SPEED);
+    rightBackTalon.set(Constants.NO_SPEED);
+
+    /* Spark Max
+    leftFrontSparkController.set(Constants.NO_SPEED);
+    rightFrontSparkController.set(Constants.NO_SPEED);
+    leftBackSparkController.set(-Constants.NO_SPEED);
+    rightBackSparkController.set(Constants.NO_SPEED);*/
   }
 
   //Shoots ball
