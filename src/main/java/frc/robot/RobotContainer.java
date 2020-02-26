@@ -10,7 +10,9 @@ package frc.robot;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.commands.DriveTrainCommand;
 import frc.robot.commands.ExampleCommand;
+import frc.robot.subsystems.DriveTrainSubsystem;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.Constants;
 import edu.wpi.first.wpilibj.Joystick;
@@ -21,9 +23,16 @@ import edu.wpi.first.wpilibj.Joystick;
  * periodic methods (other than the scheduler calls).  Instead, the structure of the robot
  * (including subsystems, commands, and button mappings) should be declared here.
  */
-public class RobotContainer 
-{
-    
+public class RobotContainer {
+  // The robot's subsystems and commands are defined here...
+  private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
+
+  private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
+
+  private final DriveTrainSubsystem m_driveTrainSubsystem = new DriveTrainSubsystem();
+
+  private final DriveTrainCommand m_driveTrainCommand = new DriveTrainCommand(m_driveTrainSubsystem);
+
 
 
   /**
@@ -47,8 +56,11 @@ public class RobotContainer
 
   }
 
- 
-
+  public Command getDriveTrainCommand()
+  {
+    //System.out.println("DRIVE TRAIN");
+    return m_driveTrainCommand;
+  }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
