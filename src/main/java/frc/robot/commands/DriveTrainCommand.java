@@ -32,7 +32,7 @@ public class DriveTrainCommand extends CommandBase {
   @Override
   public void execute() {
     //System.out.println("EXECUTE");
-    m_driveTrainSubsystem.joystickArcadeDrive();
+    m_driveTrainSubsystem.xboxArcadeDrive();
   }
 
   // Called once the command ends or is interrupted.

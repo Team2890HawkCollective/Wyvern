@@ -25,10 +25,10 @@ public class DriveTrainSubsystem extends SubsystemBase {
   
   //Talons used for testing driveTrain on Quetzquatl -> Going to need to be commented out for NEO Sparks
 
-  public WPI_TalonSRX leftFrontTalon = new WPI_TalonSRX(Constants.LEFT_FRONT_TALON_ID);
+  /*public WPI_TalonSRX leftFrontTalon = new WPI_TalonSRX(Constants.LEFT_FRONT_TALON_ID);
   public WPI_TalonSRX rightFrontTalon = new WPI_TalonSRX(Constants.RIGHT_FRONT_TALON_ID);
   public WPI_TalonSRX rightBackTalon = new WPI_TalonSRX(Constants.RIGHT_BACK_TALON_ID);
-  public WPI_TalonSRX leftBackTalon = new WPI_TalonSRX(Constants.LEFT_BACK_TALON_ID);
+  public WPI_TalonSRX leftBackTalon = new WPI_TalonSRX(Constants.LEFT_BACK_TALON_ID);*/
 
   /** NEO Spark Controllers -> Needs to be uncommented when ready for testing*/
    public CANSparkMax leftFrontSparkMax = new CANSparkMax(Constants.LEFT_FRONT_SPARK_MAX_ID, Constants.BRUSHLESS_MOTOR);
@@ -49,95 +49,94 @@ public class DriveTrainSubsystem extends SubsystemBase {
    */
   public DriveTrainSubsystem() 
   {
-    leftBackTalon.setInverted(true);
-    leftFrontTalon.setInverted(true);
+    //leftBackTalon.setInverted(true);
+    //leftFrontTalon.setInverted(true);
 
-    /* Inverting Spark Max Controller
     rightFrontSparkMax.setInverted(true);
-    rightBackSparkMax.setInverted(true);*/
+    rightBackSparkMax.setInverted(true);
   }
 
   private void moveForward()
   {
-    /*
-    leftBackSparkMax.set(Constants.TELEOP_FOWARD_SPEED_MODIFIER);
-    leftFrontSparkMax.set(Constants.TELEOP_FOWARD_SPEED_MODIFIER);
-    rightFrontSparkMax.set(Constants.TELEOP_FORWARD_SPEED_MODIFIER);
+    
+    leftBackSparkMax.set(Constants.TELEOP_FORWARD_SPEED_MODIFIER);
+    //leftFrontSparkMax.set(Constants.TELEOP_FORWARD_SPEED_MODIFIER);
+    //rightFrontSparkMax.set(Constants.TELEOP_FORWARD_SPEED_MODIFIER);
     rightBackSparkMax.set(Constants.TELEOP_FORWARD_SPEED_MODIFIER);
-    */
-    leftBackTalon.set(Constants.TELEOP_FORWARD_SPEED_MODIFIER);
+    
+    /*leftBackTalon.set(Constants.TELEOP_FORWARD_SPEED_MODIFIER);
     leftFrontTalon.set(Constants.TELEOP_FORWARD_SPEED_MODIFIER);
     rightFrontTalon.set(Constants.TELEOP_FORWARD_SPEED_MODIFIER);
-    rightBackTalon.set(Constants.TELEOP_FORWARD_SPEED_MODIFIER);
+    rightBackTalon.set(Constants.TELEOP_FORWARD_SPEED_MODIFIER);*/
     
   }
 
   private void moveBackwards()
   {
-    /*
+    
     leftBackSparkMax.set(Constants.TELEOP_BACKWARDS_SPEED_MODIFIER);
-    leftFrontSparkMax.set(Constants.TELEOP_BACKWARDS_SPEED_MODIFIER);
-    rightBackSparkMax.set(Constants.TELEOP_BACKWARDS_SPEED_MODIFIER);
+    //leftFrontSparkMax.set(Constants.TELEOP_BACKWARDS_SPEED_MODIFIER);
+    //rightBackSparkMax.set(Constants.TELEOP_BACKWARDS_SPEED_MODIFIER);
     rightFrontSparkMax.set(Constants.TELEOP_BACKWARDS_SPEED_MODIFIER);
-    */
-    leftBackTalon.set(Constants.TELEOP_BACKWARDS_SPEED_MODIFIER);
+    
+    /*leftBackTalon.set(Constants.TELEOP_BACKWARDS_SPEED_MODIFIER);
     leftFrontTalon.set(Constants.TELEOP_BACKWARDS_SPEED_MODIFIER);
     rightBackTalon.set(Constants.TELEOP_BACKWARDS_SPEED_MODIFIER);
-    rightFrontTalon.set(Constants.TELEOP_BACKWARDS_SPEED_MODIFIER);
+    rightFrontTalon.set(Constants.TELEOP_BACKWARDS_SPEED_MODIFIER);*/
   }
 
   private void moveLeft()
   {
-    /*
+    
 
     leftBackSparkMax.set(Constants.TELEOP_BACKWARDS_SPEED_MODIFIER);
-    leftFrontSparkMax.set(Constants.TELEOP_BACKWARDS_SPEED_MODIFIER);
-    rightBackSparkMax.set(Constants.TELEOP_FORWARD_SPEED_MODIFIER);
+    //leftFrontSparkMax.set(Constants.TELEOP_BACKWARDS_SPEED_MODIFIER);
+    //rightBackSparkMax.set(Constants.TELEOP_FORWARD_SPEED_MODIFIER);
     rightFrontSparkMax.set(Constants.TELEOP_FORWARD_SPEED_MODIFIER);
-    */
+    /*
     leftBackTalon.set(Constants.TELEOP_BACKWARDS_SPEED_MODIFIER);
     leftFrontTalon.set(Constants.TELEOP_BACKWARDS_SPEED_MODIFIER);
     rightBackTalon.set(Constants.TELEOP_FORWARD_SPEED_MODIFIER);
-    rightFrontTalon.set(Constants.TELEOP_FORWARD_SPEED_MODIFIER);
+    rightFrontTalon.set(Constants.TELEOP_FORWARD_SPEED_MODIFIER);*/
   }
 
   private void moveRight()
   {
-    /*
+    
 
     leftBackSparkMax.set(Constants.TELEOP_FORWARD_SPEED_MODIFIER);
     leftFrontSparkMax.set(Constants.TELEOP_FORWARD_SPEED_MODIFIER);
     rightBackSparkMax.set(Constants.TELEOP_BACKWARDS_SPEED_MODIFIER);
     rightFrontSparkMax.set(Constants.TELEOP_BACKWARDS_SPEED_MODIFIER);
-    */
-    leftBackTalon.set(Constants.TELEOP_FORWARD_SPEED_MODIFIER);
+    
+    /*leftBackTalon.set(Constants.TELEOP_FORWARD_SPEED_MODIFIER);
     leftFrontTalon.set(Constants.TELEOP_FORWARD_SPEED_MODIFIER);
     rightBackTalon.set(Constants.TELEOP_BACKWARDS_SPEED_MODIFIER);
-    rightFrontTalon.set(Constants.TELEOP_BACKWARDS_SPEED_MODIFIER);
+    rightFrontTalon.set(Constants.TELEOP_BACKWARDS_SPEED_MODIFIER);*/
   }
 
   public void stopMove()
   {
-    /*
+    
     leftBackSparkMax.set(Constants.NOT_MOVING);
     leftFrontSparkMax.set(Constants.NOT_MOVING);
     rightBackSparkMax.set(Constants.NOT_MOVING);
     rightFrontSparkMax.set(Constants.NOT_MOVING);
-    */
-    leftBackTalon.set(Constants.NOT_MOVING);
+    
+    /*leftBackTalon.set(Constants.NOT_MOVING);
     leftFrontTalon.set(Constants.NOT_MOVING);
     rightBackTalon.set(Constants.NOT_MOVING);
-    rightFrontTalon.set(Constants.NOT_MOVING);
+    rightFrontTalon.set(Constants.NOT_MOVING);*/
   }
 
-  public void moveY()
+  /*public void moveY()
   {
 
     leftBackTalon.set(Constants.NOT_MOVING);
     leftFrontTalon.set(Constants.NOT_MOVING);
     rightBackTalon.set(Constants.NOT_MOVING);
     rightFrontTalon.set(Constants.NOT_MOVING);
-  }
+  }*/
 
 
 
@@ -145,7 +144,7 @@ public class DriveTrainSubsystem extends SubsystemBase {
   public void xboxArcadeDrive()
   {
     
-    //System.out.println("Hello");
+    System.out.println("Hello");
     if(driverController.getY(Hand.kRight) > 0.05)
     {
       moveForward();
@@ -239,9 +238,9 @@ public class DriveTrainSubsystem extends SubsystemBase {
   public void arcadeDrive(double xSpeed, double ySpeed)
   {
     
-    tankDrive(forwardsSpeed, forwardsSpeed);
+    /*tankDrive(forwardsSpeed, forwardsSpeed);
     if (turningSpeed >= 0.05 || turningSpeed <= -0.05)
-      tankDrive(-turningSpeed + forwardsSpeed, turningSpeed + forwardsSpeed);
+      tankDrive(-turningSpeed + forwardsSpeed, turningSpeed + forwardsSpeed);*/
   }
   public void joystickArcadeDrive()
   {
@@ -272,7 +271,7 @@ public class DriveTrainSubsystem extends SubsystemBase {
 
   }
 
-  public void drive(double leftSpeed, double rightSpeed)
+  /*public void drive(double leftSpeed, double rightSpeed)
   {
     leftFrontTalon.set(leftSpeed);
     rightFrontTalon.set(rightSpeed);
@@ -283,7 +282,7 @@ public class DriveTrainSubsystem extends SubsystemBase {
     if (turningSpeed >= 0.05 || turningSpeed <= -0.05)
       tankDrive(-turningSpeed + forwardsSpeed, turningSpeed + forwardsSpeed, strafeSpeed);
       */
-  }
+  //}
 
 
   @Override
