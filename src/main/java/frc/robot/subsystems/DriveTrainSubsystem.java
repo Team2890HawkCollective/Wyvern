@@ -7,14 +7,8 @@
 
 package frc.robot.subsystems;
 
-import javax.lang.model.util.ElementScanner6;
-
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.SparkMax;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-
-import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
@@ -23,204 +17,148 @@ import frc.robot.Constants;
 
 public class DriveTrainSubsystem extends SubsystemBase {
   
-  //Talons used for testing driveTrain on Quetzquatl -> Going to need to be commented out for NEO Sparks
+  /**
+   * Talons used for testing driveTrain on Quetzaquotl -> Going to need to be removed after finished testing on Wyvern
+     as Wyvern uses Spark MAXs
+   */
+  private WPI_TalonSRX leftFrontTalon = new WPI_TalonSRX(Constants.LEFT_FRONT_TALON_ID);
+  private WPI_TalonSRX rightFrontTalon = new WPI_TalonSRX(Constants.RIGHT_FRONT_TALON_ID);
+  private WPI_TalonSRX rightBackTalon = new WPI_TalonSRX(Constants.RIGHT_BACK_TALON_ID);
+  private WPI_TalonSRX leftBackTalon = new WPI_TalonSRX(Constants.LEFT_BACK_TALON_ID);
 
-  /*public WPI_TalonSRX leftFrontTalon = new WPI_TalonSRX(Constants.LEFT_FRONT_TALON_ID);
-  public WPI_TalonSRX rightFrontTalon = new WPI_TalonSRX(Constants.RIGHT_FRONT_TALON_ID);
-  public WPI_TalonSRX rightBackTalon = new WPI_TalonSRX(Constants.RIGHT_BACK_TALON_ID);
-  public WPI_TalonSRX leftBackTalon = new WPI_TalonSRX(Constants.LEFT_BACK_TALON_ID);*/
-
-  /** NEO Spark Controllers -> Needs to be uncommented when ready for testing*/
-   public CANSparkMax leftFrontSparkMax = new CANSparkMax(Constants.LEFT_FRONT_SPARK_MAX_ID, Constants.BRUSHLESS_MOTOR);
-   public CANSparkMax leftBackSparkMax = new CANSparkMax(Constants.LEFT_BACK_SPARK_MAX_ID, Constants.BRUSHLESS_MOTOR);
-   public CANSparkMax rightFrontSparkMax = new CANSparkMax(Constants.RIGHT_FRONT_SPARK_MAX_ID, Constants.BRUSHLESS_MOTOR);
-   public CANSparkMax rightBackSparkMax = new CANSparkMax(Constants.RIGHT_BACK_SPARK_MAX_ID, Constants.BRUSHLESS_MOTOR);
+  /**
+   * Spark Max Controllers
+   */
+  private CANSparkMax leftFrontSparkMax = new CANSparkMax(Constants.LEFT_FRONT_SPARK_MAX_ID, Constants.BRUSHLESS_MOTOR);
+  private CANSparkMax leftBackSparkMax = new CANSparkMax(Constants.LEFT_BACK_SPARK_MAX_ID, Constants.BRUSHLESS_MOTOR);
+  private CANSparkMax rightFrontSparkMax = new CANSparkMax(Constants.RIGHT_FRONT_SPARK_MAX_ID, Constants.BRUSHLESS_MOTOR);
+  private CANSparkMax rightBackSparkMax = new CANSparkMax(Constants.RIGHT_BACK_SPARK_MAX_ID, Constants.BRUSHLESS_MOTOR);
    
+  /**
+   * Xbox controller object used in the case the driver drives with an Xbox controller
+   */
+  private XboxController driverController = new XboxController(Constants.XBOX_DRIVER_CONTROLLER_PORT_ID);
 
-  public XboxController driverController = new XboxController(Constants.DRIVER_CONTROLLER_PORT_ID);
+  /**
+   * Joystick objects used in the case the driver drives with joysticks
+   */
+  private Joystick leftJoystick = new Joystick(Constants.DRIVER_JOYSTICK_Y_PORT_ID);
+  private Joystick rightJoystick = new Joystick(Constants.DRIVER_JOYSTICK_X_PORT_ID);
 
-  public Joystick yJoystick = new Joystick(Constants.DRIVER_JOYSTICK_Y_PORT_ID);
-  public Joystick xJoystick = new Joystick(Constants.DRIVER_JOYSTICK_X_PORT_ID);
+  /**
+   * Speeds used for arcade drive. Y for forwards and backwards. X for turning left and right
+   */
+  private double yDriveSpeed = 0.0;
+  private double xDriveSpeed = 0.0;
 
+  /**
+   * Speeds used for tank drive. Left for left side of bot. Right for right side of bot
+   */
+  private double leftDriveSpeed = 0.0;
+  private double rightDriveSpeed = 0.0;
 
-  
   /**
    * Creates a new driveTrainSubsystem.
    */
   public DriveTrainSubsystem() 
   {
-    //leftBackTalon.setInverted(true);
-    //leftFrontTalon.setInverted(true);
+    //Sets left side of Talons inverted for proper functioning. Only used for Quetzaquotl testing
+    leftBackTalon.setInverted(true);
+    leftFrontTalon.setInverted(true);
 
-    rightFrontSparkMax.setInverted(true);
-    rightBackSparkMax.setInverted(true);
+    //Sets right side of Spark Maxs inverted for proper functioning
+    //rightFrontSparkMax.setInverted(true);
+    //rightBackSparkMax.setInverted(true);
   }
 
-  private void moveForward()
-  {
-    
-    leftBackSparkMax.set(Constants.TELEOP_FORWARD_SPEED_MODIFIER);
-    leftFrontSparkMax.set(Constants.TELEOP_FORWARD_SPEED_MODIFIER);
-    rightFrontSparkMax.set(Constants.TELEOP_FORWARD_SPEED_MODIFIER);
-    rightBackSparkMax.set(Constants.TELEOP_FORWARD_SPEED_MODIFIER);
-    
-    /*leftBackTalon.set(Constants.TELEOP_FORWARD_SPEED_MODIFIER);
-    leftFrontTalon.set(Constants.TELEOP_FORWARD_SPEED_MODIFIER);
-    rightFrontTalon.set(Constants.TELEOP_FORWARD_SPEED_MODIFIER);
-    rightBackTalon.set(Constants.TELEOP_FORWARD_SPEED_MODIFIER);*/
-    
-  }
-
-  private void moveBackwards()
-  {
-    
-    leftBackSparkMax.set(Constants.TELEOP_BACKWARDS_SPEED_MODIFIER);
-    //leftFrontSparkMax.set(Constants.TELEOP_BACKWARDS_SPEED_MODIFIER);
-    //rightBackSparkMax.set(Constants.TELEOP_BACKWARDS_SPEED_MODIFIER);
-    rightFrontSparkMax.set(Constants.TELEOP_BACKWARDS_SPEED_MODIFIER);
-    
-    /*leftBackTalon.set(Constants.TELEOP_BACKWARDS_SPEED_MODIFIER);
-    leftFrontTalon.set(Constants.TELEOP_BACKWARDS_SPEED_MODIFIER);
-    rightBackTalon.set(Constants.TELEOP_BACKWARDS_SPEED_MODIFIER);
-    rightFrontTalon.set(Constants.TELEOP_BACKWARDS_SPEED_MODIFIER);*/
-  }
-
-  private void moveLeft()
-  {
-    
-
-    leftBackSparkMax.set(Constants.TELEOP_BACKWARDS_SPEED_MODIFIER);
-    //leftFrontSparkMax.set(Constants.TELEOP_BACKWARDS_SPEED_MODIFIER);
-    //rightBackSparkMax.set(Constants.TELEOP_FORWARD_SPEED_MODIFIER);
-    rightFrontSparkMax.set(Constants.TELEOP_FORWARD_SPEED_MODIFIER);
-    /*
-    leftBackTalon.set(Constants.TELEOP_BACKWARDS_SPEED_MODIFIER);
-    leftFrontTalon.set(Constants.TELEOP_BACKWARDS_SPEED_MODIFIER);
-    rightBackTalon.set(Constants.TELEOP_FORWARD_SPEED_MODIFIER);
-    rightFrontTalon.set(Constants.TELEOP_FORWARD_SPEED_MODIFIER);*/
-  }
-
-  private void moveRight()
-  {
-    
-
-    leftBackSparkMax.set(Constants.TELEOP_FORWARD_SPEED_MODIFIER);
-    leftFrontSparkMax.set(Constants.TELEOP_FORWARD_SPEED_MODIFIER);
-    rightBackSparkMax.set(Constants.TELEOP_BACKWARDS_SPEED_MODIFIER);
-    rightFrontSparkMax.set(Constants.TELEOP_BACKWARDS_SPEED_MODIFIER);
-    
-    /*leftBackTalon.set(Constants.TELEOP_FORWARD_SPEED_MODIFIER);
-    leftFrontTalon.set(Constants.TELEOP_FORWARD_SPEED_MODIFIER);
-    rightBackTalon.set(Constants.TELEOP_BACKWARDS_SPEED_MODIFIER);
-    rightFrontTalon.set(Constants.TELEOP_BACKWARDS_SPEED_MODIFIER);*/
-  }
-
-  public void stopMove()
-  {
-    
-    leftBackSparkMax.set(Constants.NOT_MOVING);
-    leftFrontSparkMax.set(Constants.NOT_MOVING);
-    rightBackSparkMax.set(Constants.NOT_MOVING);
-    rightFrontSparkMax.set(Constants.NOT_MOVING);
-    
-    /*leftBackTalon.set(Constants.NOT_MOVING);
-    leftFrontTalon.set(Constants.NOT_MOVING);
-    rightBackTalon.set(Constants.NOT_MOVING);
-    rightFrontTalon.set(Constants.NOT_MOVING);*/
-  }
-
-  /*public void moveY()
-  {
-
-    leftBackTalon.set(Constants.NOT_MOVING);
-    leftFrontTalon.set(Constants.NOT_MOVING);
-    rightBackTalon.set(Constants.NOT_MOVING);
-    rightFrontTalon.set(Constants.NOT_MOVING);
-  }*/
-
-
-
-  
+  /**
+   * Method for using Xbox Controllers for arcade drive
+   */
   public void xboxArcadeDrive()
   {
-    
-    if(driverController.getY(Hand.kRight) > 0.05)
-    {
-      moveForward();
-    }
-    else if(driverController.getY(Hand.kRight) < -0.05)
-    {
-      moveBackwards();
-    }
-    else if(driverController.getX(Hand.kLeft) > 0.05)
-    {
-      moveLeft();
-    }
-    else if(driverController.getX(Hand.kLeft) < -0.05)
-    {
-      moveRight();
-    }
-    else
-    {
-      stopMove();
-    }
+    //Sets forwards and backwards speed (y) to the y-axis of the left joystick. Sets turning speed (x) tp x-axis of right joystick
+    yDriveSpeed = driverController.getY(Hand.kLeft) * Constants.TELEOP_DRIVE_SPEED_MODIFIER;
+    xDriveSpeed = driverController.getX(Hand.kRight) * Constants.TELEOP_DRIVE_SPEED_MODIFIER;
+
+    //Calls arcade drive method and sends speeds
+    arcadeDrive(yDriveSpeed, xDriveSpeed);
   }
-  public double yDriveSpeed = 0.0;
-  public double xDriveSpeed = 0.0;
   
+  /**
+   * Method for using Joysticks for arcade drive
+   */
   public void joystickArcadeDrive()
   {
-    yDriveSpeed = yJoystick.getY() * Constants.TELEOP_DRIVE_SPEED_MODIFIER;
-    xDriveSpeed = xJoystick.getX() * Constants.TELEOP_DRIVE_SPEED_MODIFIER;
+    //Sets forwards and backwards speed (y) to the y-axis of the left joystick. Sets turning speed (x) tp x-axis of right joystick
+    yDriveSpeed = leftJoystick.getY() * Constants.TELEOP_DRIVE_SPEED_MODIFIER;
+    xDriveSpeed = rightJoystick.getX() * Constants.TELEOP_DRIVE_SPEED_MODIFIER;
 
-    drive(yDriveSpeed, yDriveSpeed);
-    if (xDriveSpeed >= 0.05 || xDriveSpeed <= -0.05)
-    {
-      drive(-xDriveSpeed + yDriveSpeed, xDriveSpeed + yDriveSpeed);
-    }
-   
-    
-    /*if(xJoystick.getX() > 0.1)
-    {
-      moveLeft();
-    }
-    if(xJoystick.getX() < -0.1)
-    {
-      moveRight();
-    }
-    if(yJoystick.getY() > 0.1)
-    {
-      moveForward();
-    }
-    if(yJoystick.getY() < -0.1)
-    {
-      moveBackwards();
-    }
-    else
-    {
-      stopMove();
-    }*/
-
+    //Calls arcade drive method and sends speeds
+    arcadeDrive(yDriveSpeed, xDriveSpeed);
   }
 
+  /**
+   * Method for using an xbox controller for tank drive
+   */
+  public void xboxTankDrive()
+  {
+    //Sets left side of bot speed to the y-axis of the left joystick. Sets right side of bot speed to y-axis of the right joystick
+    leftDriveSpeed = driverController.getY(Hand.kLeft) * Constants.TELEOP_DRIVE_SPEED_MODIFIER;
+    rightDriveSpeed = driverController.getY(Hand.kRight) * Constants.TELEOP_DRIVE_SPEED_MODIFIER;
+
+    //Calls tank drive method and sends speeds
+    tankDrive(leftDriveSpeed, rightDriveSpeed);
+  }
+
+  /**
+   * Method for using Joystick controllers for tank drive
+   */
+  public void joystickTankDrive()
+  {
+    //Sets left side of bot speed to the y-axis of the left joystick. Sets right side of bot speed to y-axis of the right joystick
+    leftDriveSpeed = leftJoystick.getY() * Constants.TELEOP_DRIVE_SPEED_MODIFIER;
+    rightDriveSpeed = rightJoystick.getY() * Constants.TELEOP_DRIVE_SPEED_MODIFIER;
+
+    //Calls tank drive method and sends speeds
+    tankDrive(leftDriveSpeed, rightDriveSpeed);
+  }
+
+  /**
+   * Method that enables movement via arcade style drive
+   */
+  public void arcadeDrive(double ySpeed, double xSpeed)
+  {
+    //Assigns motor to forwards/backwards speed if no turning is detected
+    drive(ySpeed, ySpeed);
+    //If turning is detected, it will be added to one speed side and subtracted from the other speed side to generate the effect of turning
+    //whilst moving forwards/backwards at the same time
+    if (xSpeed >= 0.05 || xSpeed <= -0.05)
+    {
+      drive(-xSpeed + ySpeed, xSpeed + ySpeed);
+    }
+  }
+
+  /**
+   * Method that enables movement via tank style drive
+   */
+  public void tankDrive(double leftJoySpeed, double rightJoySpeed)
+  {
+    drive(leftJoySpeed, rightJoySpeed);
+  }
+
+  /**
+   * Assigns speeds to left and right controllers on bot
+   */
   public void drive(double leftSpeed, double rightSpeed)
   {
-    leftFrontSparkMax.set(leftSpeed);
+    /*leftFrontSparkMax.set(leftSpeed);
     rightFrontSparkMax.set(rightSpeed);
     leftBackSparkMax.set(leftSpeed);
-    rightBackSparkMax.set(rightSpeed);
-  }
-    /*
-    tankDrive(leftSpeed, rightSpeed, );
-    if (turningSpeed >= 0.05 || turningSpeed <= -0.05)
-      tankDrive(-turningSpeed + forwardsSpeed, turningSpeed + forwardsSpeed);
-      */
-  //}
+    rightBackSparkMax.set(rightSpeed);*/
 
-      
-
-  @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
+    leftBackTalon.set(leftSpeed);
+    leftFrontTalon.set(leftSpeed);
+    rightBackTalon.set(rightSpeed);
+    rightFrontTalon.set(rightSpeed);
   }
 }
