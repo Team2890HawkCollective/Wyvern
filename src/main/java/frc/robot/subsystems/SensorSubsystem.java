@@ -7,6 +7,7 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -15,25 +16,24 @@ import com.ctre.phoenix.sensors.PigeonIMU;
 
 public class SensorSubsystem extends SubsystemBase 
 {
+  //The Talon the pidgeon is connected too and the sensor itself
   private WPI_TalonSRX pidgeonTalon = new WPI_TalonSRX(Constants.PIGEON_TALON_PORT_ID);
-
-  private double [] ypr = new double[3];
-
   private PigeonIMU _pigeon = new PigeonIMU(pidgeonTalon);
 
-  private int pitchId = 1;
+  //Array to gather yaw, pitch, and roll from pidgeon sensor
+  private double [] yawPitchRoll = new double[3];
 
-  public PigeonIMU getPigeon()
-  {
-    return _pigeon;
-  }
+  //Call number for yawPitchRoll array to gather yaw data, pitch data, and roll data
+  private int yawID = 0;
+  private int pitchID = 1;
+  private int rollID = 2;
 
-  public double[] getPidgeonYpr()
-  {
-    _pigeon.getYawPitchRoll(ypr);
-    return ypr;
-  }
+  //Assistant driver controller
+  private XboxController assistantDriverController = new XboxController(Constants.ASSISTANT_DRIVER_CONTROLLER_PORT);
   
+  //Boolean to determine when to balance based on Y Button 
+  private boolean beginBalance = false;
+
   /**
    * Creates a new SensorSubsystem.
    */
@@ -42,56 +42,87 @@ public class SensorSubsystem extends SubsystemBase
 
   }
 
-  private void stopPidgeon()
+  //Stops wheel
+  private void stopWheel()
   {
-    //pidgeonTalon.set(Constants.PIGEON_STATIONARY_SPEED);
+    pidgeonTalon.set(Constants.PIGEON_WHEEL_STATIONARY_SPEED);
   }
 
-  private void turnPidgeonRight()
+  //Moves wheel to the right quickly
+  private void turnWheelRightFast()
   {
-    //pidgeonTalon.set(Constants.PIGEON_TALON_SPEED_RIGHT);
+    pidgeonTalon.set(Constants.PIGEON_WHEEL_FAST_TALON_SPEED_RIGHT);
   }
 
-  private void turnPidgeonRightSlow()
+  //Moves wheel to the right slowly
+  private void turnWheelRightSlow()
   {
-    //pidgeonTalon.set(Constants.PIGEON_SLOW_TALON_SPEED_RIGHT);
+    pidgeonTalon.set(Constants.PIGEON_WHEEL_SLOW_TALON_SPEED_RIGHT);
   }
 
-  private void turnPidgeonLeft()
+  //Moves wheel to the left quickly
+  private void turnWheelLeftFast()
   {
-    //pidgeonTalon.set(Constants.PIGEON_TALON_SPEED_LEFT);
+    pidgeonTalon.set(Constants.PIGEON_WHEEL_FAST_TALON_SPEED_LEFT);
   }
 
-  private void turnPidgeonLeftSlow()
+  //Moves wheel to the left slowly
+  private void turnWheelLeftSlow()
   {
-    //pidgeonTalon.set(Constants.PIGEON_SLOW_TALON_SPEED_LEFT);
+    pidgeonTalon.set(Constants.PIGEON_WHEEL_SLOW_TALON_SPEED_LEFT);
   }
 
+  //Method to balance the pidgeon
   public void balancePidgeon()
   {
-    /*if(ypr[pitchId] > -0.5 && ypr[pitchId] < 0.5)
+    _pigeon.getYawPitchRoll(yawPitchRoll);
+
+    //If sensor is balanced it will stop the wheel
+    if(yawPitchRoll[pitchID] > -Constants.PIDGEON_BALANCING_CLOSE_TO_BALANCED && yawPitchRoll[pitchID] < Constants.PIDGEON_BALANCING_CLOSE_TO_BALANCED)
     {
-      //stopPidgeon();
+      //stopWheel();
       System.out.println("Stop pidgeon");
+      beginBalance = false; //Ends balancing process by changing to false
     }
-    else if(ypr[pitchId] < -1)
+    //If sensor is far from being balanced negatively, it will move to the left
+    if (yawPitchRoll[pitchID] < -Constants.PIDGEON_BALANCING_FAR_FROM_BALANCED)
     {
-      //turnPidgeonLeft();
+      //turnWheelLeft();
       System.out.println("Move left");
     }
-    else if(ypr[pitchId] > 1)
+    //If sensor is far from being balanced positivly, it will move to the right
+    if(yawPitchRoll[pitchID] > Constants.PIDGEON_BALANCING_FAR_FROM_BALANCED)
     {
-      //turnPidgeonRight();
+      //turnWheelRight();
       System.out.println("Move right");
-    }*/
+    }
+    //If sensor is close to being balanced negatively, it will move left slowly
+    if (yawPitchRoll[pitchID] > -Constants.PIDGEON_BALANCING_FAR_FROM_BALANCED && yawPitchRoll[pitchID] < -Constants.PIDGEON_BALANCING_CLOSE_TO_BALANCED)
+    {
+      //turnWheelLeftSlowly();
+      System.out.println("Move left slowly");
+    }
+    //If sensor is close if being balanced positively, it will move right slowly
+    if (yawPitchRoll[pitchID] < Constants.PIDGEON_BALANCING_FAR_FROM_BALANCED && yawPitchRoll[pitchID] > Constants.PIDGEON_BALANCING_CLOSE_TO_BALANCED)
+    {
+      //turnWheelRightSlowly();
+      System.out.println("Move right slowly");
+    }
   }
 
-
-
-
+  //Method called within Robotcontainer
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
+    //Checks if the XboxController YButton has been pressed and changes begin balanced to be true
+    if (assistantDriverController.getYButtonPressed() == true)
+    {
+      beginBalance = true;
+    }
+    //If beginBalance is true, the bot will begin to balance
+    if (beginBalance == true)
+    {
+      balancePidgeon();
+    }
   }
 }
 

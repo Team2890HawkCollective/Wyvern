@@ -31,7 +31,15 @@ import frc.robot.subsystems.SensorSubsystem;
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
+  private Command m_sensorCommand;
+
   private RobotContainer m_robotContainer;
+
+  private WPI_TalonSRX pidgeonTalon = new WPI_TalonSRX(Constants.PIGEON_TALON_PORT_ID);
+
+  private double [] ypr = new double[3];
+
+  private PigeonIMU _pigeon = new PigeonIMU(pidgeonTalon);
 
 
   //Color sensor stuff
@@ -87,14 +95,14 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Green", detectedColor.green);
     SmartDashboard.putNumber("Blue", detectedColor.blue);
     SmartDashboard.putNumber("IR", IR);*/
+    _pigeon.getYawPitchRoll(ypr);
 
-    //m_robotContainer.getSensorSubsystem().getPidgeonYpr();
     //System.out.print("Yaw: " + ypr[0] + " | ");
     //System.out.println("Pitch: " + ypr[1] + " | Roll: " + ypr[2]);
 
-    SmartDashboard.putNumber("Yaw", m_robotContainer.getSensorSubsystem().getPidgeonYpr()[0]);
-    SmartDashboard.putNumber("Pitch", m_robotContainer.getSensorSubsystem().getPidgeonYpr()[1]);
-    SmartDashboard.putNumber("Roll", m_robotContainer.getSensorSubsystem().getPidgeonYpr()[2]);
+    SmartDashboard.putNumber("Yaw", ypr[0]);
+    SmartDashboard.putNumber("Pitch", ypr[1]);
+    SmartDashboard.putNumber("Roll", ypr[2]);
 
   }
 
@@ -142,8 +150,6 @@ public class Robot extends TimedRobot {
     {
       m_autonomousCommand.cancel();
     }
-
-    m_robotContainer.getSensorCommand();
   }
 
   /**
@@ -152,6 +158,8 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() 
   {
+    m_sensorCommand = m_robotContainer.getSensorCommand();
+    m_sensorCommand.execute();
   }
 
   @Override

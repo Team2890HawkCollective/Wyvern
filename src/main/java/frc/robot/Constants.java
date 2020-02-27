@@ -17,15 +17,20 @@ package frc.robot;
  */
 public final class Constants 
 {
-    public static final int PIGEON_TALON_PORT_ID = 1;
+    //Talon IDs
+    public static final int PIGEON_TALON_PORT_ID = 5;
 
-    public static final double PIGEON_TALON_SPEED_RIGHT = 0.01;
+    //Controller Ports
+    public static final int ASSISTANT_DRIVER_CONTROLLER_PORT = 2;
 
-    public static final double PIGEON_SLOW_TALON_SPEED_RIGHT = 0.001;
+    //Pidgeon speeds for moving the balancer wheel
+    public static final double PIGEON_WHEEL_FAST_TALON_SPEED_RIGHT = 0.1;
+    public static final double PIGEON_WHEEL_SLOW_TALON_SPEED_RIGHT = 0.05;
+    public static final double PIGEON_WHEEL_FAST_TALON_SPEED_LEFT = -0.1;
+    public static final double PIGEON_WHEEL_SLOW_TALON_SPEED_LEFT = -0.05;
+    public static final double PIGEON_WHEEL_STATIONARY_SPEED = 0.0;
 
-    public static final double PIGEON_TALON_SPEED_LEFT = -0.01;
-
-    public static final double PIGEON_SLOW_TALON_SPEED_LEFT = -0.001;
-
-    public static final double PIGEON_STATIONARY_SPEED = 0.0;
+    //Degrees upon wihch pidgeon measures distance from album
+    public static final double PIDGEON_BALANCING_FAR_FROM_BALANCED = 20.0;
+    public static final double PIDGEON_BALANCING_CLOSE_TO_BALANCED = 5.0;
 }
