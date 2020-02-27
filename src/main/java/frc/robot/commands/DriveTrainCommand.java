@@ -29,6 +29,7 @@ public class DriveTrainCommand extends CommandBase {
   }
 
   // Called every time the scheduler runs while the command is scheduled.
+  // Calls which drive mode we're going to use during competitions
   @Override
   public void execute() {
     //System.out.println("EXECUTE");

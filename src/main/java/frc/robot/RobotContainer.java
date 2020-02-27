@@ -26,11 +26,9 @@ import edu.wpi.first.wpilibj.Joystick;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
-
   private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
 
   private final DriveTrainSubsystem m_driveTrainSubsystem = new DriveTrainSubsystem();
-
   private final DriveTrainCommand m_driveTrainCommand = new DriveTrainCommand(m_driveTrainSubsystem);
 
 
@@ -56,6 +54,9 @@ public class RobotContainer {
 
   }
 
+  /**
+   * Returns the command to run drive train during teleop
+   */
   public Command getDriveTrainCommand()
   {
     //System.out.println("DRIVE TRAIN");
