@@ -60,8 +60,8 @@ public class DriveTrainSubsystem extends SubsystemBase {
   {
     
     leftBackSparkMax.set(Constants.TELEOP_FORWARD_SPEED_MODIFIER);
-    //leftFrontSparkMax.set(Constants.TELEOP_FORWARD_SPEED_MODIFIER);
-    //rightFrontSparkMax.set(Constants.TELEOP_FORWARD_SPEED_MODIFIER);
+    leftFrontSparkMax.set(Constants.TELEOP_FORWARD_SPEED_MODIFIER);
+    rightFrontSparkMax.set(Constants.TELEOP_FORWARD_SPEED_MODIFIER);
     rightBackSparkMax.set(Constants.TELEOP_FORWARD_SPEED_MODIFIER);
     
     /*leftBackTalon.set(Constants.TELEOP_FORWARD_SPEED_MODIFIER);
@@ -144,7 +144,6 @@ public class DriveTrainSubsystem extends SubsystemBase {
   public void xboxArcadeDrive()
   {
     
-    System.out.println("Hello");
     if(driverController.getY(Hand.kRight) > 0.05)
     {
       moveForward();
@@ -168,85 +167,18 @@ public class DriveTrainSubsystem extends SubsystemBase {
   }
   public double yDriveSpeed = 0.0;
   public double xDriveSpeed = 0.0;
-
-  public double intervalSpeedX(double speedX)
-  {
-    if(xJoystick.getX() < 0.1 || xJoystick.getX() > -0.1)
-    {
-      stopMove();
-    }
-    else if(xJoystick.getX() > 0.3)
-    {
-      return speedX = 0.1;
-    }
-    else if(xJoystick.getY() < -0.3)
-    {
-      return speedX = -0.1;
-    }
-    else if(xJoystick.getX() > 0.6)
-    {
-      return speedX = 0.5;
-    }
-    else if(xJoystick.getX() < -0.6)
-    {
-      return speedX = -0.5;
-    }
-    else if(xJoystick.getX() > 0.9 || xJoystick.getX()> 0.9)
-    {
-      return speedX = 1.0;
-    }
-    else if(xJoystick.getX() < -0.9)
-    {
-      return speedX = -1.0;
-    }
-    return 0;
-  }
-
-  public double intervalSpeedY(double speedY)
-  {
-    if(xJoystick.getY() < 0.1 || xJoystick.getY() > -0.1)
-    {
-      stopMove();
-    }
-    else if(yJoystick.getY() > 0.3 )
-    {
-      return speedY = 0.1;
-    }
-    else if(yJoystick.getY() < -0.3)
-    {
-      return speedY = -0.1;
-    }
-    else if(yJoystick.getY() > 0.6 )
-    {
-      return speedY = 0.5;
-    }
-    else if(yJoystick.getY() < -0.6)
-    {
-      return speedY = -0.5;
-    }
-    else if(yJoystick.getY() > 0.9)
-    {
-      return speedY = 1.0;
-    }
-    else if(yJoystick.getY() < -0.9)
-    {
-      return speedY = -1.0;
-    }
-    return 0;
-  }
   
-  public void arcadeDrive(double xSpeed, double ySpeed)
-  {
-    
-    /*tankDrive(forwardsSpeed, forwardsSpeed);
-    if (turningSpeed >= 0.05 || turningSpeed <= -0.05)
-      tankDrive(-turningSpeed + forwardsSpeed, turningSpeed + forwardsSpeed);*/
-  }
   public void joystickArcadeDrive()
   {
-    yDriveSpeed = yJoystick.getY() * 1;
-    xDriveSpeed = xJoystick.getX() * 1;
+    yDriveSpeed = yJoystick.getY() * Constants.TELEOP_DRIVE_SPEED_MODIFIER;
+    xDriveSpeed = xJoystick.getX() * Constants.TELEOP_DRIVE_SPEED_MODIFIER;
 
+    drive(yDriveSpeed, yDriveSpeed);
+    if (xDriveSpeed >= 0.05 || xDriveSpeed <= -0.05)
+    {
+      drive(-xDriveSpeed + yDriveSpeed, xDriveSpeed + yDriveSpeed);
+    }
+   
     
     /*if(xJoystick.getX() > 0.1)
     {
@@ -271,19 +203,21 @@ public class DriveTrainSubsystem extends SubsystemBase {
 
   }
 
-  /*public void drive(double leftSpeed, double rightSpeed)
+  public void drive(double leftSpeed, double rightSpeed)
   {
-    leftFrontTalon.set(leftSpeed);
-    rightFrontTalon.set(rightSpeed);
-    leftBackTalon.set(leftSpeed);
-    rightBackTalon.set(rightSpeed);
+    leftFrontSparkMax.set(leftSpeed);
+    rightFrontSparkMax.set(rightSpeed);
+    leftBackSparkMax.set(leftSpeed);
+    rightBackSparkMax.set(rightSpeed);
+  }
     /*
-    tankDrive(forwardsSpeed, forwardsSpeed, strafeSpeed);
+    tankDrive(leftSpeed, rightSpeed, );
     if (turningSpeed >= 0.05 || turningSpeed <= -0.05)
-      tankDrive(-turningSpeed + forwardsSpeed, turningSpeed + forwardsSpeed, strafeSpeed);
+      tankDrive(-turningSpeed + forwardsSpeed, turningSpeed + forwardsSpeed);
       */
   //}
 
+      
 
   @Override
   public void periodic() {
