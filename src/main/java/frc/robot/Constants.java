@@ -16,4 +16,5 @@ package frc.robot;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
+    public static final int BALL_PICKUP_CONTROLLER_VICTOR_SPX_ID = 1;
 }
