@@ -119,6 +119,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
     {
       magazineController.set(ControlMode.PercentOutput, 0.0);
       magazineTimer.stop();
+      magazineTimer.reset();
       magazineCheck = false;
     }
   }
@@ -128,15 +129,14 @@ public class ManipulatorSubsystem extends SubsystemBase {
     if (assistantDriverController.getBButtonPressed())
     {
       magazineCheck = true;
-      magazineTimer.reset();
       magazineTimer.start();
 
       if (magazineCheck)
       {
         magazineIntake();
       }
-
     }
+    
   }
 
   public void magazineOutake() {
