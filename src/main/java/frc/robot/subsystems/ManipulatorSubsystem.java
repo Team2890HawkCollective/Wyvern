@@ -23,6 +23,8 @@ import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.wpilibj.Timer;
 
+import edu.wpi.first.wpilibj.XboxController;
+
 public class ManipulatorSubsystem extends SubsystemBase {
 
   private VictorSPX ballPickupController = new VictorSPX(Constants.BALL_PICKUP_CONTROLLER_VICTOR_SPX_ID);
@@ -42,6 +44,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
 
   private double shooterSpeed = 0.0;
   private boolean targetingOkay = false;
+  private boolean magazineCheck = false;
 
   private CANSparkMax leftFrontSparkController = new CANSparkMax(Constants.LEFT_FRONT_SPARK_CONTROLLER_ID,
       Constants.BRUSHLESS_MOTOR);
@@ -108,9 +111,6 @@ public class ManipulatorSubsystem extends SubsystemBase {
   }
 
   public void magazineIntake() {
-    magazineTimer.reset();
-    magazineTimer.start();
-
     if (magazineTimer.get() <= 0.5)
     {
       magazineController.set(ControlMode.PercentOutput, 0.4);
@@ -119,12 +119,24 @@ public class ManipulatorSubsystem extends SubsystemBase {
     {
       magazineController.set(ControlMode.PercentOutput, 0.0);
       magazineTimer.stop();
+      magazineCheck = false;
     }
   }
 
   public void controlManipulators()
   {
-    if ()
+    if (assistantDriverController.getBButtonPressed())
+    {
+      magazineCheck = true;
+      magazineTimer.reset();
+      magazineTimer.start();
+
+      if (magazineCheck)
+      {
+        magazineIntake();
+      }
+
+    }
   }
 
   public void magazineOutake() {
