@@ -18,6 +18,18 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class EndGameSubsytem extends SubsystemBase {
+
+  private WPI_TalonSRX pidgeonTalon = new WPI_TalonSRX(Constants.PIGEON_TALON_PORT_ID);
+  private PigeonIMU _pigeon = new PigeonIMU(pidgeonTalon);
+
+  private double [] yawPitchRoll = new double[3];
+
+  //Call number for yawPitchRoll array to gather yaw data, pitch data, and roll data
+  private int yawID = 0;
+  private int pitchID = 1;
+  private int rollID = 2;
+
+  private boolean beginBalance = false;
   
   private VictorSPX liftController = new VictorSPX(Constants.LIFT_VICTOR_SPX_CONTROLLER_ID);
 
@@ -43,15 +55,52 @@ public class EndGameSubsytem extends SubsystemBase {
       pullInClimbRope();
     }
 
-    if (assistantDriverController.getBackButton())
+    if (assistantDriverController.getBackButtonPressed())
     {
-      balance();
+      beginBalance = true;
+    }
+    //If beginBalance is true, the bot will begin to balance
+    if (beginBalance == true)
+    {
+      balanceWheel();
     }
   }
 
-  private void balance()
+  private void balanceWheel()
   {
-    
+    _pigeon.getYawPitchRoll(yawPitchRoll);
+
+    //If sensor is balanced it will stop the wheel
+    if(yawPitchRoll[pitchID] > -Constants.PIDGEON_BALANCING_CLOSE_TO_BALANCED && yawPitchRoll[pitchID] < Constants.PIDGEON_BALANCING_CLOSE_TO_BALANCED)
+    {
+      //stopWheel();
+      System.out.println("Stop pidgeon");
+      beginBalance = false; //Ends balancing process by changing to false
+    }
+    //If sensor is far from being balanced negatively, it will move to the left
+    if (yawPitchRoll[pitchID] < -Constants.PIDGEON_BALANCING_FAR_FROM_BALANCED)
+    {
+      //turnWheelLeft();
+      System.out.println("Move left");
+    }
+    //If sensor is far from being balanced positivly, it will move to the right
+    if(yawPitchRoll[pitchID] > Constants.PIDGEON_BALANCING_FAR_FROM_BALANCED)
+    {
+      //turnWheelRight();
+      System.out.println("Move right");
+    }
+    //If sensor is close to being balanced negatively, it will move left slowly
+    if (yawPitchRoll[pitchID] > -Constants.PIDGEON_BALANCING_FAR_FROM_BALANCED && yawPitchRoll[pitchID] < -Constants.PIDGEON_BALANCING_CLOSE_TO_BALANCED)
+    {
+      //turnWheelLeftSlowly();
+      System.out.println("Move left slowly");
+    }
+    //If sensor is close if being balanced positively, it will move right slowly
+    if (yawPitchRoll[pitchID] < Constants.PIDGEON_BALANCING_FAR_FROM_BALANCED && yawPitchRoll[pitchID] > Constants.PIDGEON_BALANCING_CLOSE_TO_BALANCED)
+    {
+      //turnWheelRightSlowly();
+      System.out.println("Move right slowly");
+    }
   }
 
   private void releaseClimbRope()
@@ -63,8 +112,34 @@ public class EndGameSubsytem extends SubsystemBase {
   {
     liftController.set(ControlMode.PercentOutput, -0.2);
   }
-  public EndGameSubsytem() {
 
+  private void stopWheel()
+  {
+    pidgeonTalon.set(Constants.PIGEON_WHEEL_STATIONARY_SPEED);
+  }
+
+  //Moves wheel to the right quickly
+  private void turnWheelRightFast()
+  {
+    pidgeonTalon.set(Constants.PIGEON_WHEEL_FAST_TALON_SPEED_RIGHT);
+  }
+
+  //Moves wheel to the right slowly
+  private void turnWheelRightSlow()
+  {
+    pidgeonTalon.set(Constants.PIGEON_WHEEL_SLOW_TALON_SPEED_RIGHT);
+  }
+
+  //Moves wheel to the left quickly
+  private void turnWheelLeftFast()
+  {
+    pidgeonTalon.set(Constants.PIGEON_WHEEL_FAST_TALON_SPEED_LEFT);
+  }
+
+  //Moves wheel to the left slowly
+  private void turnWheelLeftSlow()
+  {
+    pidgeonTalon.set(Constants.PIGEON_WHEEL_SLOW_TALON_SPEED_LEFT);
   }
 
   @Override
