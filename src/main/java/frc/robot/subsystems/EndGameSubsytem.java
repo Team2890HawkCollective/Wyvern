@@ -75,33 +75,28 @@ public class EndGameSubsytem extends SubsystemBase {
     //If sensor is balanced it will stop the wheel
     if(yawPitchRoll[pitchID] > -Constants.PIDGEON_BALANCING_CLOSE_TO_BALANCED && yawPitchRoll[pitchID] < Constants.PIDGEON_BALANCING_CLOSE_TO_BALANCED)
     {
-      //stopWheel();
-      System.out.println("Stop pidgeon");
+      stopWheel();
       beginBalance = false; //Ends balancing process by changing to false
     }
     //If sensor is far from being balanced negatively, it will move to the left
     if (yawPitchRoll[pitchID] < -Constants.PIDGEON_BALANCING_FAR_FROM_BALANCED)
     {
-      //turnWheelLeft();
-      System.out.println("Move left");
+      turnWheelLeftFast();
     }
     //If sensor is far from being balanced positivly, it will move to the right
     if(yawPitchRoll[pitchID] > Constants.PIDGEON_BALANCING_FAR_FROM_BALANCED)
     {
-      //turnWheelRight();
-      System.out.println("Move right");
+      turnWheelRightFast();
     }
     //If sensor is close to being balanced negatively, it will move left slowly
     if (yawPitchRoll[pitchID] > -Constants.PIDGEON_BALANCING_FAR_FROM_BALANCED && yawPitchRoll[pitchID] < -Constants.PIDGEON_BALANCING_CLOSE_TO_BALANCED)
     {
-      //turnWheelLeftSlowly();
-      System.out.println("Move left slowly");
+      turnWheelLeftSlow();
     }
     //If sensor is close if being balanced positively, it will move right slowly
     if (yawPitchRoll[pitchID] < Constants.PIDGEON_BALANCING_FAR_FROM_BALANCED && yawPitchRoll[pitchID] > Constants.PIDGEON_BALANCING_CLOSE_TO_BALANCED)
     {
-      //turnWheelRightSlowly();
-      System.out.println("Move right slowly");
+      turnWheelRightSlow();
     }
   }
 
@@ -142,10 +137,5 @@ public class EndGameSubsytem extends SubsystemBase {
   private void turnWheelLeftSlow()
   {
     pidgeonTalon.set(Constants.PIGEON_WHEEL_SLOW_TALON_SPEED_LEFT);
-  }
-
-  @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
   }
 }
