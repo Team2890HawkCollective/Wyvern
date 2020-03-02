@@ -43,9 +43,9 @@ public class Robot extends TimedRobot {
 
 
   //Color sensor stuff
-  /*private final I2C.Port i2cPort = I2C.Port.kOnboard;
+  private final I2C.Port i2cPort = I2C.Port.kOnboard;
 
-  private final ColorSensorV3 m_colorSensor = new ColorSensorV3(i2cPort);*/
+  private final ColorSensorV3 m_colorSensor = new ColorSensorV3(i2cPort);
   
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -86,23 +86,23 @@ public class Robot extends TimedRobot {
     //CommandScheduler.getInstance().run();
 
     //Color sensor stuff
-    /*
+    
     Color detectedColor = m_colorSensor.getColor();
 
     double IR = m_colorSensor.getIR();
 
-    SmartDashboard.putNumber("Red", detectedColor.red);
-    SmartDashboard.putNumber("Green", detectedColor.green);
-    SmartDashboard.putNumber("Blue", detectedColor.blue);
-    SmartDashboard.putNumber("IR", IR);*/
-    _pigeon.getYawPitchRoll(ypr);
+    SmartDashboard.putNumber("Red", (detectedColor.red * 100));
+    SmartDashboard.putNumber("Green", (detectedColor.green * 100));
+    SmartDashboard.putNumber("Blue", (detectedColor.blue * 100));
+    SmartDashboard.putNumber("IR", IR);
+    //_pigeon.getYawPitchRoll(ypr);
 
     //System.out.print("Yaw: " + ypr[0] + " | ");
     //System.out.println("Pitch: " + ypr[1] + " | Roll: " + ypr[2]);
 
-    SmartDashboard.putNumber("Yaw", ypr[0]);
+    /*SmartDashboard.putNumber("Yaw", ypr[0]);
     SmartDashboard.putNumber("Pitch", ypr[1]);
-    SmartDashboard.putNumber("Roll", ypr[2]);
+    SmartDashboard.putNumber("Roll", ypr[2]);*/
 
   }
 
@@ -158,7 +158,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() 
   {
-    m_sensorCommand = m_robotContainer.getSensorCommand();
+    //m_sensorCommand = m_robotContainer.getSensorCommand();
     m_sensorCommand.execute();
   }
 
