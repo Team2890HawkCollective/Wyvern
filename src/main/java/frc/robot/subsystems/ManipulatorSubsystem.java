@@ -124,9 +124,13 @@ public class ManipulatorSubsystem extends SubsystemBase {
     }
   }
 
+  public void powerCellIntake() {
+    ballPickupController.set(ControlMode.PercentOutput, 0.3);
+  }
+
   public void controlManipulators()
   {
-    if (assistantDriverController.getBButtonPressed())
+    if (assistantDriverController.getAButtonPressed())
     {
       magazineCheck = true;
       magazineTimer.start();
@@ -136,6 +140,23 @@ public class ManipulatorSubsystem extends SubsystemBase {
         magazineIntake();
       }
     }
+
+    if (assistantDriverController.getBButtonPressed())
+    {
+      findTarget();
+    }
+
+    if (assistantDriverController.getYButtonPressed())
+    {
+      shootPowerCell();
+    }
+
+    if (assistantDriverController.getXButtonPressed())
+    {
+      powerCellIntake();
+    }
+
+
     
   }
 
