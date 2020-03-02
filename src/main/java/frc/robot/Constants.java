@@ -16,4 +16,14 @@ package frc.robot;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
+
+    public static final int LIFT_VICTOR_SPX_CONTROLLER_ID = 1;
+
+    public static final int LIFT_SOLENOID_FORWARD_PORT_ID = 1;
+
+    public static final int LIFT_SOLENOID_BACKWARD_PORT_ID = 2;
+
+    public static final int BALANCER_TALON_ID = 5;
+
+    public static final int ASSISTANT_DRIVER_CONTROLLER_PORT_ID = 4;
 }
