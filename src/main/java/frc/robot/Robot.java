@@ -10,6 +10,9 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj.AnalogOutput;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
@@ -35,17 +38,24 @@ public class Robot extends TimedRobot {
 
   private RobotContainer m_robotContainer;
 
-  private WPI_TalonSRX pidgeonTalon = new WPI_TalonSRX(Constants.PIGEON_TALON_PORT_ID);
+  /*private WPI_TalonSRX pidgeonTalon = new WPI_TalonSRX(Constants.PIGEON_TALON_PORT_ID);
 
   private double [] ypr = new double[3];
 
-  private PigeonIMU _pigeon = new PigeonIMU(pidgeonTalon);
+  private PigeonIMU _pigeon = new PigeonIMU(pidgeonTalon);*/
 
 
   //Color sensor stuff
-  private final I2C.Port i2cPort = I2C.Port.kOnboard;
+  /*private final I2C.Port i2cPort = I2C.Port.kOnboard;
 
-  private final ColorSensorV3 m_colorSensor = new ColorSensorV3(i2cPort);
+  private final ColorSensorV3 m_colorSensor = new ColorSensorV3(i2cPort);*/
+
+  private AnalogInput lightTest = new AnalogInput(0);
+
+  //private AnalogInput lightTest2 = new AnalogInput(1);
+
+  //private DigitalInput lightTest3 = new DigitalInput(0);
+
   
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -87,14 +97,14 @@ public class Robot extends TimedRobot {
 
     //Color sensor stuff
     
-    Color detectedColor = m_colorSensor.getColor();
+    /*Color detectedColor = m_colorSensor.getColor();
 
     double IR = m_colorSensor.getIR();
 
     SmartDashboard.putNumber("Red", (detectedColor.red * 100));
     SmartDashboard.putNumber("Green", (detectedColor.green * 100));
     SmartDashboard.putNumber("Blue", (detectedColor.blue * 100));
-    SmartDashboard.putNumber("IR", IR);
+    SmartDashboard.putNumber("IR", IR);*/
     //_pigeon.getYawPitchRoll(ypr);
 
     //System.out.print("Yaw: " + ypr[0] + " | ");
@@ -103,6 +113,8 @@ public class Robot extends TimedRobot {
     /*SmartDashboard.putNumber("Yaw", ypr[0]);
     SmartDashboard.putNumber("Pitch", ypr[1]);
     SmartDashboard.putNumber("Roll", ypr[2]);*/
+
+    System.out.println("Bottom: " + lightTest.getValue());
 
   }
 
