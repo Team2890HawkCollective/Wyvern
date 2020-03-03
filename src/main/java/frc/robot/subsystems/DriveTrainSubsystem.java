@@ -18,15 +18,6 @@ import frc.robot.Constants;
 public class DriveTrainSubsystem extends SubsystemBase {
   
   /**
-   * Talons used for testing driveTrain on Quetzaquotl -> Going to need to be removed after finished testing on Wyvern
-     as Wyvern uses Spark MAXs
-   */
-  private WPI_TalonSRX leftFrontTalon = new WPI_TalonSRX(Constants.LEFT_FRONT_TALON_ID);
-  private WPI_TalonSRX rightFrontTalon = new WPI_TalonSRX(Constants.RIGHT_FRONT_TALON_ID);
-  private WPI_TalonSRX rightBackTalon = new WPI_TalonSRX(Constants.RIGHT_BACK_TALON_ID);
-  private WPI_TalonSRX leftBackTalon = new WPI_TalonSRX(Constants.LEFT_BACK_TALON_ID);
-
-  /**
    * Spark Max Controllers
    */
   private CANSparkMax leftFrontSparkMax = new CANSparkMax(Constants.LEFT_FRONT_SPARK_MAX_ID, Constants.BRUSHLESS_MOTOR);
@@ -62,13 +53,10 @@ public class DriveTrainSubsystem extends SubsystemBase {
    */
   public DriveTrainSubsystem() 
   {
-    //Sets left side of Talons inverted for proper functioning. Only used for Quetzaquotl testing
-    leftBackTalon.setInverted(true);
-    leftFrontTalon.setInverted(true);
 
     //Sets right side of Spark Maxs inverted for proper functioning
-    //rightFrontSparkMax.setInverted(true);
-    //rightBackSparkMax.setInverted(true);
+    rightFrontSparkMax.setInverted(true);
+    rightBackSparkMax.setInverted(true);
   }
 
   /**
@@ -151,14 +139,9 @@ public class DriveTrainSubsystem extends SubsystemBase {
    */
   public void drive(double leftSpeed, double rightSpeed)
   {
-    /*leftFrontSparkMax.set(leftSpeed);
+    leftFrontSparkMax.set(leftSpeed);
     rightFrontSparkMax.set(rightSpeed);
     leftBackSparkMax.set(leftSpeed);
-    rightBackSparkMax.set(rightSpeed);*/
-
-    leftBackTalon.set(leftSpeed);
-    leftFrontTalon.set(leftSpeed);
-    rightBackTalon.set(rightSpeed);
-    rightFrontTalon.set(rightSpeed);
+    rightBackSparkMax.set(rightSpeed);
   }
 }

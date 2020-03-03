@@ -19,15 +19,10 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
  */
 public final class Constants 
 {
-    public static final int RIGHT_BACK_TALON_ID = 4;
-    public static final int RIGHT_FRONT_TALON_ID = 2;
-    public static final int LEFT_FRONT_TALON_ID = 1;
-    public static final int LEFT_BACK_TALON_ID = 3;
-
-    public static final int LEFT_FRONT_SPARK_MAX_ID = 5;
-    public static final int LEFT_BACK_SPARK_MAX_ID = 6;
-    public static final int RIGHT_FRONT_SPARK_MAX_ID = 1;
-    public static final int RIGHT_BACK_SPARK_MAX_ID = 4;
+    public static final int LEFT_FRONT_SPARK_MAX_ID = 3;
+    public static final int LEFT_BACK_SPARK_MAX_ID = 1;
+    public static final int RIGHT_FRONT_SPARK_MAX_ID = 4;
+    public static final int RIGHT_BACK_SPARK_MAX_ID = 2;
 
     public static final MotorType BRUSHLESS_MOTOR = MotorType.kBrushless;
     public static final MotorType BRUSHED_MOTOR = MotorType.kBrushed;
