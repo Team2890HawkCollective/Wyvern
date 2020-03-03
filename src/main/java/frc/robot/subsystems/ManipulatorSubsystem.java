@@ -30,72 +30,93 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.util.Color;
 
 public class ManipulatorSubsystem extends SubsystemBase {
-
+  /**
+   * Victor SPX targets to control intake, magazine, and outtake magazines
+   */
   private VictorSPX ballPickupController = new VictorSPX(Constants.BALL_PICKUP_CONTROLLER_VICTOR_SPX_ID);
-
   private VictorSPX shooterLeftSideController = new VictorSPX(Constants.SHOOTER_CONTROLLER_LEFT_SIDE_VICTOR_SPX_ID);
   private VictorSPX shooterRightSideController = new VictorSPX(Constants.SHOOTER_CONTROLLER_RIGHT_SIDE_VICTOR_SPX_ID);
-
   private VictorSPX magazineController = new VictorSPX(Constants.MAGAZINE_CONTROLLER_VICTOR_SPX_ID);
 
-  //private Timer magazineTimer = new Timer();
-
+  /**
+   * Limelight and Data values produced from the Network table
+   */
   private NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
   private NetworkTableEntry limelightX = table.getEntry("tx"); // tx
   private NetworkTableEntry limelightY = table.getEntry("ty"); // ty
   private NetworkTableEntry limelightArea = table.getEntry("ta"); // ta
   private NetworkTableEntry limelightTargetFound = table.getEntry("tv"); // tv
 
+  /**
+   * Color sensor and port detected straight fron Rio
+   */
   private final I2C.Port i2cPort = I2C.Port.kOnboard;
   private final ColorSensorV3 colorSensor = new ColorSensorV3(i2cPort);
   
+  /**
+   * Numbers and booleans 
+   */
+  private double shooterSpeed = 0.5; //Determined after targeting
+  private boolean targetingOkay = false; //Checks whether or not we're okay to target
+  private boolean magazineCheckForYellow = false; //Determines whether or not to check for yellow in magazine
+  private boolean magazineCheckForNothing = false; //Determines whether or not to check for nothing in magazine
+  private boolean magazineEmpty = true; //Determines whether or not the magazine is empty
+  private int countOfBallsInMagazine = 0; //Counts how many balls we have in the magazine
 
-  private double shooterSpeed = 0.0;
-  private boolean targetingOkay = false;
-  private boolean magazineCheckForYellow = false;
-  private boolean magazineCheckForNothing = false;
-  private boolean magazineEmpty = true;
-  private boolean shooterMagazineCheck = false;
-  private int countOfBallsInMagazine = 0; 
+  /**
+   * Spark Max's used for drive train
+   */
+  private CANSparkMax leftFrontSparkController = new CANSparkMax(Constants.LEFT_FRONT_SPARK_CONTROLLER_ID, Constants.BRUSHLESS_MOTOR);
+  private CANSparkMax rightFrontSparkController = new CANSparkMax(Constants.RIGHT_FRONT_SPARK_CONTROLLER_ID, Constants.BRUSHLESS_MOTOR);
+  private CANSparkMax leftBackSparkController = new CANSparkMax(Constants.LEFT_BACK_SPARK_CONTROLLER_ID, Constants.BRUSHLESS_MOTOR);
+  private CANSparkMax rightBackSparkController = new CANSparkMax(Constants.RIGHT_BACK_SPARK_CONTROLLER_ID, Constants.BRUSHLESS_MOTOR);
 
-  private CANSparkMax leftFrontSparkController = new CANSparkMax(Constants.LEFT_FRONT_SPARK_CONTROLLER_ID,
-      Constants.BRUSHLESS_MOTOR);
-  private CANSparkMax rightFrontSparkController = new CANSparkMax(Constants.RIGHT_FRONT_SPARK_CONTROLLER_ID,
-      Constants.BRUSHLESS_MOTOR);
-  private CANSparkMax leftBackSparkController = new CANSparkMax(Constants.LEFT_FRONT_SPARK_CONTROLLER_ID,
-      MotorType.kBrushless);
-  private CANSparkMax rightBackSparkController = new CANSparkMax(Constants.LEFT_FRONT_SPARK_CONTROLLER_ID,
-      MotorType.kBrushless);
-
-  private XboxController assistantDriverController = new XboxController(1);
+  /**
+   * Xbox controller used by the assistant driver
+   */
+  private XboxController assistantDriverController = new XboxController(Constants.XBOX_ASSISTANT_DRIVER_CONTROLLER_ID);
 
   /**
    * Creates a new ManipulatorSubsystem.
    */
   public ManipulatorSubsystem() {
-
+    leftFrontSparkController.setInverted(true);
+    leftBackSparkController.setInverted(true);
   }
 
+  /**
+   * Finds target and centers robot 
+   */
   public void findTarget() {
     double limelightXValue = limelightX.getDouble(0.0); // tx
     double limelightYValue = limelightY.getDouble(0.0); // ty
     double limelightAreaValue = limelightArea.getDouble(0.0); // ta
     double limelightTargetFoundValue = limelightTargetFound.getDouble(0.0); // tv
 
+    //If it's okay to target, the limelight will enable the light and move robot depending on position
     if (targetingOkay) {
-      if (limelightTargetFoundValue != 1.0) {
+      NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(3);
+      if (limelightTargetFoundValue != 1.0) 
+      {
         turnRight();
-      } else if (limelightXValue < -2.0) {
+      } 
+      else if (limelightXValue < -2.0) 
+      {
         turnLeft();
-      } else if (limelightXValue > 2.0) {
+      } 
+      else if (limelightXValue > 2.0) 
+      {
         turnRight();
-      } else {
+      } 
+      else 
+      {
         stopMoving();
         targetingOkay = false;
       }
     }
     else
     {
+      NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(1);
       determineShooterSpeed(limelightAreaValue);
     }
   }
@@ -118,24 +139,11 @@ public class ManipulatorSubsystem extends SubsystemBase {
 
   private void shootPowerCell()
   {
-    shooterMagazineCheck = true;
     shooterLeftSideController.set(ControlMode.PercentOutput, shooterSpeed);
     shooterRightSideController.set(ControlMode.PercentOutput, -shooterSpeed);
   }
 
   public void magazineIntake() {
-    /*if (magazineTimer.get() <= 0.5)
-    {
-      magazineController.set(ControlMode.PercentOutput, 0.4);
-    }
-    else if (magazineTimer.get() >= 0.5)
-    {
-      magazineController.set(ControlMode.PercentOutput, 0.0);
-      magazineTimer.stop();
-      magazineTimer.reset();
-      magazineCheck = false;
-    }*/
-
     Color detectedColor = colorSensor.getColor();
     double blue = detectedColor.blue * 100.0;
     double green = detectedColor.green * 100.0;
@@ -204,8 +212,14 @@ public class ManipulatorSubsystem extends SubsystemBase {
       }
     }
 
+    if (assistantDriverController.getStartButtonPressed())
+    {
+      killMagazine();
+    }
+
     if (assistantDriverController.getBButtonPressed())
     {
+      targetingOkay = true;
       findTarget();
     }
 
@@ -222,7 +236,11 @@ public class ManipulatorSubsystem extends SubsystemBase {
 
   public void magazineOutake() {
 
-    magazineController.set(ControlMode.PercentOutput, -0.4);
+    magazineController.set(ControlMode.PercentOutput, 0.4);
+  }
+
+  private void killMagazine() {
+    magazineController.set(ControlMode.PercentOutput, 0.0);
   }
 
   // Turns robot right

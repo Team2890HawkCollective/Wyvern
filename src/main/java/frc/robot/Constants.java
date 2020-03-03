@@ -32,5 +32,7 @@ public final class Constants {
 
     public static final double SHOOTER_TARGETING_TURNING_SPEED = 0.4;
 
+    public static final int XBOX_ASSISTANT_DRIVER_CONTROLLER_ID = 1;
+
     public static final double NO_SPEED = 0.0;
 }
