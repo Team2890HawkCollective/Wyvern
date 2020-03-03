@@ -23,7 +23,11 @@ import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.wpilibj.Timer;
 
+import com.revrobotics.ColorSensorV3;
+import edu.wpi.first.wpilibj.I2C;
+
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.util.Color;
 
 public class ManipulatorSubsystem extends SubsystemBase {
 
@@ -34,7 +38,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
 
   private VictorSPX magazineController = new VictorSPX(Constants.MAGAZINE_CONTROLLER_VICTOR_SPX_ID);
 
-  private Timer magazineTimer = new Timer();
+  //private Timer magazineTimer = new Timer();
 
   private NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
   private NetworkTableEntry limelightX = table.getEntry("tx"); // tx
@@ -42,9 +46,17 @@ public class ManipulatorSubsystem extends SubsystemBase {
   private NetworkTableEntry limelightArea = table.getEntry("ta"); // ta
   private NetworkTableEntry limelightTargetFound = table.getEntry("tv"); // tv
 
+  private final I2C.Port i2cPort = I2C.Port.kOnboard;
+  private final ColorSensorV3 colorSensor = new ColorSensorV3(i2cPort);
+  
+
   private double shooterSpeed = 0.0;
   private boolean targetingOkay = false;
-  private boolean magazineCheck = false;
+  private boolean magazineCheckForYellow = false;
+  private boolean magazineCheckForNothing = false;
+  private boolean magazineEmpty = true;
+  private boolean shooterMagazineCheck = false;
+  private int countOfBallsInMagazine = 0; 
 
   private CANSparkMax leftFrontSparkController = new CANSparkMax(Constants.LEFT_FRONT_SPARK_CONTROLLER_ID,
       Constants.BRUSHLESS_MOTOR);
@@ -106,12 +118,13 @@ public class ManipulatorSubsystem extends SubsystemBase {
 
   private void shootPowerCell()
   {
+    shooterMagazineCheck = true;
     shooterLeftSideController.set(ControlMode.PercentOutput, shooterSpeed);
     shooterRightSideController.set(ControlMode.PercentOutput, -shooterSpeed);
   }
 
   public void magazineIntake() {
-    if (magazineTimer.get() <= 0.5)
+    /*if (magazineTimer.get() <= 0.5)
     {
       magazineController.set(ControlMode.PercentOutput, 0.4);
     }
@@ -121,6 +134,54 @@ public class ManipulatorSubsystem extends SubsystemBase {
       magazineTimer.stop();
       magazineTimer.reset();
       magazineCheck = false;
+    }*/
+
+    Color detectedColor = colorSensor.getColor();
+    double blue = detectedColor.blue * 100.0;
+    double green = detectedColor.green * 100.0;
+
+    if (magazineEmpty)
+    {
+      if (green >= 50.0 && blue <= 15.0)
+      {
+        magazineController.set(ControlMode.PercentOutput, 0.0);
+        magazineCheckForYellow = false;
+        magazineEmpty = false;
+        countOfBallsInMagazine++;
+      }
+      else
+      {
+        magazineController.set(ControlMode.PercentOutput, 0.1);
+      }
+    }
+    else if (!magazineEmpty)
+    {
+      magazineCheckForNothing = true;
+      if (magazineCheckForNothing)
+      {
+        if (green >= 50.0 && blue <= 15.0)
+        {
+          magazineController.set(ControlMode.PercentOutput, 0.1);
+        }
+        else
+        {
+          magazineController.set(ControlMode.PercentOutput, 0.0);
+          magazineCheckForNothing = false;
+        }
+      }
+      else if (magazineCheckForYellow)
+      {
+        if (green >= 50.0 && blue <= 15.0)
+        {
+          magazineController.set(ControlMode.PercentOutput, 0.0);
+          magazineCheckForYellow = false;
+          countOfBallsInMagazine++;
+        }
+        else
+        {
+          magazineController.set(ControlMode.PercentOutput, 0.1);
+        }
+      }
     }
   }
 
@@ -132,10 +193,12 @@ public class ManipulatorSubsystem extends SubsystemBase {
   {
     if (assistantDriverController.getAButtonPressed())
     {
-      magazineCheck = true;
-      magazineTimer.start();
-
-      if (magazineCheck)
+      magazineCheckForYellow = true;
+      if (countOfBallsInMagazine == 5)
+      {
+        magazineOutake();
+      }
+      else
       {
         magazineIntake();
       }
@@ -155,12 +218,10 @@ public class ManipulatorSubsystem extends SubsystemBase {
     {
       powerCellIntake();
     }
-
-
-    
   }
 
   public void magazineOutake() {
+
     magazineController.set(ControlMode.PercentOutput, -0.4);
   }
 
@@ -191,10 +252,5 @@ public class ManipulatorSubsystem extends SubsystemBase {
     rightFrontSparkController.set(Constants.NO_SPEED);
     leftBackSparkController.set(-Constants.NO_SPEED);
     rightBackSparkController.set(Constants.NO_SPEED);
-  }
-
-  @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
   }
 }
