@@ -50,7 +50,9 @@ public class Robot extends TimedRobot {
 
   private final ColorSensorV3 m_colorSensor = new ColorSensorV3(i2cPort);*/
 
-  private AnalogInput lightTest = new AnalogInput(0);
+  private AnalogInput bottomTest = new AnalogInput(0);
+
+  private AnalogInput topTest = new AnalogInput(1);
 
   //private AnalogInput lightTest2 = new AnalogInput(1);
 
@@ -114,7 +116,8 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Pitch", ypr[1]);
     SmartDashboard.putNumber("Roll", ypr[2]);*/
 
-    System.out.println("Bottom: " + lightTest.getValue());
+    System.out.println("Bottom: " + bottomTest.getValue());
+    System.out.println("Top: " + topTest.getValue());
 
   }
 
