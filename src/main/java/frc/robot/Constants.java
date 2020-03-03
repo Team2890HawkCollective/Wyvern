@@ -29,12 +29,12 @@ public final class Constants
 
 
     public static final int XBOX_DRIVER_CONTROLLER_PORT_ID = 4;
-    public static final int DRIVER_JOYSTICK_X_PORT_ID = 0;
-    public static final int DRIVER_JOYSTICK_Y_PORT_ID = 1;
+    public static final int DRIVER_JOYSTICK_X_PORT_ID = 1;
+    public static final int DRIVER_JOYSTICK_Y_PORT_ID = 0;
     public static final double TELEOP_FORWARD_SPEED_MODIFIER = 0.4;
 
     public static final double TELEOP_BACKWARDS_SPEED_MODIFIER = -0.4;
-    public static final double TELEOP_DRIVE_SPEED_MODIFIER = 0.4;
+    public static final double TELEOP_DRIVE_SPEED_MODIFIER = 1.0;
 
     public static final double NO_SPEED = 0.0;
 

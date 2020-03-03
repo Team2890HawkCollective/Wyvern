@@ -54,9 +54,9 @@ public class DriveTrainSubsystem extends SubsystemBase {
   public DriveTrainSubsystem() 
   {
 
-    //Sets right side of Spark Maxs inverted for proper functioning
-    rightFrontSparkMax.setInverted(true);
-    rightBackSparkMax.setInverted(true);
+    //Sets left side of Spark Maxs inverted for proper functioning
+    leftFrontSparkMax.setInverted(true);
+    leftBackSparkMax.setInverted(true);
   }
 
   /**
@@ -78,11 +78,11 @@ public class DriveTrainSubsystem extends SubsystemBase {
   public void joystickArcadeDrive()
   {
     //Sets forwards and backwards speed (y) to the y-axis of the left joystick. Sets turning speed (x) tp x-axis of right joystick
-    yDriveSpeed = leftJoystick.getY() * Constants.TELEOP_DRIVE_SPEED_MODIFIER;
-    xDriveSpeed = rightJoystick.getX() * Constants.TELEOP_DRIVE_SPEED_MODIFIER;
+    yDriveSpeed = leftJoystick.getX() * Constants.TELEOP_DRIVE_SPEED_MODIFIER;
+    xDriveSpeed = rightJoystick.getY() * Constants.TELEOP_DRIVE_SPEED_MODIFIER;
 
     //Calls arcade drive method and sends speeds
-    arcadeDrive(yDriveSpeed, xDriveSpeed);
+    arcadeDrive(-yDriveSpeed, -xDriveSpeed);
   }
 
   /**
@@ -104,8 +104,8 @@ public class DriveTrainSubsystem extends SubsystemBase {
   public void joystickTankDrive()
   {
     //Sets left side of bot speed to the y-axis of the left joystick. Sets right side of bot speed to y-axis of the right joystick
-    leftDriveSpeed = leftJoystick.getY() * Constants.TELEOP_DRIVE_SPEED_MODIFIER;
-    rightDriveSpeed = rightJoystick.getY() * Constants.TELEOP_DRIVE_SPEED_MODIFIER;
+    leftDriveSpeed = leftJoystick.getX() * Constants.TELEOP_DRIVE_SPEED_MODIFIER;
+    rightDriveSpeed = rightJoystick.getX() * Constants.TELEOP_DRIVE_SPEED_MODIFIER;
 
     //Calls tank drive method and sends speeds
     tankDrive(leftDriveSpeed, rightDriveSpeed);
