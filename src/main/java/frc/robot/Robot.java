@@ -45,9 +45,6 @@ public class Robot extends TimedRobot {
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
 
-
-    //joystickDriveCommand.execute();
-
   }
 
   public RobotContainer getRobotContainer()
@@ -69,16 +66,6 @@ public class Robot extends TimedRobot {
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     //CommandScheduler.getInstance().run();
-
-    /*Color detectedColor = m_colorSensor.getColor();
-
-    double IR = m_colorSensor.getIR();
-
-    SmartDashboard.putNumber("Red", detectedColor.red);
-    SmartDashboard.putNumber("Green", detectedColor.green);
-    SmartDashboard.putNumber("Blue", detectedColor.blue);
-    SmartDashboard.putNumber("IR", IR);*/
-
   }
 
   /**
@@ -133,7 +120,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
-    //System.out.println("Teleop Periodic");
+    //Calls drive train
     m_robotContainer.getDriveTrainCommand().execute();
   }
 

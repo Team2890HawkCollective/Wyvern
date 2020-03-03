@@ -28,6 +28,7 @@ public class RobotContainer {
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
 
+  //Ties DrivetrainSubsystem and DriveTrainCommand together
   private final DriveTrainSubsystem m_driveTrainSubsystem = new DriveTrainSubsystem();
   private final DriveTrainCommand m_driveTrainCommand = new DriveTrainCommand(m_driveTrainSubsystem);
 
@@ -68,9 +69,9 @@ public class RobotContainer {
    *
    * @return the command to run in autonomous
    */
-  /*public Command getAutonomousCommand() 
+  public Command getAutonomousCommand() 
   {
     // An ExampleCommand will run in autonomous
-    //return m_autoCommand;
-  }*/
+    return m_autoCommand;
+  }
 }

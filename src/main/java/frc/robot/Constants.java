@@ -18,30 +18,32 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-
-    public static final double TELEOP_DRIVE_SPEED_MODIFIER = 1.0;
-
-    public static final MotorType BRUSHLESS_MOTOR = MotorType.kBrushless;
-
-    public static final double SHOOTER_TARGETING_TURNING_SPEED = 0.4;
-
-    public static final int XBOX_ASSISTANT_DRIVER_CONTROLLER_ID = 1;
-
-    public static final double NO_SPEED = 0.0;
-
+    /**
+     * IDs for Spark Max Controllers on the bot 
+     */
     public static final int LEFT_FRONT_SPARK_MAX_ID = 3;
     public static final int LEFT_BACK_SPARK_MAX_ID = 1;
     public static final int RIGHT_FRONT_SPARK_MAX_ID = 4;
     public static final int RIGHT_BACK_SPARK_MAX_ID = 2;
 
+    /**
+     * Speed modifiers for Teleop
+     */
+    public static final double TELEOP_DRIVE_SPEED_MODIFIER = 1.0;
+    public static final double NO_SPEED = 0.0;
+    public static final double SHOOTER_TARGETING_TURNING_SPEED = 0.4;
+
+    /**
+     * Motor types for the Spark Max Controller
+     */
+    public static final MotorType BRUSHLESS_MOTOR = MotorType.kBrushless;
     public static final MotorType BRUSHED_MOTOR = MotorType.kBrushed;
 
-
+    /**
+     * Port IDs for various controllers used for driving
+     */
+    public static final int XBOX_ASSISTANT_DRIVER_CONTROLLER_ID = 1;
     public static final int XBOX_DRIVER_CONTROLLER_PORT_ID = 4;
     public static final int DRIVER_JOYSTICK_X_PORT_ID = 1;
     public static final int DRIVER_JOYSTICK_Y_PORT_ID = 0;
-    public static final double TELEOP_FORWARD_SPEED_MODIFIER = 0.4;
-
-    public static final double TELEOP_BACKWARDS_SPEED_MODIFIER = -0.4;
-
 }
