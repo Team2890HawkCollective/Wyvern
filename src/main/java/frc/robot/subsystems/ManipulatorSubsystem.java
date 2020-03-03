@@ -24,6 +24,8 @@ import com.revrobotics.CANSparkMax;
 import edu.wpi.first.wpilibj.Timer;
 
 import com.revrobotics.ColorSensorV3;
+
+import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.I2C;
 
 import edu.wpi.first.wpilibj.XboxController;
@@ -46,12 +48,6 @@ public class ManipulatorSubsystem extends SubsystemBase {
   private NetworkTableEntry limelightY = table.getEntry("ty"); // ty
   private NetworkTableEntry limelightArea = table.getEntry("ta"); // ta
   private NetworkTableEntry limelightTargetFound = table.getEntry("tv"); // tv
-
-  /**
-   * Color sensor and port detected straight fron Rio
-   */
-  private final I2C.Port i2cPort = I2C.Port.kOnboard;
-  private final ColorSensorV3 colorSensor = new ColorSensorV3(i2cPort);
   
   /**
    * Numbers and booleans 
@@ -61,7 +57,15 @@ public class ManipulatorSubsystem extends SubsystemBase {
   private boolean magazineCheckForYellow = false; //Determines whether or not to check for yellow in magazine
   private boolean magazineCheckForNothing = false; //Determines whether or not to check for nothing in magazine
   private boolean magazineEmpty = true; //Determines whether or not the magazine is empty
+  private boolean shooterCheckForYellow = false;
+  private boolean shooterCheckForNothing = false; 
   private int countOfBallsInMagazine = 0; //Counts how many balls we have in the magazine
+
+  /**
+   * Inputs to determine when a ball crosses the top and bottom of the magazine
+   */
+  private AnalogInput topMagazineSensor = new AnalogInput(Constants.TOP_MAGAZINE_SENSOR_PORT);
+  private AnalogInput bottomMagazineSensor = new AnalogInput(Constants.BOTTOM_MAGAZINE_SENSOR_PORT);
 
   /**
    * Spark Max's used for drive train
@@ -80,8 +84,8 @@ public class ManipulatorSubsystem extends SubsystemBase {
    * Creates a new ManipulatorSubsystem.
    */
   public ManipulatorSubsystem() {
-    leftFrontSparkController.setInverted(true);
-    leftBackSparkController.setInverted(true);
+    rightFrontSparkController.setInverted(true);
+    rightBackSparkController.setInverted(true);
   }
 
   /**
@@ -139,18 +143,44 @@ public class ManipulatorSubsystem extends SubsystemBase {
 
   private void shootPowerCell()
   {
-    shooterLeftSideController.set(ControlMode.PercentOutput, shooterSpeed);
-    shooterRightSideController.set(ControlMode.PercentOutput, -shooterSpeed);
+    if (countOfBallsInMagazine != 0)
+    {
+      shooterLeftSideController.set(ControlMode.PercentOutput, shooterSpeed);
+      shooterRightSideController.set(ControlMode.PercentOutput, -shooterSpeed);
+      magazineController.set(ControlMode.PercentOutput, 0.1);
+
+      if (shooterCheckForYellow)
+      {
+        if (topMagazineSensor.getValue() <= 100.0 && topMagazineSensor.getValue() >= 0.0)
+        {
+          countOfBallsInMagazine--;
+          shooterCheckForNothing = true;
+        }
+      }
+      if (shooterCheckForNothing = true)
+      {
+        if (topMagazineSensor.getValue() > 150.0)
+        {
+          shooterCheckForYellow = true;
+          shooterCheckForNothing = false;
+        }
+      }
+    }
+    else
+    {
+      shooterLeftSideController.set(ControlMode.PercentOutput, 0.0);
+      shooterRightSideController.set(ControlMode.PercentOutput, 0.0);
+      magazineController.set(ControlMode.PercentOutput, 0.0);
+    }
+
+
   }
 
   public void magazineIntake() {
-    Color detectedColor = colorSensor.getColor();
-    double blue = detectedColor.blue * 100.0;
-    double green = detectedColor.green * 100.0;
 
     if (magazineEmpty)
     {
-      if (green >= 50.0 && blue <= 15.0)
+      if (bottomMagazineSensor.getValue() <= 100.0 && bottomMagazineSensor.getValue() >= 0.0)
       {
         magazineController.set(ControlMode.PercentOutput, 0.0);
         magazineCheckForYellow = false;
@@ -167,7 +197,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
       magazineCheckForNothing = true;
       if (magazineCheckForNothing)
       {
-        if (green >= 50.0 && blue <= 15.0)
+        if (bottomMagazineSensor.getValue() <= 100.0 && bottomMagazineSensor.getValue() >= 0.0)
         {
           magazineController.set(ControlMode.PercentOutput, 0.1);
         }
@@ -179,7 +209,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
       }
       else if (magazineCheckForYellow)
       {
-        if (green >= 50.0 && blue <= 15.0)
+        if (bottomMagazineSensor.getValue() <= 100.0 && bottomMagazineSensor.getValue() >= 0.0)
         {
           magazineController.set(ControlMode.PercentOutput, 0.0);
           magazineCheckForYellow = false;
@@ -202,14 +232,8 @@ public class ManipulatorSubsystem extends SubsystemBase {
     if (assistantDriverController.getAButtonPressed())
     {
       magazineCheckForYellow = true;
-      if (countOfBallsInMagazine == 5)
-      {
-        magazineOutake();
-      }
-      else
-      {
-        magazineIntake();
-      }
+      magazineIntake();
+      
     }
 
     if (assistantDriverController.getStartButtonPressed())
@@ -225,6 +249,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
 
     if (assistantDriverController.getYButtonPressed())
     {
+      shooterCheckForYellow = true; 
       shootPowerCell();
     }
 
@@ -232,11 +257,6 @@ public class ManipulatorSubsystem extends SubsystemBase {
     {
       powerCellIntake();
     }
-  }
-
-  public void magazineOutake() {
-
-    magazineController.set(ControlMode.PercentOutput, 0.4);
   }
 
   private void killMagazine() {

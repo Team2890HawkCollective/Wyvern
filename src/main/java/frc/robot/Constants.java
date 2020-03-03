@@ -35,4 +35,7 @@ public final class Constants {
     public static final int XBOX_ASSISTANT_DRIVER_CONTROLLER_ID = 1;
 
     public static final double NO_SPEED = 0.0;
+
+    public static final int BOTTOM_MAGAZINE_SENSOR_PORT = 0;
+    public static final int TOP_MAGAZINE_SENSOR_PORT = 1;
 }

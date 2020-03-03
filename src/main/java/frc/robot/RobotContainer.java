@@ -11,7 +11,9 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.commands.ExampleCommand;
+import frc.robot.commands.ManipulatorCommand;
 import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.subsystems.ManipulatorSubsystem;
 import frc.robot.Constants;
 import edu.wpi.first.wpilibj.Joystick;
 
@@ -23,7 +25,8 @@ import edu.wpi.first.wpilibj.Joystick;
  */
 public class RobotContainer 
 {
-    
+    private ManipulatorSubsystem m_manipulatorSubsystem = new ManipulatorSubsystem();
+    private ManipulatorCommand m_manipulatorCommand = new ManipulatorCommand(m_manipulatorSubsystem);
 
 
   /**
@@ -45,6 +48,11 @@ public class RobotContainer
   private void configureButtonBindings() 
   {
 
+  }
+
+  public Command runManipulators()
+  {
+    return m_manipulatorCommand;
   }
 
  
