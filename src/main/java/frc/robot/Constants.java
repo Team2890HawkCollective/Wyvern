@@ -17,27 +17,24 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
  * <p>It is advised to statically import this class (or one of its inner classes) wherever the
  * constants are needed, to reduce verbosity.
  */
-public final class Constants 
-{
-    public static final int LEFT_FRONT_SPARK_MAX_ID = 3;
-    public static final int LEFT_BACK_SPARK_MAX_ID = 1;
-    public static final int RIGHT_FRONT_SPARK_MAX_ID = 4;
-    public static final int RIGHT_BACK_SPARK_MAX_ID = 2;
+public final class Constants {
+    public static final int BALL_PICKUP_CONTROLLER_VICTOR_SPX_ID = 3;
+    public static final int SHOOTER_CONTROLLER_LEFT_SIDE_VICTOR_SPX_ID = 2;
+    public static final int SHOOTER_CONTROLLER_RIGHT_SIDE_VICTOR_SPX_ID = 1;
+    public static final int MAGAZINE_CONTROLLER_VICTOR_SPX_ID = 4;
 
-    public static final MotorType BRUSHLESS_MOTOR = MotorType.kBrushless;
-    public static final MotorType BRUSHED_MOTOR = MotorType.kBrushed;
+    public static final int LEFT_FRONT_SPARK_CONTROLLER_ID = 1;
+    public static final int LEFT_BACK_SPARK_CONTROLLER_ID = 2;
+    public static final int RIGHT_FRONT_SPARK_CONTROLLER_ID = 3;
+    public static final int RIGHT_BACK_SPARK_CONTROLLER_ID = 4;
 
-
-    public static final int XBOX_DRIVER_CONTROLLER_PORT_ID = 4;
-    public static final int DRIVER_JOYSTICK_X_PORT_ID = 1;
-    public static final int DRIVER_JOYSTICK_Y_PORT_ID = 0;
-    public static final double TELEOP_FORWARD_SPEED_MODIFIER = 0.4;
-
-    public static final double TELEOP_BACKWARDS_SPEED_MODIFIER = -0.4;
     public static final double TELEOP_DRIVE_SPEED_MODIFIER = 1.0;
 
+    public static final MotorType BRUSHLESS_MOTOR = MotorType.kBrushless;
+
+    public static final double SHOOTER_TARGETING_TURNING_SPEED = 0.4;
+
+    public static final int XBOX_ASSISTANT_DRIVER_CONTROLLER_ID = 1;
+
     public static final double NO_SPEED = 0.0;
-
-
-    
 }
