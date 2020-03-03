@@ -19,7 +19,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
  */
 public final class Constants {
     public static final int BALL_PICKUP_CONTROLLER_VICTOR_SPX_ID = 1;
-    public static final int SHOOTER_CONTROLLER_LEFT_SIDE_VICTOR_SPX_ID = 1;
+    public static final int SHOOTER_CONTROLLER_LEFT_SIDE_VICTOR_SPX_ID = 2;
     public static final int SHOOTER_CONTROLLER_RIGHT_SIDE_VICTOR_SPX_ID = 3;
     public static final int MAGAZINE_CONTROLLER_VICTOR_SPX_ID = 4;
 
