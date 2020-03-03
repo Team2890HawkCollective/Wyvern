@@ -36,7 +36,7 @@ public final class Constants
     public static final double TELEOP_BACKWARDS_SPEED_MODIFIER = -0.4;
     public static final double TELEOP_DRIVE_SPEED_MODIFIER = 0.4;
 
-    public static final double NOT_MOVING = 0.0;
+    public static final double NO_SPEED = 0.0;
 
 
     
