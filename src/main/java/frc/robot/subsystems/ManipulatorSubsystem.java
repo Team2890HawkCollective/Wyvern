@@ -69,7 +69,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
   /**
    * Numbers
    */
-  private double shooterSpeed = 0.5; //Speed for the shooter determined after targeting
+  private double shooterSpeed = 0.3; //Speed for the shooter determined after targeting
   private int countOfBallsInMagazine = 0; //Keeps track of how many balls are in the magazine at a given time
 
   /**
@@ -104,7 +104,10 @@ public class ManipulatorSubsystem extends SubsystemBase {
    */
   public void controlManipulators()
   {
-    System.out.println("Here");
+
+    System.out.println("Bottom: " + bottomMagazineSensor.getValue());
+    System.out.println("Top: " + topMagazineSensor.getValue());
+    findTargetOkay = false;
     //If the A button is pressed, the magazine intake process will begin 
     if (assistantDriverController.getAButtonPressed())
     {
@@ -120,13 +123,15 @@ public class ManipulatorSubsystem extends SubsystemBase {
     //If the start button is pressed, the magazine intake/outake will immediately be stopped
     if (assistantDriverController.getStartButtonPressed())
     {
+      System.out.println("Killed");
       killMagazine();
       magazineOkay = false;
       shootingOkay = false;
+      targetingOkay = false;
     }
 
     //If the B button is pressed, the targeting process will begin and shooter speed will be determined
-    if (assistantDriverController.getBButtonPressed())
+    /*if (assistantDriverController.getBButtonPressed())
     {
       findTargetOkay = true;
       targetingOkay = true;
@@ -135,11 +140,12 @@ public class ManipulatorSubsystem extends SubsystemBase {
     if (targetingOkay)
     {
       findTarget();
-    }
+    }*/
 
     //If the Y button is pressed, the shooting process will begin and emptying of the magazine
     if (assistantDriverController.getYButtonPressed())
     {
+      System.out.println("Shooting");
       shooterCheckForYellow = true; 
       shootingOkay = true;
     }
@@ -152,7 +158,13 @@ public class ManipulatorSubsystem extends SubsystemBase {
     //If the X button is held, the intake system will be run
     if (assistantDriverController.getXButton())
     {
-      powerCellIntake();
+      System.out.println("Intake");
+      powerCellIntake(0.275);
+    }
+
+    if (assistantDriverController.getXButtonReleased())
+    {
+      powerCellIntake(0.0);
     }
   }
 
@@ -228,11 +240,11 @@ public class ManipulatorSubsystem extends SubsystemBase {
     {
       shooterLeftSideController.set(ControlMode.PercentOutput, shooterSpeed);
       shooterRightSideController.set(ControlMode.PercentOutput, -shooterSpeed);
-      magazineController.set(ControlMode.PercentOutput, 0.1);
+      magazineController.set(ControlMode.PercentOutput, 0.2);
 
       if (shooterCheckForYellow)
       {
-        if (topMagazineSensor.getValue() <= 100.0 && topMagazineSensor.getValue() >= 0.0)
+        if (topMagazineSensor.getValue() >= 100.0)
         {
           countOfBallsInMagazine--;
           shooterCheckForNothing = true;
@@ -261,9 +273,10 @@ public class ManipulatorSubsystem extends SubsystemBase {
 
   public void magazineIntake() {
 
+    System.out.println("Running");
     if (magazineEmpty)
     {
-      if (bottomMagazineSensor.getValue() <= 100.0 && bottomMagazineSensor.getValue() >= 0.0)
+      if (bottomMagazineSensor.getValue() >= 100.0)
       {
         magazineController.set(ControlMode.PercentOutput, 0.0);
         magazineCheckForYellow = false;
@@ -273,7 +286,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
       }
       else
       {
-        magazineController.set(ControlMode.PercentOutput, 0.1);
+        magazineController.set(ControlMode.PercentOutput, 0.2);
       }
     }
     else if (!magazineEmpty)
@@ -281,9 +294,9 @@ public class ManipulatorSubsystem extends SubsystemBase {
       magazineCheckForNothing = true;
       if (magazineCheckForNothing)
       {
-        if (bottomMagazineSensor.getValue() <= 100.0 && bottomMagazineSensor.getValue() >= 0.0)
+        if (bottomMagazineSensor.getValue() >= 100.0)
         {
-          magazineController.set(ControlMode.PercentOutput, 0.1);
+          magazineController.set(ControlMode.PercentOutput, 0.2);
         }
         else
         {
@@ -293,7 +306,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
       }
       else if (magazineCheckForYellow)
       {
-        if (bottomMagazineSensor.getValue() <= 100.0 && bottomMagazineSensor.getValue() >= 0.0)
+        if (bottomMagazineSensor.getValue() >= 100.0)
         {
           magazineController.set(ControlMode.PercentOutput, 0.0);
           magazineCheckForYellow = false;
@@ -302,14 +315,14 @@ public class ManipulatorSubsystem extends SubsystemBase {
         }
         else
         {
-          magazineController.set(ControlMode.PercentOutput, 0.1);
+          magazineController.set(ControlMode.PercentOutput, 0.2);
         }
       }
     }
   }
 
-  public void powerCellIntake() {
-    ballPickupController.set(ControlMode.PercentOutput, 0.3);
+  public void powerCellIntake(double speed) {
+    ballPickupController.set(ControlMode.PercentOutput, speed);
   }
 
   private void killMagazine() {
