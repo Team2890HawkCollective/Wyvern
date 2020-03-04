@@ -203,14 +203,16 @@ public class ManipulatorSubsystem extends SubsystemBase {
   private void determineShooterSpeed(double areaValue)
   {
     //11-15 ft
-    if (areaValue > 3.0)
+    if (areaValue > Constants.LIMELIGHT_TARGETING_AREA_LARGE_VALUE)
     {
       shooterSpeed = 0.8;
     }
+    //9-11 ft
     else if (areaValue <= 2.9 && areaValue >= 2.3)
     {
       shooterSpeed = 0.5;
     }
+    //7-9 ft
     else if (areaValue > 2.3)
     {
       shooterSpeed = 0.3;
