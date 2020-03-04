@@ -27,9 +27,7 @@ public class EndGameSubsytem extends SubsystemBase {
   private double [] yawPitchRoll = new double[3];
 
   //Call number for yawPitchRoll array to gather yaw data, pitch data, and roll data
-  private int yawID = 0;
   private int pitchID = 1;
-  private int rollID = 2;
 
   private boolean beginBalance = false;
   
