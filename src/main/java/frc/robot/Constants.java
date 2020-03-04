@@ -21,10 +21,10 @@ public final class Constants {
     /**
      * IDs for Spark Max Controllers on the bot 
      */
-    public static final int LEFT_FRONT_SPARK_MAX_ID = 3;
-    public static final int LEFT_BACK_SPARK_MAX_ID = 1;
-    public static final int RIGHT_FRONT_SPARK_MAX_ID = 4;
-    public static final int RIGHT_BACK_SPARK_MAX_ID = 2;
+    public static final int LEFT_FRONT_SPARK_MAX_ID = 4;
+    public static final int LEFT_BACK_SPARK_MAX_ID = 2;
+    public static final int RIGHT_FRONT_SPARK_MAX_ID = 3;
+    public static final int RIGHT_BACK_SPARK_MAX_ID = 1;
 
     /**
      * Speed modifiers for Teleop
