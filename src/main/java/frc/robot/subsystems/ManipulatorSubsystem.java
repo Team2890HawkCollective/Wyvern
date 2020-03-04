@@ -22,6 +22,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.Ultrasonic;
 
 import com.revrobotics.ColorSensorV3;
 
@@ -48,6 +49,12 @@ public class ManipulatorSubsystem extends SubsystemBase {
   private NetworkTableEntry limelightY = limelightTable.getEntry("ty"); // ty
   private NetworkTableEntry limelightArea = limelightTable.getEntry("ta"); // ta
   private NetworkTableEntry limelightTargetFound = limelightTable.getEntry("tv"); // tv
+
+  private final I2C.Port i2cPort = I2C.Port.kOnboard;
+
+  private final ColorSensorV3 m_colorSensor = new ColorSensorV3(i2cPort);
+
+  private Ultrasonic bottomRangeFinder = new Ultrasonic(0, 1);
   
   /**
    * Booleans for determining process of operations within manipulators methods
@@ -105,8 +112,11 @@ public class ManipulatorSubsystem extends SubsystemBase {
   public void controlManipulators()
   {
 
-    System.out.println("Bottom: " + bottomMagazineSensor.getValue());
-    System.out.println("Top: " + topMagazineSensor.getValue());
+    //System.out.println("Bottom: " + bottomMagazineSensor.getValue());
+    //System.out.println("Top: " + topMagazineSensor.getValue());
+    System.out.println("Blue: " + (m_colorSensor.getBlue() * 100));
+    System.out.println("Green: " + (m_colorSensor.getGreen() * 100));
+
     findTargetOkay = false;
     //If the A button is pressed, the magazine intake process will begin 
     if (assistantDriverController.getAButtonPressed())
@@ -276,7 +286,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
     System.out.println("Running");
     if (magazineEmpty)
     {
-      if (bottomMagazineSensor.getValue() >= 100.0)
+      if (bottomMagazineSensor.getValue() >= 100.0) //bottomMagazineSensor.getValue() >= 100.0
       {
         magazineController.set(ControlMode.PercentOutput, 0.0);
         magazineCheckForYellow = false;
