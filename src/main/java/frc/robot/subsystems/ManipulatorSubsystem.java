@@ -198,10 +198,11 @@ public class ManipulatorSubsystem extends SubsystemBase {
   }
 
   /**
-   * 
+   * Determines shooter speed based off area of target on screen calculated after targeting
    */
   private void determineShooterSpeed(double areaValue)
   {
+    //11-15 ft
     if (areaValue > 3.0)
     {
       shooterSpeed = 0.8;
