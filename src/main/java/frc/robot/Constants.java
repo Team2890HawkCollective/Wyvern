@@ -38,4 +38,9 @@ public final class Constants {
 
     public static final int BOTTOM_MAGAZINE_SENSOR_PORT = 0;
     public static final int TOP_MAGAZINE_SENSOR_PORT = 1;
+
+    public static final double LIMELIGHT_TARGET_FOUND = 1.0;
+    public static final double LIMELIGHT_X_RANGE_MAXIMUM = 2.0;
+    public static final int LIMELIGHT_ON_CODE = 1;
+    public static final int LIMELIGHT_OFF_CODE = 3;
 }

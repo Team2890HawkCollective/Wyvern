@@ -43,29 +43,40 @@ public class ManipulatorSubsystem extends SubsystemBase {
   /**
    * Limelight and Data values produced from the Network table
    */
-  private NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
-  private NetworkTableEntry limelightX = table.getEntry("tx"); // tx
-  private NetworkTableEntry limelightY = table.getEntry("ty"); // ty
-  private NetworkTableEntry limelightArea = table.getEntry("ta"); // ta
-  private NetworkTableEntry limelightTargetFound = table.getEntry("tv"); // tv
+  private NetworkTable limelightTable = NetworkTableInstance.getDefault().getTable("limelight"); //limelight network table
+  private NetworkTableEntry limelightX = limelightTable.getEntry("tx"); // tx
+  private NetworkTableEntry limelightY = limelightTable.getEntry("ty"); // ty
+  private NetworkTableEntry limelightArea = limelightTable.getEntry("ta"); // ta
+  private NetworkTableEntry limelightTargetFound = limelightTable.getEntry("tv"); // tv
   
   /**
-   * Numbers and booleans 
+   * Booleans for determining process of operations within manipulators methods
    */
-  private double shooterSpeed = 0.5; //Determined after targeting
-  private boolean targetingOkay = false; //Checks whether or not we're okay to target
-  private boolean magazineCheckForYellow = false; //Determines whether or not to check for yellow in magazine
-  private boolean magazineCheckForNothing = false; //Determines whether or not to check for nothing in magazine
+  private boolean magazineCheckForYellow = false; //Determines whether or not to check for power cell in beginning of magazine
+  private boolean magazineCheckForNothing = false; //Determines whether or not to check for nothing in beginning of magazine
   private boolean magazineEmpty = true; //Determines whether or not the magazine is empty
-  private boolean shooterCheckForYellow = false;
-  private boolean shooterCheckForNothing = false; 
-  private int countOfBallsInMagazine = 0; //Counts how many balls we have in the magazine
+  private boolean shooterCheckForYellow = false; //Determines whether or not to check for power cell in end of magazine while shooting
+  private boolean shooterCheckForNothing = false; //Determines whether or not to check for nothing in end of magazine while shooting
+  private boolean findTargetOkay = false; //Determines whether or not to find the target while targeting 
+  
+  /**
+   * Booleans for determining whether or not to run a manipulator method
+   */
+  private boolean magazineOkay = false; //Determines whether or not to run the magazine intake method
+  private boolean targetingOkay = false; //Determines whether or not to target 
+  private boolean shootingOkay = false; //Determines whether or not to shoot and empty the magazine
 
   /**
-   * Inputs to determine when a ball crosses the top and bottom of the magazine
+   * Numbers
    */
-  private AnalogInput topMagazineSensor = new AnalogInput(Constants.TOP_MAGAZINE_SENSOR_PORT);
-  private AnalogInput bottomMagazineSensor = new AnalogInput(Constants.BOTTOM_MAGAZINE_SENSOR_PORT);
+  private double shooterSpeed = 0.5; //Speed for the shooter determined after targeting
+  private int countOfBallsInMagazine = 0; //Keeps track of how many balls are in the magazine at a given time
+
+  /**
+   * Inputs to determine when a ball enters and exits the magazine based on the top and bottom exits and entrances
+   */
+  private AnalogInput topMagazineSensor = new AnalogInput(Constants.TOP_MAGAZINE_SENSOR_PORT); //Sensor at end of magazine
+  private AnalogInput bottomMagazineSensor = new AnalogInput(Constants.BOTTOM_MAGAZINE_SENSOR_PORT); //Sensor at beginning of magazine
 
   /**
    * Spark Max's used for drive train
@@ -89,42 +100,106 @@ public class ManipulatorSubsystem extends SubsystemBase {
   }
 
   /**
+   * Called by robot container during teleop and runs periodically
+   */
+  public void controlManipulators()
+  {
+    //If the A button is pressed, the magazine intake process will begin 
+    if (assistantDriverController.getAButtonPressed())
+    {
+      magazineOkay = true;
+      magazineCheckForYellow = true;
+    }
+    //Magazine intake process
+    if (magazineOkay)
+    {
+      magazineIntake();
+    }
+
+    //If the start button is pressed, the magazine intake/outake will immediately be stopped
+    if (assistantDriverController.getStartButtonPressed())
+    {
+      killMagazine();
+      magazineOkay = false;
+      shootingOkay = false;
+    }
+
+    //If the B button is pressed, the targeting process will begin and shooter speed will be determined
+    if (assistantDriverController.getBButtonPressed())
+    {
+      findTargetOkay = true;
+      targetingOkay = true;
+    }
+    //Target process
+    if (targetingOkay)
+    {
+      findTarget();
+    }
+
+    //If the Y button is pressed, the shooting process will begin and emptying of the magazine
+    if (assistantDriverController.getYButtonPressed())
+    {
+      shooterCheckForYellow = true; 
+      shootingOkay = true;
+    }
+    //Shooting process
+    if (shootingOkay)
+    {
+      shootPowerCell();
+    }
+
+    //If the X button is held, the intake system will be run
+    if (assistantDriverController.getXButton())
+    {
+      powerCellIntake();
+    }
+  }
+
+  /**
    * Finds target and centers robot 
    */
-  public void findTarget() {
+  private void findTarget() 
+  {
+    //Data gathered from limelight network table
     double limelightXValue = limelightX.getDouble(0.0); // tx
     double limelightYValue = limelightY.getDouble(0.0); // ty
     double limelightAreaValue = limelightArea.getDouble(0.0); // ta
     double limelightTargetFoundValue = limelightTargetFound.getDouble(0.0); // tv
 
     //If it's okay to target, the limelight will enable the light and move robot depending on position
-    if (targetingOkay) {
-      NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(3);
-      if (limelightTargetFoundValue != 1.0) 
+    if (findTargetOkay)
+    {
+      //Turns on the limelight LED
+      NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(Constants.LIMELIGHT_ON_CODE);
+      if (limelightTargetFoundValue != Constants.LIMELIGHT_TARGET_FOUND) 
       {
         turnRight();
       } 
-      else if (limelightXValue < -2.0) 
+      else if (limelightXValue < -Constants.LIMELIGHT_X_RANGE_MAXIMUM) 
       {
         turnLeft();
       } 
-      else if (limelightXValue > 2.0) 
+      else if (limelightXValue > Constants.LIMELIGHT_X_RANGE_MAXIMUM) 
       {
         turnRight();
       } 
       else 
       {
         stopMoving();
-        targetingOkay = false;
+        findTargetOkay = false; //Stops targeting after centering on the target
       }
     }
     else
     {
-      NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(1);
+      //Turns off light when targeting is done
+      NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(Constants.LIMELIGHT_OFF_CODE);
       determineShooterSpeed(limelightAreaValue);
     }
   }
 
+  /**
+   * 
+   */
   private void determineShooterSpeed(double areaValue)
   {
     if (areaValue > 3.0)
@@ -139,6 +214,8 @@ public class ManipulatorSubsystem extends SubsystemBase {
     {
       shooterSpeed = 0.3;
     }
+
+    targetingOkay = false;
   }
 
   private void shootPowerCell()
@@ -171,6 +248,8 @@ public class ManipulatorSubsystem extends SubsystemBase {
       shooterLeftSideController.set(ControlMode.PercentOutput, 0.0);
       shooterRightSideController.set(ControlMode.PercentOutput, 0.0);
       magazineController.set(ControlMode.PercentOutput, 0.0);
+
+      shootingOkay = false;
     }
 
 
@@ -185,6 +264,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
         magazineController.set(ControlMode.PercentOutput, 0.0);
         magazineCheckForYellow = false;
         magazineEmpty = false;
+        magazineOkay = false;
         countOfBallsInMagazine++;
       }
       else
@@ -213,6 +293,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
         {
           magazineController.set(ControlMode.PercentOutput, 0.0);
           magazineCheckForYellow = false;
+          magazineOkay = false;
           countOfBallsInMagazine++;
         }
         else
@@ -225,38 +306,6 @@ public class ManipulatorSubsystem extends SubsystemBase {
 
   public void powerCellIntake() {
     ballPickupController.set(ControlMode.PercentOutput, 0.3);
-  }
-
-  public void controlManipulators()
-  {
-    if (assistantDriverController.getAButtonPressed())
-    {
-      magazineCheckForYellow = true;
-      magazineIntake();
-      
-    }
-
-    if (assistantDriverController.getStartButtonPressed())
-    {
-      killMagazine();
-    }
-
-    if (assistantDriverController.getBButtonPressed())
-    {
-      targetingOkay = true;
-      findTarget();
-    }
-
-    if (assistantDriverController.getYButtonPressed())
-    {
-      shooterCheckForYellow = true; 
-      shootPowerCell();
-    }
-
-    if (assistantDriverController.getXButtonPressed())
-    {
-      powerCellIntake();
-    }
   }
 
   private void killMagazine() {
