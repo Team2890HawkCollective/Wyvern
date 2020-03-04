@@ -205,7 +205,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
     //11-15 ft
     if (areaValue > Constants.LIMELIGHT_TARGETING_AREA_LARGE_VALUE)
     {
-      shooterSpeed = 0.8;
+      shooterSpeed = Constants.SHOOTER_SPEED_LIMELIGHT_TARGETING_AREA_LARGE_VALUE;
     }
     //9-11 ft
     else if (areaValue <= 2.9 && areaValue >= 2.3)
