@@ -19,7 +19,7 @@ import frc.robot.Constants;
 
 import com.ctre.phoenix.sensors.PigeonIMU;
 
-public class EndGameSubsytem extends SubsystemBase {
+public class EndGameSubsystem extends SubsystemBase {
 
   private WPI_TalonSRX pidgeonTalon = new WPI_TalonSRX(Constants.PIGEON_TALON_PORT_ID);
   private PigeonIMU _pigeon = new PigeonIMU(pidgeonTalon);
@@ -44,7 +44,7 @@ public class EndGameSubsytem extends SubsystemBase {
 
   public void endGame()
   {
-    if (assistantDriverController.getBumperPressed(Hand.kLeft))
+    /*if (assistantDriverController.getBumperPressed(Hand.kLeft))
     {
       liftSolenoid.set(DoubleSolenoid.Value.kForward);
       releaseClimbRope();
@@ -53,10 +53,11 @@ public class EndGameSubsytem extends SubsystemBase {
     {
       liftSolenoid.set(DoubleSolenoid.Value.kReverse);
       pullInClimbRope();
-    }
+    }*/
 
     if (assistantDriverController.getBackButtonPressed())
     {
+      System.out.println("Made it");
       beginBalance = true;
     }
     //If beginBalance is true, the bot will begin to balance
@@ -68,7 +69,9 @@ public class EndGameSubsytem extends SubsystemBase {
 
   private void balanceWheel()
   {
+    System.out.println("Running");
     _pigeon.getYawPitchRoll(yawPitchRoll);
+    System.out.println(yawPitchRoll[pitchID]);
 
     //If sensor is balanced it will stop the wheel
     if(yawPitchRoll[pitchID] > -Constants.PIDGEON_BALANCING_CLOSE_TO_BALANCED && yawPitchRoll[pitchID] < Constants.PIDGEON_BALANCING_CLOSE_TO_BALANCED)

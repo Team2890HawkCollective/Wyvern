@@ -8,13 +8,18 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.subsystems.EndGameSubsystem;
 
 public class EndGameCommand extends CommandBase {
+  
+  private EndGameSubsystem m_endGameSubsystem;
   /**
    * Creates a new EndGameCommand.
    */
-  public EndGameCommand() {
+  public EndGameCommand(EndGameSubsystem subsytem) {
     // Use addRequirements() here to declare subsystem dependencies.
+    m_endGameSubsystem = subsytem;
+    addRequirements(subsytem);
   }
 
   // Called when the command is initially scheduled.
@@ -25,6 +30,7 @@ public class EndGameCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    m_endGameSubsystem.endGame();
   }
 
   // Called once the command ends or is interrupted.

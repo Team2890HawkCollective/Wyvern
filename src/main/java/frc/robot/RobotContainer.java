@@ -10,7 +10,9 @@ package frc.robot;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.commands.EndGameCommand;
 import frc.robot.commands.ExampleCommand;
+import frc.robot.subsystems.EndGameSubsystem;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.Constants;
 import edu.wpi.first.wpilibj.Joystick;
@@ -23,7 +25,9 @@ import edu.wpi.first.wpilibj.Joystick;
  */
 public class RobotContainer 
 {
+    private EndGameSubsystem m_endGameSubsystem = new EndGameSubsystem();
     
+    private EndGameCommand m_endGameCommand = new EndGameCommand(m_endGameSubsystem);
 
 
   /**
@@ -34,6 +38,11 @@ public class RobotContainer
     // Configure the button bindings
     configureButtonBindings();
     //init();
+  }
+
+  public Command returnEndGame()
+  {
+    return m_endGameCommand;
   }
 
   /**
