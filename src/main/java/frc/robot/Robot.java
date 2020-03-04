@@ -30,7 +30,6 @@ public class Robot extends TimedRobot {
 
   private RobotContainer m_robotContainer;
 
-  private XboxController test = new XboxController(4);
 
   /*private final I2C.Port i2cPort = I2C.Port.kOnboard;
 
@@ -69,7 +68,6 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
 
-    System.out.println("Pressed: " + test.getBButtonPressed());
     // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
     // commands, running already-scheduled commands, removing finished or interrupted commands,
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
@@ -131,6 +129,7 @@ public class Robot extends TimedRobot {
     {
       m_autonomousCommand.cancel();
     }
+    System.out.println("Hello");
   }
 
   /**
@@ -139,7 +138,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() 
   {
-    m_robotContainer.runManipulators();
+    m_robotContainer.runManipulators().execute();
   }
 
   @Override

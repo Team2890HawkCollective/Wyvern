@@ -104,6 +104,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
    */
   public void controlManipulators()
   {
+    System.out.println("Here");
     //If the A button is pressed, the magazine intake process will begin 
     if (assistantDriverController.getAButtonPressed())
     {

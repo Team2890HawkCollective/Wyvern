@@ -52,6 +52,7 @@ public class RobotContainer
 
   public Command runManipulators()
   {
+    System.out.println("here");
     return m_manipulatorCommand;
   }
 
