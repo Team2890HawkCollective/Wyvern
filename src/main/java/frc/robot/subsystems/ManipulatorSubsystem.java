@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj.Ultrasonic;
 import com.revrobotics.ColorSensorV3;
 
 import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.I2C;
 
 import edu.wpi.first.wpilibj.XboxController;
@@ -50,11 +51,9 @@ public class ManipulatorSubsystem extends SubsystemBase {
   private NetworkTableEntry limelightArea = limelightTable.getEntry("ta"); // ta
   private NetworkTableEntry limelightTargetFound = limelightTable.getEntry("tv"); // tv
 
-  private final I2C.Port i2cPort = I2C.Port.kOnboard;
 
-  private final ColorSensorV3 m_colorSensor = new ColorSensorV3(i2cPort);
-
-  private Ultrasonic bottomRangeFinder = new Ultrasonic(0, 1);
+  //private Ultrasonic bottomRangeFinder = new Ultrasonic(1, 0);
+  private DigitalInput lowerLimitSwitch = new DigitalInput(0);
   
   /**
    * Booleans for determining process of operations within manipulators methods
@@ -111,11 +110,9 @@ public class ManipulatorSubsystem extends SubsystemBase {
    */
   public void controlManipulators()
   {
-
-    //System.out.println("Bottom: " + bottomMagazineSensor.getValue());
-    //System.out.println("Top: " + topMagazineSensor.getValue());
-    System.out.println("Blue: " + (m_colorSensor.getBlue() * 100));
-    System.out.println("Green: " + (m_colorSensor.getGreen() * 100));
+    //System.out.println("Rangefinder: " + bottomRangeFinder.getRangeInches());
+    System.out.println("Bottom Sensor: " + bottomMagazineSensor.getValue());
+    System.out.println("Switch: " + lowerLimitSwitch.get());
 
     findTargetOkay = false;
     //If the A button is pressed, the magazine intake process will begin 
@@ -151,6 +148,17 @@ public class ManipulatorSubsystem extends SubsystemBase {
     {
       findTarget();
     }*/
+
+    if (assistantDriverController.getBButtonPressed())
+    {
+      shooterLeftSideController.set(ControlMode.PercentOutput, 0.2);
+      shooterRightSideController.set(ControlMode.PercentOutput, -0.2);
+    }
+    if (assistantDriverController.getBButtonReleased())
+    {
+      shooterLeftSideController.set(ControlMode.PercentOutput, 0.0);
+      shooterRightSideController.set(ControlMode.PercentOutput, 0.0);
+    }
 
     //If the Y button is pressed, the shooting process will begin and emptying of the magazine
     if (assistantDriverController.getYButtonPressed())
@@ -286,7 +294,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
     System.out.println("Running");
     if (magazineEmpty)
     {
-      if (bottomMagazineSensor.getValue() >= 100.0) //bottomMagazineSensor.getValue() >= 100.0
+      if (lowerLimitSwitch.get() == false) //bottomMagazineSensor.getValue() >= 100.0
       {
         magazineController.set(ControlMode.PercentOutput, 0.0);
         magazineCheckForYellow = false;
@@ -304,7 +312,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
       magazineCheckForNothing = true;
       if (magazineCheckForNothing)
       {
-        if (bottomMagazineSensor.getValue() >= 100.0)
+        if (lowerLimitSwitch.get() == false)
         {
           magazineController.set(ControlMode.PercentOutput, 0.2);
         }
@@ -316,7 +324,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
       }
       else if (magazineCheckForYellow)
       {
-        if (bottomMagazineSensor.getValue() >= 100.0)
+        if (lowerLimitSwitch.get() == false)
         {
           magazineController.set(ControlMode.PercentOutput, 0.0);
           magazineCheckForYellow = false;
