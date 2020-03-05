@@ -28,6 +28,7 @@ import com.revrobotics.ColorSensorV3;
 
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.I2C;
 
 import edu.wpi.first.wpilibj.XboxController;
@@ -51,9 +52,9 @@ public class ManipulatorSubsystem extends SubsystemBase {
   private NetworkTableEntry limelightArea = limelightTable.getEntry("ta"); // ta
   private NetworkTableEntry limelightTargetFound = limelightTable.getEntry("tv"); // tv
 
-
-  //private Ultrasonic bottomRangeFinder = new Ultrasonic(1, 0);
-  private DigitalInput lowerLimitSwitch = new DigitalInput(0);
+  private DigitalInput echo = new DigitalInput(1);
+  private DigitalOutput ping = new DigitalOutput(0);
+  private Ultrasonic bottomRangeFinder = new Ultrasonic(ping, echo);
   
   /**
    * Booleans for determining process of operations within manipulators methods
@@ -75,6 +76,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
   /**
    * Numbers
    */
+  private double magazineSpeed = 0.2;
   private double shooterSpeed = 0.3; //Speed for the shooter determined after targeting
   private int countOfBallsInMagazine = 0; //Keeps track of how many balls are in the magazine at a given time
 
@@ -103,6 +105,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
   public ManipulatorSubsystem() {
     rightFrontSparkController.setInverted(true);
     rightBackSparkController.setInverted(true);
+    bottomRangeFinder.setAutomaticMode(true);
   }
 
   /**
@@ -110,10 +113,6 @@ public class ManipulatorSubsystem extends SubsystemBase {
    */
   public void controlManipulators()
   {
-    //System.out.println("Rangefinder: " + bottomRangeFinder.getRangeInches());
-    System.out.println("Bottom Sensor: " + bottomMagazineSensor.getValue());
-    System.out.println("Switch: " + lowerLimitSwitch.get());
-
     findTargetOkay = false;
     //If the A button is pressed, the magazine intake process will begin 
     if (assistantDriverController.getAButtonPressed())
@@ -149,17 +148,6 @@ public class ManipulatorSubsystem extends SubsystemBase {
       findTarget();
     }*/
 
-    if (assistantDriverController.getBButtonPressed())
-    {
-      shooterLeftSideController.set(ControlMode.PercentOutput, 0.2);
-      shooterRightSideController.set(ControlMode.PercentOutput, -0.2);
-    }
-    if (assistantDriverController.getBButtonReleased())
-    {
-      shooterLeftSideController.set(ControlMode.PercentOutput, 0.0);
-      shooterRightSideController.set(ControlMode.PercentOutput, 0.0);
-    }
-
     //If the Y button is pressed, the shooting process will begin and emptying of the magazine
     if (assistantDriverController.getYButtonPressed())
     {
@@ -183,6 +171,16 @@ public class ManipulatorSubsystem extends SubsystemBase {
     if (assistantDriverController.getXButtonReleased())
     {
       powerCellIntake(0.0);
+    }
+
+    if (assistantDriverController.getBButtonPressed())
+    {
+      magazineController.set(ControlMode.PercentOutput, -0.3);
+    }
+
+    if (assistantDriverController.getBButtonReleased())
+    {
+      magazineController.set(ControlMode.PercentOutput, 0.0);
     }
   }
 
@@ -290,51 +288,53 @@ public class ManipulatorSubsystem extends SubsystemBase {
   }
 
   public void magazineIntake() {
-
-    System.out.println("Running");
-    if (magazineEmpty)
+    System.out.println("Range: " + bottomRangeFinder.getRangeInches());
+    if (countOfBallsInMagazine == 0)
     {
-      if (lowerLimitSwitch.get() == false) //bottomMagazineSensor.getValue() >= 100.0
+      magazineSpeed = 0.2;
+    }
+    else if (countOfBallsInMagazine == 1)
+    {
+      magazineSpeed = 0.2;
+    }
+    else if (countOfBallsInMagazine == 2)
+    {
+      magazineSpeed = 0.3;
+    }
+    else if (countOfBallsInMagazine == 3)
+    {
+      magazineSpeed = 0.3;
+    }
+    else if (countOfBallsInMagazine == 4)
+    {
+      magazineSpeed = 0.3;
+    }
+
+    if (magazineCheckForYellow)
+    {
+      if (bottomRangeFinder.getRangeInches() <= 2.1) //bottomMagazineSensor.getValue() >= 100.0
       {
         magazineController.set(ControlMode.PercentOutput, 0.0);
         magazineCheckForYellow = false;
-        magazineEmpty = false;
-        magazineOkay = false;
+        magazineCheckForNothing = true;
         countOfBallsInMagazine++;
       }
       else
       {
-        magazineController.set(ControlMode.PercentOutput, 0.2);
+        magazineController.set(ControlMode.PercentOutput, 0.25);
       }
     }
-    else if (!magazineEmpty)
+    if (magazineCheckForNothing)
     {
-      magazineCheckForNothing = true;
-      if (magazineCheckForNothing)
+      if (bottomRangeFinder.getRangeInches() >= 3.0) //bottomMagazineSensor.getValue() >= 100.0
       {
-        if (lowerLimitSwitch.get() == false)
-        {
-          magazineController.set(ControlMode.PercentOutput, 0.2);
-        }
-        else
-        {
-          magazineController.set(ControlMode.PercentOutput, 0.0);
-          magazineCheckForNothing = false;
-        }
+        magazineController.set(ControlMode.PercentOutput, 0.0);
+        magazineCheckForNothing = false;
+        magazineOkay = false;
       }
-      else if (magazineCheckForYellow)
+      else
       {
-        if (lowerLimitSwitch.get() == false)
-        {
-          magazineController.set(ControlMode.PercentOutput, 0.0);
-          magazineCheckForYellow = false;
-          magazineOkay = false;
-          countOfBallsInMagazine++;
-        }
-        else
-        {
-          magazineController.set(ControlMode.PercentOutput, 0.2);
-        }
+        magazineController.set(ControlMode.PercentOutput, 0.25);
       }
     }
   }
