@@ -56,9 +56,9 @@ public class ManipulatorSubsystem extends SubsystemBase {
   private DigitalOutput bottomPing = new DigitalOutput(0);
   private Ultrasonic bottomRangeFinder = new Ultrasonic(bottomPing, bottomEcho);
 
-  /*private DigitalInput topEcho = new DigitalInput(3);
+  private DigitalInput topEcho = new DigitalInput(3);
   private DigitalOutput topPing = new DigitalOutput(4);
-  private Ultrasonic topRangeFinder = new Ultrasonic(topPing, topEcho);*/
+  private Ultrasonic topRangeFinder = new Ultrasonic(topPing, topEcho);
 
   
   /**
@@ -70,7 +70,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
   private boolean shooterCheckForYellow = false; //Determines whether or not to check for power cell in end of magazine while shooting
   private boolean shooterCheckForNothing = false; //Determines whether or not to check for nothing in end of magazine while shooting
   private boolean findTargetOkay = false; //Determines whether or not to find the target while targeting 
-  
+  private boolean determineDistanceOkay = false;
   /**
    * Booleans for determining whether or not to run a manipulator method
    */
@@ -118,7 +118,6 @@ public class ManipulatorSubsystem extends SubsystemBase {
    */
   public void controlManipulators()
   {
-    findTargetOkay = false;
     //If the A button is pressed, the magazine intake process will begin 
     if (assistantDriverController.getAButtonPressed())
     {
@@ -194,30 +193,41 @@ public class ManipulatorSubsystem extends SubsystemBase {
     double limelightAreaValue = limelightArea.getDouble(0.0); // ta
     double limelightTargetFoundValue = limelightTargetFound.getDouble(0.0); // tv
 
+    System.out.println("tv: " + limelightTargetFoundValue);
+    System.out.println("tx: " + limelightXValue);
+    System.out.println("ta: " + limelightAreaValue);
+
+
     //If it's okay to target, the limelight will enable the light and move robot depending on position
     if (findTargetOkay)
     {
-      //Turns on the limelight LED
+      System.out.println("in");
       NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(Constants.LIMELIGHT_ON_CODE);
-      /*if (limelightTargetFoundValue != Constants.LIMELIGHT_TARGET_FOUND) 
-      {
-        turnRight();
-      } 
-      else if (limelightXValue < -Constants.LIMELIGHT_X_RANGE_MAXIMUM) 
+      //Turns on the limelight LED
+      if (limelightTargetFoundValue != Constants.LIMELIGHT_TARGET_FOUND) 
       {
         turnLeft();
       } 
-      else if (limelightXValue > Constants.LIMELIGHT_X_RANGE_MAXIMUM) 
+      else if (limelightAreaValue < 1.2)
+      {
+        turnLeft();
+      }
+      else if (limelightXValue < -Constants.LIMELIGHT_X_RANGE_MAXIMUM) 
       {
         turnRight();
+      } 
+      else if (limelightXValue > Constants.LIMELIGHT_X_RANGE_MAXIMUM) 
+      {
+        turnLeft();
       } 
       else 
       {
         stopMoving();
         findTargetOkay = false; //Stops targeting after centering on the target
-      }*/
+        determineDistanceOkay = true;
+      }
     }
-    else
+    else if (determineDistanceOkay)
     {
       //Turns off light when targeting is done
       NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(Constants.LIMELIGHT_OFF_CODE);
@@ -230,6 +240,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
    */
   private void determineShooterSpeed(double areaValue)
   {
+    System.out.println("Here");
     //11-15 ft
     if (areaValue > Constants.LIMELIGHT_TARGETING_AREA_LARGE_VALUE)
     {
@@ -251,15 +262,15 @@ public class ManipulatorSubsystem extends SubsystemBase {
 
   private void shootPowerCell()
   {
-    /*if (countOfBallsInMagazine != 0)
+    if (countOfBallsInMagazine != 0)
     {
       shooterLeftSideController.set(ControlMode.PercentOutput, shooterSpeed);
       shooterRightSideController.set(ControlMode.PercentOutput, -shooterSpeed);
-      magazineController.set(ControlMode.PercentOutput, 0.2);
+      magazineController.set(ControlMode.PercentOutput, 0.3);
 
       if (shooterCheckForYellow)
       {
-        if (topMagazineSensor.getValue() >= 100.0)
+        if (topRangeFinder.getRangeInches() <= 2.0)
         {
           countOfBallsInMagazine--;
           shooterCheckForNothing = true;
@@ -267,7 +278,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
       }
       if (shooterCheckForNothing = true)
       {
-        if (topMagazineSensor.getValue() > 150.0)
+        if (topRangeFinder.getRangeInches() >= 4.0)
         {
           shooterCheckForYellow = true;
           shooterCheckForNothing = false;
@@ -281,7 +292,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
       magazineController.set(ControlMode.PercentOutput, 0.0);
 
       shootingOkay = false;
-    }*/
+    }
 
     if (shootingOkay)
     {

@@ -30,7 +30,7 @@ public final class Constants {
 
     public static final MotorType BRUSHLESS_MOTOR = MotorType.kBrushless;
 
-    public static final double SHOOTER_TARGETING_TURNING_SPEED = 0.4;
+    public static final double SHOOTER_TARGETING_TURNING_SPEED = 0.2;
 
     public static final int XBOX_ASSISTANT_DRIVER_CONTROLLER_ID = 2;
 
@@ -40,9 +40,9 @@ public final class Constants {
     public static final int TOP_MAGAZINE_SENSOR_PORT = 1;
 
     public static final double LIMELIGHT_TARGET_FOUND = 1.0;
-    public static final double LIMELIGHT_X_RANGE_MAXIMUM = 2.0;
-    public static final int LIMELIGHT_ON_CODE = 1;
-    public static final int LIMELIGHT_OFF_CODE = 3;
+    public static final double LIMELIGHT_X_RANGE_MAXIMUM = 5.0;
+    public static final int LIMELIGHT_ON_CODE = 3;
+    public static final int LIMELIGHT_OFF_CODE = 1;
 
     public static final double LIMELIGHT_TARGETING_AREA_LARGE_VALUE = 3.0;
     public static final double SHOOTER_SPEED_LIMELIGHT_TARGETING_AREA_LARGE_VALUE = 1.0;
