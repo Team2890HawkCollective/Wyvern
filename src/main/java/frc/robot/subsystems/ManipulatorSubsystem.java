@@ -52,9 +52,14 @@ public class ManipulatorSubsystem extends SubsystemBase {
   private NetworkTableEntry limelightArea = limelightTable.getEntry("ta"); // ta
   private NetworkTableEntry limelightTargetFound = limelightTable.getEntry("tv"); // tv
 
-  private DigitalInput echo = new DigitalInput(1);
-  private DigitalOutput ping = new DigitalOutput(0);
-  private Ultrasonic bottomRangeFinder = new Ultrasonic(ping, echo);
+  private DigitalInput bottomEcho = new DigitalInput(1);
+  private DigitalOutput bottomPing = new DigitalOutput(0);
+  private Ultrasonic bottomRangeFinder = new Ultrasonic(bottomPing, bottomEcho);
+
+  /*private DigitalInput topEcho = new DigitalInput(3);
+  private DigitalOutput topPing = new DigitalOutput(4);
+  private Ultrasonic topRangeFinder = new Ultrasonic(topPing, topEcho);*/
+
   
   /**
    * Booleans for determining process of operations within manipulators methods
@@ -77,7 +82,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
    * Numbers
    */
   private double magazineSpeed = 0.2;
-  private double shooterSpeed = 0.3; //Speed for the shooter determined after targeting
+  private double shooterSpeed = 0.8; //Speed for the shooter determined after targeting
   private int countOfBallsInMagazine = 0; //Keeps track of how many balls are in the magazine at a given time
 
   /**
@@ -137,7 +142,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
     }
 
     //If the B button is pressed, the targeting process will begin and shooter speed will be determined
-    /*if (assistantDriverController.getBButtonPressed())
+    if (assistantDriverController.getBButtonPressed())
     {
       findTargetOkay = true;
       targetingOkay = true;
@@ -146,7 +151,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
     if (targetingOkay)
     {
       findTarget();
-    }*/
+    }
 
     //If the Y button is pressed, the shooting process will begin and emptying of the magazine
     if (assistantDriverController.getYButtonPressed())
@@ -154,6 +159,10 @@ public class ManipulatorSubsystem extends SubsystemBase {
       System.out.println("Shooting");
       shooterCheckForYellow = true; 
       shootingOkay = true;
+    }
+    if (assistantDriverController.getYButtonReleased())
+    {
+      shootingOkay = false;
     }
     //Shooting process
     if (shootingOkay)
@@ -171,16 +180,6 @@ public class ManipulatorSubsystem extends SubsystemBase {
     if (assistantDriverController.getXButtonReleased())
     {
       powerCellIntake(0.0);
-    }
-
-    if (assistantDriverController.getBButtonPressed())
-    {
-      magazineController.set(ControlMode.PercentOutput, -0.3);
-    }
-
-    if (assistantDriverController.getBButtonReleased())
-    {
-      magazineController.set(ControlMode.PercentOutput, 0.0);
     }
   }
 
@@ -200,7 +199,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
     {
       //Turns on the limelight LED
       NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(Constants.LIMELIGHT_ON_CODE);
-      if (limelightTargetFoundValue != Constants.LIMELIGHT_TARGET_FOUND) 
+      /*if (limelightTargetFoundValue != Constants.LIMELIGHT_TARGET_FOUND) 
       {
         turnRight();
       } 
@@ -216,7 +215,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
       {
         stopMoving();
         findTargetOkay = false; //Stops targeting after centering on the target
-      }
+      }*/
     }
     else
     {
@@ -239,12 +238,12 @@ public class ManipulatorSubsystem extends SubsystemBase {
     //9-11 ft
     else if (areaValue <= 2.9 && areaValue >= 2.3)
     {
-      shooterSpeed = 0.5;
+      shooterSpeed = 0.8;
     }
     //7-9 ft
     else if (areaValue > 2.3)
     {
-      shooterSpeed = 0.3;
+      shooterSpeed = 0.7;
     }
 
     targetingOkay = false;
@@ -252,7 +251,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
 
   private void shootPowerCell()
   {
-    if (countOfBallsInMagazine != 0)
+    /*if (countOfBallsInMagazine != 0)
     {
       shooterLeftSideController.set(ControlMode.PercentOutput, shooterSpeed);
       shooterRightSideController.set(ControlMode.PercentOutput, -shooterSpeed);
@@ -282,20 +281,33 @@ public class ManipulatorSubsystem extends SubsystemBase {
       magazineController.set(ControlMode.PercentOutput, 0.0);
 
       shootingOkay = false;
-    }
+    }*/
 
+    if (shootingOkay)
+    {
+      shooterLeftSideController.set(ControlMode.PercentOutput, shooterSpeed);
+      shooterRightSideController.set(ControlMode.PercentOutput, -shooterSpeed);
+      magazineController.set(ControlMode.PercentOutput, 0.4);
+    }
+    else
+    {
+      shooterLeftSideController.set(ControlMode.PercentOutput, 0.0);
+      shooterRightSideController.set(ControlMode.PercentOutput, 0.0);
+      magazineController.set(ControlMode.PercentOutput, 0.0);
+    }
 
   }
 
   public void magazineIntake() {
     System.out.println("Range: " + bottomRangeFinder.getRangeInches());
+    System.out.println("Count of Balls: " + countOfBallsInMagazine);
     if (countOfBallsInMagazine == 0)
     {
-      magazineSpeed = 0.2;
+      magazineSpeed = 0.15;
     }
     else if (countOfBallsInMagazine == 1)
     {
-      magazineSpeed = 0.2;
+      magazineSpeed = 0.15;
     }
     else if (countOfBallsInMagazine == 2)
     {
@@ -321,7 +333,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
       }
       else
       {
-        magazineController.set(ControlMode.PercentOutput, 0.25);
+        magazineController.set(ControlMode.PercentOutput, magazineSpeed);
       }
     }
     if (magazineCheckForNothing)
@@ -334,7 +346,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
       }
       else
       {
-        magazineController.set(ControlMode.PercentOutput, 0.25);
+        magazineController.set(ControlMode.PercentOutput, magazineSpeed);
       }
     }
   }
