@@ -11,8 +11,10 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.commands.DriveTrainCommand;
+import frc.robot.commands.EndGameCommand;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.DriveTrainSubsystem;
+import frc.robot.subsystems.EndGameSubsystem;
 import frc.robot.commands.ManipulatorCommand;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.ManipulatorSubsystem;
@@ -39,6 +41,9 @@ public class RobotContainer
   private ManipulatorSubsystem m_manipulatorSubsystem = new ManipulatorSubsystem();
   private ManipulatorCommand m_manipulatorCommand = new ManipulatorCommand(m_manipulatorSubsystem);
 
+  //Creates a end game subsystem and command
+  private EndGameSubsystem m_endGameSubsystem = new EndGameSubsystem();
+  private EndGameCommand m_endGameCommand = new EndGameCommand(m_endGameSubsystem);
 
   /**
    * The container for the robot.  Contains subsystems, OI devices, and commands.
@@ -75,6 +80,11 @@ public class RobotContainer
   public Command getManipulatorCommand()
   {
     return m_manipulatorCommand;
+  }
+
+  public Command getEndGameCommand()
+  {
+    return m_endGameCommand;
   }
 
  
