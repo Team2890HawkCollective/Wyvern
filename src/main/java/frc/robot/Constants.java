@@ -39,6 +39,15 @@ public final class Constants {
     public static final double SHOOTER_MAGAZINE_OUTTAKE_SPEED = 0.3;
 
     /**
+     * Speed modifiers for Autonomous
+     */
+    public static final double AUTONOMOUS_MOVEMENT_SPEED = 0.35;
+    public static final double AUTONOMOUS_MOVEMENT_SPEED_SLOW = 0.2;
+    public static final double AUTONOMOUS_SHOOTER_SPEED_POSITION_ONE = 0.4;
+    public static final double AUTONOMOUS_SHOOTER_SPEED_POSITION_TWO = 0.4;
+    public static final double AUTONOMOUS_SHOOTER_SPEED_POSITION_THREE = 0.4;
+
+    /**
      * Motor types for the Spark Max Controller
      */
     public static final MotorType BRUSHLESS_MOTOR = MotorType.kBrushless;
@@ -74,6 +83,7 @@ public final class Constants {
     public static final double LIMELIGHT_TARGET_FOUND = 1.0; //tv
     public static final double LIMELIGHT_X_RANGE_MAXIMUM = 5.0; //range for which limelight is considered centered
     public static final double LIMELIGHT_AREA_FOUND_MINIMUM = 1.2; //minimum area for target to be considered found
+    public static final double LIMELIGHT_AREA_FOUND_MAXIMUM = 3.0; //maximum area where target is reachable
     public static final double LIMELIGHT_TARGETING_AREA_LARGE_VALUE = 3.0; //11-15 ft away ta value
     public static final double LIMELIGHT_TARGETING_AREA_MEDIUM_VALUE = 2.9; //9-11 ft away ta value
     public static final double LIMELIGHT_TARGETING_AREA_SMALL_VALUE = 2.3; //7-9 ft awat ta value

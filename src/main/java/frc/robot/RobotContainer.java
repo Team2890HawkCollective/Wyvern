@@ -10,9 +10,11 @@ package frc.robot;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.commands.AutonomousCommand;
 import frc.robot.commands.DriveTrainCommand;
 import frc.robot.commands.EndGameCommand;
 import frc.robot.commands.ExampleCommand;
+import frc.robot.subsystems.AutonomousSubsystem;
 import frc.robot.subsystems.DriveTrainSubsystem;
 import frc.robot.subsystems.EndGameSubsystem;
 import frc.robot.commands.ManipulatorCommand;
@@ -44,6 +46,11 @@ public class RobotContainer
   //Creates a end game subsystem and command
   private EndGameSubsystem m_endGameSubsystem = new EndGameSubsystem();
   private EndGameCommand m_endGameCommand = new EndGameCommand(m_endGameSubsystem);
+
+  //Creates an autonomous subsystem and command
+  private final AutonomousSubsystem m_autonomousSubsystem = new AutonomousSubsystem();
+  private final AutonomousCommand m_autonomousCommand = new AutonomousCommand(m_autonomousSubsystem);
+
 
   /**
    * The container for the robot.  Contains subsystems, OI devices, and commands.
@@ -95,9 +102,8 @@ public class RobotContainer
    *
    * @return the command to run in autonomous
    */
-  public Command getAutonomousCommand() 
-  {
+  public Command getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
-    return m_autoCommand;
+    return m_autonomousCommand;
   }
 }
