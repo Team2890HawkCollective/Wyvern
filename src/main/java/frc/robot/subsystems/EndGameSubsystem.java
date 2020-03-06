@@ -47,9 +47,6 @@ public class EndGameSubsystem extends SubsystemBase {
    * Booleans to determine order of end game lift and balance
    */
   private boolean beginBalance = false; //Determines when to balance
-  private boolean engageLiftPneumatic = false; //Determines when to enagae the lift/heighten the lift
-  private boolean releaseLiftPneumatic = false; //Determines when to release the pneumatics to be able to pull up
-  private boolean pullUpLift = false; //Determines when to engage controller to lift bot
 
   /**
    * Xbox Controller for Assistant driver
@@ -61,36 +58,27 @@ public class EndGameSubsystem extends SubsystemBase {
    */
   public void endGame()
   {
-    //If the left bumper is pressed then the bot will rise up to the bar
+    //If the left bumper is pressed, then the bot will rise up to the bar
     if (assistantDriverController.getBumperPressed(Hand.kLeft))
     {
-      engageLiftPneumatic = true;
+      engageLiftPneumatic();
     }
-    //Engages lift
-    if (engageLiftPneumatic)
+    //If the left bumper is released, the lift pneumatic will release
+    if (assistantDriverController.getBumperReleased(Hand.kLeft))
     {
-      firstLiftStage();
+      releaseLiftPneumatic();
     }
 
-    //If the right bumper is pressed, the pneumatics will release and the balancer will rest on the bar
+    //If the right bumper is pressed, the lift will begin to pull the bot up
     if (assistantDriverController.getBumperPressed(Hand.kRight))
     {
-      releaseLiftPneumatic = true;
+      pullInClimbRope();
     }
-    //If the right bumper is released, the bot will begin to be pulled up by the controller
+    //If the right bumper is released, the bot will brake and stay stationary while hanging
     if (assistantDriverController.getBumperReleased(Hand.kRight))
     {
-      pullUpLift = true;
-    }
-    //System to release the pneumatic
-    if (releaseLiftPneumatic)
-    {
-      stageTwoReleasePneumatics();
-    }
-    //System to pull up the bot
-    if (pullUpLift)
-    {
-      pullInClimbRope();
+      stopClimbRope();
+      engageBreakPneumatic();
     }
 
     //If the back button is pressed, the bot will begin to balance
@@ -107,12 +95,8 @@ public class EndGameSubsystem extends SubsystemBase {
     //If the start button is pressed, all systems will be turned off and stopped
     if (assistantDriverController.getStartButtonPressed())
     {
-      engageLiftPneumatic = false;
-      releaseLiftPneumatic = false;
-      beginBalance = false;
-      pullUpLift = false;
 
-      liftSolenoid.set(Constants.SOLENOID_FORWARD);
+      liftSolenoid.set(Constants.SOLENOID_OFF);
       brakeSolenoid.set(Constants.SOLENOID_OFF);
 
       liftController.set(Constants.SPEED_CONTROL, Constants.PIGEON_WHEEL_STATIONARY_SPEED);
@@ -122,7 +106,7 @@ public class EndGameSubsystem extends SubsystemBase {
   /**
    * Method to engage the pneumatic to raise lift
    */
-  private void firstLiftStage()
+  private void engageLiftPneumatic()
   {
     liftSolenoid.set(Constants.SOLENOID_REVERSE);
   }
@@ -130,9 +114,17 @@ public class EndGameSubsystem extends SubsystemBase {
   /**
    * Method to release the pneumatics to latch onto the bar
    */
-  private void stageTwoReleasePneumatics()
+  private void releaseLiftPneumatic()
   {
     liftSolenoid.set(Constants.SOLENOID_FORWARD);
+  }
+
+  /**
+   * Method to enable break on climb
+   */
+  private void engageBreakPneumatic()
+  {
+    brakeSolenoid.set(Constants.SOLENOID_FORWARD);
   }
 
   /**
@@ -144,11 +136,11 @@ public class EndGameSubsystem extends SubsystemBase {
   }
 
   /**
-   * Method to unreel rope after climb
+   * Method to stop rope after climb
    */
-  private void releaseClimbRope()
+  private void stopClimbRope()
   {
-    liftController.set(Constants.SPEED_CONTROL, Constants.LIFT_CONTROLLER_SPEED);
+    liftController.set(Constants.SPEED_CONTROL, Constants.NO_SPEED);
   }
 
   /**
