@@ -91,7 +91,7 @@ public class EndGameSubsystem extends SubsystemBase {
       releasePneumatics = false;
       beginBalance = false;
 
-      liftSolenoid.set(DoubleSolenoid.Value.kOff);
+      liftSolenoid.set(DoubleSolenoid.Value.kForward);
       brakeSolenoid.set(DoubleSolenoid.Value.kOff);
     }
   }
@@ -109,7 +109,7 @@ public class EndGameSubsystem extends SubsystemBase {
 
   private void stageTwoPullUp()
   {
-    liftController.set(ControlMode.PercentOutput, 0.7);
+    liftController.set(ControlMode.PercentOutput, -0.6);
   }
 
   private void balanceWheel()
