@@ -35,7 +35,7 @@ public class EndGameSubsystem extends SubsystemBase {
   
   private VictorSPX liftController = new VictorSPX(Constants.LIFT_VICTOR_SPX_CONTROLLER_ID);
 
-  private DoubleSolenoid liftSolenoid = new DoubleSolenoid(3, 4);
+  private DoubleSolenoid liftSolenoid = new DoubleSolenoid(0, 7);
   private DoubleSolenoid brakeSolenoid = new DoubleSolenoid(1, 2);
   
   private WPI_TalonSRX balancerTalon = new WPI_TalonSRX(Constants.BALANCER_TALON_ID);
@@ -80,18 +80,22 @@ public class EndGameSubsystem extends SubsystemBase {
       liftStageOne = false;
       liftStageTwo = false;
       beginBalance = false;
+
+      liftSolenoid.set(DoubleSolenoid.Value.kOff);
+      brakeSolenoid.set(DoubleSolenoid.Value.kOff);
     }
   }
 
   private void firstLiftStage()
   {
-    liftSolenoid.set(DoubleSolenoid.Value.kForward);
+    liftSolenoid.set(DoubleSolenoid.Value.kReverse);
     //releaseClimbRope();
   }
 
   private void secondLiftStage()
   {
-    liftSolenoid.set(DoubleSolenoid.Value.kReverse);
+    liftSolenoid.set(DoubleSolenoid.Value.kForward);
+    brakeSolenoid.set(DoubleSolenoid.Value.kOff);
     pullInClimbRope();
   }
 
@@ -131,12 +135,12 @@ public class EndGameSubsystem extends SubsystemBase {
 
   private void releaseClimbRope()
   {
-    liftController.set(ControlMode.PercentOutput, 0.2);
+    liftController.set(ControlMode.PercentOutput, 0.8);
   }
 
   private void pullInClimbRope()
   {
-    liftController.set(ControlMode.PercentOutput, -0.2);
+    liftController.set(ControlMode.PercentOutput, -0.5);
   }
 
   private void stopWheel()
