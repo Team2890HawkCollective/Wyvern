@@ -7,6 +7,10 @@
 
 package frc.robot;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
  * constants.  This class should not be used for any other purpose.  All constants should be
@@ -31,13 +35,17 @@ public final class Constants {
     public static final int PIGEON_TALON_PORT_ID = 1;
 
     //Pidgeon speeds for moving the balancer wheel
-    public static final double PIGEON_WHEEL_FAST_TALON_SPEED_RIGHT = 1.0;
-    public static final double PIGEON_WHEEL_SLOW_TALON_SPEED_RIGHT = 0.5;
-    public static final double PIGEON_WHEEL_FAST_TALON_SPEED_LEFT = -1.0;
-    public static final double PIGEON_WHEEL_SLOW_TALON_SPEED_LEFT = -0.5;
+    public static final double PIGEON_WHEEL_FAST_TALON_SPEED = 1.0;
+    public static final double PIGEON_WHEEL_SLOW_TALON_SPEED = 0.5;
     public static final double PIGEON_WHEEL_STATIONARY_SPEED = 0.0;
 
     //Degrees upon wihch pidgeon measures distance from album
     public static final double PIDGEON_BALANCING_FAR_FROM_BALANCED = 15.0;
     public static final double PIDGEON_BALANCING_CLOSE_TO_BALANCED = 2.0;
+
+    public static final ControlMode SPEED_CONTROL = ControlMode.PercentOutput;
+
+    public static final Value SOLENOID_OFF = Value.kOff;
+    public static final Value SOLENOID_FORWARD = Value.kForward;
+    public static final Value SOLENOID_REVERSE = Value.kReverse;
 }

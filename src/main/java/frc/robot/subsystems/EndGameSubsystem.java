@@ -62,35 +62,41 @@ public class EndGameSubsystem extends SubsystemBase {
    */
   public void endGame()
   {
+    //If the left bumper is pressed then the bot will rise up to the bar
     if (assistantDriverController.getBumperPressed(Hand.kLeft))
     {
       engageLiftPneumatic = true;
     }
+    //Engages lift
     if (engageLiftPneumatic)
     {
       firstLiftStage();
     }
+
+    //If the right bumper is pressed, the pneumatics will release and the balancer will rest on the bar
     if (assistantDriverController.getBumperPressed(Hand.kRight))
     {
       releaseLiftPneumatic = true;
     }
+    //If the right bumper is released, the bot will begin to be pulled up by the controller
     if (assistantDriverController.getBumperReleased(Hand.kRight))
     {
-      releaseLiftPneumatic = false;
       pullUpLift = true;
     }
+    //System to release the pneumatic
     if (releaseLiftPneumatic)
     {
       stageTwoReleasePneumatics();
     }
+    //System to pull up the bot
     if (pullUpLift)
     {
-      stageTwoPullUp();
+      pullInClimbRope();
     }
 
+    //If the back button is pressed, the bot will begin to balance
     if (assistantDriverController.getBackButtonPressed())
     {
-      System.out.println("Made it");
       beginBalance = true;
     }
     //If beginBalance is true, the bot will begin to balance
@@ -99,103 +105,95 @@ public class EndGameSubsystem extends SubsystemBase {
       balanceWheel();
     }
 
+    //If the start button is pressed, all systems will be turned off and stopped
     if (assistantDriverController.getStartButtonPressed())
     {
       engageLiftPneumatic = false;
       releaseLiftPneumatic = false;
       beginBalance = false;
+      pullUpLift = false;
 
       liftSolenoid.set(DoubleSolenoid.Value.kForward);
       brakeSolenoid.set(DoubleSolenoid.Value.kOff);
+
+      liftController.set(Constants.SPEED_CONTROL, Constants.PIGEON_WHEEL_STATIONARY_SPEED);
     }
   }
 
+  /**
+   * Method to engage the pneumatic to raise lift
+   */
   private void firstLiftStage()
   {
     liftSolenoid.set(DoubleSolenoid.Value.kReverse);
-    //releaseClimbRope();
   }
 
+  /**
+   * Method to release the pneumatics to latch onto the bar
+   */
   private void stageTwoReleasePneumatics()
   {
     liftSolenoid.set(DoubleSolenoid.Value.kForward);
   }
 
-  private void stageTwoPullUp()
+  /**
+   * Method to pull up bot 
+   */
+  private void pullInClimbRope()
   {
-    liftController.set(ControlMode.PercentOutput, -0.6);
+    liftController.set(Constants.SPEED_CONTROL, -1.0);
   }
 
+  /**
+   * Method to unreel rope after climb
+   */
+  private void releaseClimbRope()
+  {
+    liftController.set(Constants.SPEED_CONTROL, 0.8);
+  }
+
+  /**
+   * Method to balance bot when on bar
+   */
   private void balanceWheel()
   {
-    System.out.println("Running");
+    //Periodically gathers data from the pidgeon
     _pigeon.getYawPitchRoll(yawPitchRoll);
     System.out.println(yawPitchRoll[pitchID]);
 
-    //If sensor is balanced it will stop the wheel
+    //If sensor is balanced it will stop the balancer wheel
     if(yawPitchRoll[pitchID] > -Constants.PIDGEON_BALANCING_CLOSE_TO_BALANCED && yawPitchRoll[pitchID] < Constants.PIDGEON_BALANCING_CLOSE_TO_BALANCED)
     {
-      stopWheel();
+      turnWheel(Constants.PIGEON_WHEEL_STATIONARY_SPEED);
       beginBalance = false; //Ends balancing process by changing to false
     }
-    //If sensor is far from being balanced negatively, it will move to the left
+    //If sensor is far from being balanced negatively, the balancer wheel will move to the left
     if (yawPitchRoll[pitchID] < -Constants.PIDGEON_BALANCING_FAR_FROM_BALANCED)
     {
-      turnWheelLeftFast();
+      turnWheel(-Constants.PIGEON_WHEEL_FAST_TALON_SPEED);
     }
-    //If sensor is far from being balanced positivly, it will move to the right
+    //If sensor is far from being balanced positivly, the balancer wheel will move to the right
     if(yawPitchRoll[pitchID] > Constants.PIDGEON_BALANCING_FAR_FROM_BALANCED)
     {
-      turnWheelRightFast();
+      turnWheel(Constants.PIGEON_WHEEL_FAST_TALON_SPEED);
     }
-    //If sensor is close to being balanced negatively, it will move left slowly
+    //If sensor is close to being balanced negatively, the balancer wheel will move left slowly
     if (yawPitchRoll[pitchID] > -Constants.PIDGEON_BALANCING_FAR_FROM_BALANCED && yawPitchRoll[pitchID] < -Constants.PIDGEON_BALANCING_CLOSE_TO_BALANCED)
     {
-      turnWheelLeftSlow();
+      turnWheel(-Constants.PIGEON_WHEEL_SLOW_TALON_SPEED);
     }
-    //If sensor is close if being balanced positively, it will move right slowly
+    //If sensor is close if being balanced positively, the balancer will move right slowly
     if (yawPitchRoll[pitchID] < Constants.PIDGEON_BALANCING_FAR_FROM_BALANCED && yawPitchRoll[pitchID] > Constants.PIDGEON_BALANCING_CLOSE_TO_BALANCED)
     {
-      turnWheelRightSlow();
+      turnWheel(Constants.PIGEON_WHEEL_SLOW_TALON_SPEED);
     }
   }
 
-  private void releaseClimbRope()
+  /**
+   * Method to move or stop the wheel. Can be quick or slow based on speed sent
+   */
+  private void turnWheel(double speed)
   {
-    liftController.set(ControlMode.PercentOutput, 0.8);
-  }
-
-  private void pullInClimbRope()
-  {
-    liftController.set(ControlMode.PercentOutput, -0.5);
-  }
-
-  private void stopWheel()
-  {
-    pidgeonTalon.set(Constants.PIGEON_WHEEL_STATIONARY_SPEED);
-  }
-
-  //Moves wheel to the right quickly
-  private void turnWheelRightFast()
-  {
-    pidgeonTalon.set(Constants.PIGEON_WHEEL_FAST_TALON_SPEED_RIGHT);
-  }
-
-  //Moves wheel to the right slowly
-  private void turnWheelRightSlow()
-  {
-    pidgeonTalon.set(Constants.PIGEON_WHEEL_SLOW_TALON_SPEED_RIGHT);
-  }
-
-  //Moves wheel to the left quickly
-  private void turnWheelLeftFast()
-  {
-    pidgeonTalon.set(Constants.PIGEON_WHEEL_FAST_TALON_SPEED_LEFT);
-  }
-
-  //Moves wheel to the left slowly
-  private void turnWheelLeftSlow()
-  {
-    pidgeonTalon.set(Constants.PIGEON_WHEEL_SLOW_TALON_SPEED_LEFT);
+    pidgeonTalon.set(speed);
   }
 }
