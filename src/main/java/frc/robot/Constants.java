@@ -43,8 +43,11 @@ public final class Constants {
     public static final double LIMELIGHT_X_RANGE_MAXIMUM = 5.0;
     public static final int LIMELIGHT_ON_CODE = 3;
     public static final int LIMELIGHT_OFF_CODE = 1;
+    public static final double LIMELIGHT_AREA_FOUND_MINIMUM = 1.2;
 
     public static final double LIMELIGHT_TARGETING_AREA_LARGE_VALUE = 3.0;
+    public static final double LIMELIGHT_TARGETING_AREA_MEDIUM_VALUE = 2.9;
+    public static final double LIMELIGHT_TARGETING_AREA_SMALL_VALUE = 2.3;
     public static final double SHOOTER_SPEED_LIMELIGHT_TARGETING_AREA_LARGE_VALUE = 1.0;
     public static final double LIMELIGHT_TARGETING_AREA_WHITE_LINE_VALUE = 2.8; 
 }

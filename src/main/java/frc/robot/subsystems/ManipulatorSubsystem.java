@@ -204,15 +204,15 @@ public class ManipulatorSubsystem extends SubsystemBase {
       System.out.println("in");
       NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(Constants.LIMELIGHT_ON_CODE);
       //Turns on the limelight LED
-      if (limelightTargetFoundValue != Constants.LIMELIGHT_TARGET_FOUND) 
+      if (limelightTargetFoundValue != Constants.LIMELIGHT_TARGET_FOUND) //Checks if there's a target
       {
         turnLeft();
       } 
-      else if (limelightAreaValue < 1.2)
+      else if (limelightAreaValue < Constants.LIMELIGHT_AREA_FOUND_MINIMUM) //Checks if the target meets a specific area
       {
         turnLeft();
       }
-      else if (limelightXValue < -Constants.LIMELIGHT_X_RANGE_MAXIMUM) 
+      else if (limelightXValue < -Constants.LIMELIGHT_X_RANGE_MAXIMUM) //Aligns to center position
       {
         turnRight();
       } 
@@ -220,11 +220,11 @@ public class ManipulatorSubsystem extends SubsystemBase {
       {
         turnLeft();
       } 
-      else 
+      else //Stops moving when centered
       {
         stopMoving();
-        findTargetOkay = false; //Stops targeting after centering on the target
-        determineDistanceOkay = true;
+        findTargetOkay = false; //Ends targeting process
+        determineDistanceOkay = true; //Begins determining distance
       }
     }
     else if (determineDistanceOkay)
@@ -247,7 +247,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
       shooterSpeed = Constants.SHOOTER_SPEED_LIMELIGHT_TARGETING_AREA_LARGE_VALUE;
     }
     //9-11 ft
-    else if (areaValue <= 2.9 && areaValue >= 2.3)
+    else if (areaValue <= Constants.LIMELIGHT_TARGETING_AREA_MEDIUM_VALUE && areaValue >= LIMELIGHT_TARGETING_AREA_SMALL_VALUE)
     {
       shooterSpeed = 0.8;
     }
