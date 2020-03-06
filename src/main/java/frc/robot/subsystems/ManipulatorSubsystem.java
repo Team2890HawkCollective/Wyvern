@@ -249,17 +249,20 @@ public class ManipulatorSubsystem extends SubsystemBase {
     //9-11 ft
     else if (areaValue <= Constants.LIMELIGHT_TARGETING_AREA_MEDIUM_VALUE && areaValue >= Constants.LIMELIGHT_TARGETING_AREA_SMALL_VALUE)
     {
-      shooterSpeed = 0.8;
+      shooterSpeed = Constants.SHOOTER_SPEED_LIMELIGHT_TARGETING_AREA_MEDIUM_VALUE;
     }
     //7-9 ft
     else if (areaValue > Constants.LIMELIGHT_TARGETING_AREA_SMALL_VALUE)
     {
-      shooterSpeed = 0.7;
+      shooterSpeed = Constants.SHOOTER_SPEED_LIMELIGHT_TARGETING_AREA_SMALL_VALUE;
     }
 
-    targetingOkay = false;
+    targetingOkay = false; //Ends targeting process
   }
 
+  /**
+   * 
+   */
   private void shootPowerCell()
   {
     if (countOfBallsInMagazine != 0)

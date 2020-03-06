@@ -49,5 +49,7 @@ public final class Constants {
     public static final double LIMELIGHT_TARGETING_AREA_MEDIUM_VALUE = 2.9;
     public static final double LIMELIGHT_TARGETING_AREA_SMALL_VALUE = 2.3;
     public static final double SHOOTER_SPEED_LIMELIGHT_TARGETING_AREA_LARGE_VALUE = 1.0;
+    public static final double SHOOTER_SPEED_LIMELIGHT_TARGETING_AREA_MEDIUM_VALUE = 0.8;
+    public static final double SHOOTER_SPEED_LIMELIGHT_TARGETING_AREA_SMALL_VALUE = 0.7;
     public static final double LIMELIGHT_TARGETING_AREA_WHITE_LINE_VALUE = 2.8; 
 }
