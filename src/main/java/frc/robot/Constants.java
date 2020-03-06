@@ -7,6 +7,7 @@
 
 package frc.robot;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 /**
@@ -18,38 +19,70 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
+    /**
+     * IDs for Victor motor controllers
+     */
     public static final int BALL_PICKUP_CONTROLLER_VICTOR_SPX_ID = 3;
     public static final int SHOOTER_CONTROLLER_LEFT_SIDE_VICTOR_SPX_ID = 1;
     public static final int SHOOTER_CONTROLLER_RIGHT_SIDE_VICTOR_SPX_ID = 2;
     public static final int MAGAZINE_CONTROLLER_VICTOR_SPX_ID = 4;
 
+    /**
+     * IDs for drive Spark Max controllers
+     */
     public static int LEFT_FRONT_SPARK_CONTROLLER_ID = 2;
     public static int LEFT_BACK_SPARK_CONTROLLER_ID = 4;
     public static int RIGHT_FRONT_SPARK_CONTROLLER_ID = 1;
     public static int RIGHT_BACK_SPARK_CONTROLLER_ID = 3;
 
+    /**
+     * Motortype for brushless Spark Max motors
+     */
     public static final MotorType BRUSHLESS_MOTOR = MotorType.kBrushless;
 
+    /**
+     * ControlMode used to declare Victors to set speed with .set()
+     */
+    public static final ControlMode SPEED_CONTROL = ControlMode.PercentOutput;
+
+    /**
+     * Speeds
+     */
     public static final double SHOOTER_TARGETING_TURNING_SPEED = 0.2;
-
-    public static final int XBOX_ASSISTANT_DRIVER_CONTROLLER_ID = 2;
-
     public static final double NO_SPEED = 0.0;
 
-    public static final int BOTTOM_MAGAZINE_SENSOR_PORT = 0;
-    public static final int TOP_MAGAZINE_SENSOR_PORT = 1;
+    /**
+     * Port ID for Assistant driver controller
+     */
+    public static final int XBOX_ASSISTANT_DRIVER_CONTROLLER_ID = 2;
 
-    public static final double LIMELIGHT_TARGET_FOUND = 1.0;
-    public static final double LIMELIGHT_X_RANGE_MAXIMUM = 5.0;
+    /**
+     * Distances and area calculations used for limelight targeting
+     */
+    public static final double LIMELIGHT_TARGET_FOUND = 1.0; //tv
+    public static final double LIMELIGHT_X_RANGE_MAXIMUM = 5.0; //range for which limelight is considered centered
+    public static final double LIMELIGHT_AREA_FOUND_MINIMUM = 1.2; //minimum area for target to be considered found
+    public static final double LIMELIGHT_TARGETING_AREA_LARGE_VALUE = 3.0; //11-15 ft away ta value
+    public static final double LIMELIGHT_TARGETING_AREA_MEDIUM_VALUE = 2.9; //9-11 ft away ta value
+    public static final double LIMELIGHT_TARGETING_AREA_SMALL_VALUE = 2.3; //7-9 ft awat ta value
+    public static final double SHOOTER_SPEED_LIMELIGHT_TARGETING_AREA_LARGE_VALUE = 1.0; //11-15 ft shooter speed
+    public static final double SHOOTER_SPEED_LIMELIGHT_TARGETING_AREA_MEDIUM_VALUE = 0.8; //9-11 ft shooter speed
+    public static final double SHOOTER_SPEED_LIMELIGHT_TARGETING_AREA_SMALL_VALUE = 0.7; //7-9 ft shooter speed
+
+    /**
+     * Codes used to turn limelight camera on and off throughout the match
+     */
     public static final int LIMELIGHT_ON_CODE = 3;
     public static final int LIMELIGHT_OFF_CODE = 1;
-    public static final double LIMELIGHT_AREA_FOUND_MINIMUM = 1.2;
 
-    public static final double LIMELIGHT_TARGETING_AREA_LARGE_VALUE = 3.0;
-    public static final double LIMELIGHT_TARGETING_AREA_MEDIUM_VALUE = 2.9;
-    public static final double LIMELIGHT_TARGETING_AREA_SMALL_VALUE = 2.3;
-    public static final double SHOOTER_SPEED_LIMELIGHT_TARGETING_AREA_LARGE_VALUE = 1.0;
-    public static final double SHOOTER_SPEED_LIMELIGHT_TARGETING_AREA_MEDIUM_VALUE = 0.8;
-    public static final double SHOOTER_SPEED_LIMELIGHT_TARGETING_AREA_SMALL_VALUE = 0.7;
-    public static final double LIMELIGHT_TARGETING_AREA_WHITE_LINE_VALUE = 2.8; 
+    /**
+     * Outake speed for magazine while shooting
+     */
+    public static final double SHOOTER_MAGAZINE_OUTTAKE_SPEED = 0.3;
+
+    /**
+     * Distances for rangefinder detecting power cells
+     */
+    public static final double RANGEFINDER_BALL_DETECTED_DISTANCE = 2.0; //2 inches is detected
+    public static final double RANGEFINDER_BALL_AWAY_DISTANCE = 4.0; //More than 4 inches is away
 }

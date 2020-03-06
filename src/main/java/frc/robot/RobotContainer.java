@@ -25,8 +25,9 @@ import edu.wpi.first.wpilibj.Joystick;
  */
 public class RobotContainer 
 {
-    private ManipulatorSubsystem m_manipulatorSubsystem = new ManipulatorSubsystem();
-    private ManipulatorCommand m_manipulatorCommand = new ManipulatorCommand(m_manipulatorSubsystem);
+  //Creates a manipulator subsystem and command
+  private ManipulatorSubsystem m_manipulatorSubsystem = new ManipulatorSubsystem();
+  private ManipulatorCommand m_manipulatorCommand = new ManipulatorCommand(m_manipulatorSubsystem);
 
 
   /**
@@ -50,6 +51,9 @@ public class RobotContainer
 
   }
 
+  /**
+   * Runs manipulators during teleop periodic
+   */
   public Command runManipulators()
   {
     return m_manipulatorCommand;

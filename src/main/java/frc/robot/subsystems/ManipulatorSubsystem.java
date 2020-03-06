@@ -52,25 +52,28 @@ public class ManipulatorSubsystem extends SubsystemBase {
   private NetworkTableEntry limelightArea = limelightTable.getEntry("ta"); // ta
   private NetworkTableEntry limelightTargetFound = limelightTable.getEntry("tv"); // tv
 
+  /**
+   * Rangefinders used to track number of power cells in bot at specific time
+   */
+  //Bottom
   private DigitalInput bottomEcho = new DigitalInput(1);
   private DigitalOutput bottomPing = new DigitalOutput(0);
   private Ultrasonic bottomRangeFinder = new Ultrasonic(bottomPing, bottomEcho);
-
+  //Top
   private DigitalInput topEcho = new DigitalInput(3);
   private DigitalOutput topPing = new DigitalOutput(4);
   private Ultrasonic topRangeFinder = new Ultrasonic(topPing, topEcho);
 
-  
   /**
    * Booleans for determining process of operations within manipulators methods
    */
   private boolean magazineCheckForYellow = false; //Determines whether or not to check for power cell in beginning of magazine
   private boolean magazineCheckForNothing = false; //Determines whether or not to check for nothing in beginning of magazine
-  private boolean magazineEmpty = true; //Determines whether or not the magazine is empty
   private boolean shooterCheckForYellow = false; //Determines whether or not to check for power cell in end of magazine while shooting
   private boolean shooterCheckForNothing = false; //Determines whether or not to check for nothing in end of magazine while shooting
   private boolean findTargetOkay = false; //Determines whether or not to find the target while targeting 
-  private boolean determineDistanceOkay = false;
+  private boolean determineDistanceOkay = false; //Determines whether or not to determine how far we are from target
+
   /**
    * Booleans for determining whether or not to run a manipulator method
    */
@@ -81,15 +84,9 @@ public class ManipulatorSubsystem extends SubsystemBase {
   /**
    * Numbers
    */
-  private double magazineSpeed = 0.2;
+  private double magazineSpeed = 0.2; //Speed determined for magazine whilst loading balls
   private double shooterSpeed = 0.8; //Speed for the shooter determined after targeting
   private int countOfBallsInMagazine = 0; //Keeps track of how many balls are in the magazine at a given time
-
-  /**
-   * Inputs to determine when a ball enters and exits the magazine based on the top and bottom exits and entrances
-   */
-  private AnalogInput topMagazineSensor = new AnalogInput(Constants.TOP_MAGAZINE_SENSOR_PORT); //Sensor at end of magazine
-  private AnalogInput bottomMagazineSensor = new AnalogInput(Constants.BOTTOM_MAGAZINE_SENSOR_PORT); //Sensor at beginning of magazine
 
   /**
    * Spark Max's used for drive train
@@ -108,9 +105,13 @@ public class ManipulatorSubsystem extends SubsystemBase {
    * Creates a new ManipulatorSubsystem.
    */
   public ManipulatorSubsystem() {
+    //Inverts wheels for proper driving
     rightFrontSparkController.setInverted(true);
     rightBackSparkController.setInverted(true);
+
+    //Makes sure rangefinders work properly
     bottomRangeFinder.setAutomaticMode(true);
+    topRangeFinder.setAutomaticMode(true);
   }
 
   /**
@@ -130,11 +131,9 @@ public class ManipulatorSubsystem extends SubsystemBase {
       magazineIntake();
     }
 
-    //If the start button is pressed, the magazine intake/outake will immediately be stopped
+    //If the start button is pressed, all systems will be immediately stopped
     if (assistantDriverController.getStartButtonPressed())
     {
-      System.out.println("Killed");
-      killMagazine();
       magazineOkay = false;
       shootingOkay = false;
       targetingOkay = false;
@@ -159,6 +158,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
       shooterCheckForYellow = true; 
       shootingOkay = true;
     }
+    //Temporary stop for the shooter
     if (assistantDriverController.getYButtonReleased())
     {
       shootingOkay = false;
@@ -172,10 +172,9 @@ public class ManipulatorSubsystem extends SubsystemBase {
     //If the X button is held, the intake system will be run
     if (assistantDriverController.getXButton())
     {
-      System.out.println("Intake");
       powerCellIntake(0.275);
     }
-
+    //When the X button is released, the intake will stop rotating
     if (assistantDriverController.getXButtonReleased())
     {
       powerCellIntake(0.0);
@@ -193,17 +192,11 @@ public class ManipulatorSubsystem extends SubsystemBase {
     double limelightAreaValue = limelightArea.getDouble(0.0); // ta
     double limelightTargetFoundValue = limelightTargetFound.getDouble(0.0); // tv
 
-    System.out.println("tv: " + limelightTargetFoundValue);
-    System.out.println("tx: " + limelightXValue);
-    System.out.println("ta: " + limelightAreaValue);
-
-
     //If it's okay to target, the limelight will enable the light and move robot depending on position
     if (findTargetOkay)
     {
-      System.out.println("in");
-      NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(Constants.LIMELIGHT_ON_CODE);
       //Turns on the limelight LED
+      NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(Constants.LIMELIGHT_ON_CODE);
       if (limelightTargetFoundValue != Constants.LIMELIGHT_TARGET_FOUND) //Checks if there's a target
       {
         turnLeft();
@@ -227,6 +220,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
         determineDistanceOkay = true; //Begins determining distance
       }
     }
+    //Begins determining the distance from the target 
     else if (determineDistanceOkay)
     {
       //Turns off light when targeting is done
@@ -240,7 +234,6 @@ public class ManipulatorSubsystem extends SubsystemBase {
    */
   private void determineShooterSpeed(double areaValue)
   {
-    System.out.println("Here");
     //11-15 ft
     if (areaValue > Constants.LIMELIGHT_TARGETING_AREA_LARGE_VALUE)
     {
@@ -261,60 +254,91 @@ public class ManipulatorSubsystem extends SubsystemBase {
   }
 
   /**
-   * 
+   * System for shooting power cells through shooter
    */
   private void shootPowerCell()
   {
+    //Runs only if there are more than 0 cells in the magazine
     if (countOfBallsInMagazine != 0)
     {
-      shooterLeftSideController.set(ControlMode.PercentOutput, shooterSpeed);
-      shooterRightSideController.set(ControlMode.PercentOutput, -shooterSpeed);
-      magazineController.set(ControlMode.PercentOutput, 0.3);
+      //Sets shooter to speed and begins magazine movement
+      shooterLeftSideController.set(Constants.SPEED_CONTROL, shooterSpeed);
+      shooterRightSideController.set(Constants.SPEED_CONTROL, -shooterSpeed);
+      magazineController.set(Constants.SPEED_CONTROL, Constants.SHOOTER_MAGAZINE_OUTTAKE_SPEED);
 
+      //Checks for yellow to determine when ball exits 
       if (shooterCheckForYellow)
       {
-        if (topRangeFinder.getRangeInches() <= 2.0)
+        if (topRangeFinder.getRangeInches() <= Constants.RANGEFINDER_BALL_DETECTED_DISTANCE)
         {
           countOfBallsInMagazine--;
           shooterCheckForNothing = true;
         }
       }
+      //Checks for nothing so there isn't a constant subtracting of balls to the counter
       if (shooterCheckForNothing = true)
       {
-        if (topRangeFinder.getRangeInches() >= 4.0)
+        if (topRangeFinder.getRangeInches() >= Constants.RANGEFINDER_BALL_AWAY_DISTANCE)
         {
           shooterCheckForYellow = true;
           shooterCheckForNothing = false;
         }
       }
     }
-    else
+    else //Ends shooting when balls is at zero
     {
-      shooterLeftSideController.set(ControlMode.PercentOutput, 0.0);
-      shooterRightSideController.set(ControlMode.PercentOutput, 0.0);
-      magazineController.set(ControlMode.PercentOutput, 0.0);
+      shooterLeftSideController.set(Constants.SPEED_CONTROL, Constants.NO_SPEED);
+      shooterRightSideController.set(Constants.SPEED_CONTROL, Constants.NO_SPEED);
+      magazineController.set(Constants.SPEED_CONTROL, Constants.NO_SPEED);
 
       shootingOkay = false;
     }
-
-    if (shootingOkay)
-    {
-      shooterLeftSideController.set(ControlMode.PercentOutput, shooterSpeed);
-      shooterRightSideController.set(ControlMode.PercentOutput, -shooterSpeed);
-      magazineController.set(ControlMode.PercentOutput, 0.4);
-    }
-    else
-    {
-      shooterLeftSideController.set(ControlMode.PercentOutput, 0.0);
-      shooterRightSideController.set(ControlMode.PercentOutput, 0.0);
-      magazineController.set(ControlMode.PercentOutput, 0.0);
-    }
-
   }
 
-  public void magazineIntake() {
-    System.out.println("Range: " + bottomRangeFinder.getRangeInches());
-    System.out.println("Count of Balls: " + countOfBallsInMagazine);
+  /**
+   * Method for intaking and spacing power cells within the magazine
+   */
+  private void magazineIntake() 
+  {
+    //Determines what speed the magazine based on how many balls are in the magazine
+    determineMagazineSpeed();
+
+    //Checks for yellow first to determine when ball is inside the magazine
+    if (magazineCheckForYellow)
+    {
+      if (bottomRangeFinder.getRangeInches() <= Constants.RANGEFINDER_BALL_DETECTED_DISTANCE)
+      {
+        magazineController.set(Constants.SPEED_CONTROL, Constants.NO_SPEED);
+        magazineCheckForYellow = false;
+        magazineCheckForNothing = true;
+        countOfBallsInMagazine++;
+      }
+      else
+      {
+        magazineController.set(Constants.SPEED_CONTROL, magazineSpeed);
+      }
+    }
+    //Checks for nothing next to push the power cell slightly inside the magazine
+    if (magazineCheckForNothing)
+    {
+      if (bottomRangeFinder.getRangeInches() >= (Constants.RANGEFINDER_BALL_AWAY_DISTANCE - 1.0)) // -1.0 to create tighter range
+      {
+        magazineController.set(Constants.SPEED_CONTROL, Constants.NO_SPEED);
+        magazineCheckForNothing = false;
+        magazineOkay = false;
+      }
+      else
+      {
+        magazineController.set(Constants.SPEED_CONTROL, magazineSpeed);
+      }
+    }
+  }
+
+  /**
+   * Determines speed of magazine based on number of power cells in magazine
+   */
+  private void determineMagazineSpeed()
+  {
     if (countOfBallsInMagazine == 0)
     {
       magazineSpeed = 0.15;
@@ -335,48 +359,29 @@ public class ManipulatorSubsystem extends SubsystemBase {
     {
       magazineSpeed = 0.3;
     }
-
-    if (magazineCheckForYellow)
-    {
-      if (bottomRangeFinder.getRangeInches() <= 2.1) //bottomMagazineSensor.getValue() >= 100.0
-      {
-        magazineController.set(ControlMode.PercentOutput, 0.0);
-        magazineCheckForYellow = false;
-        magazineCheckForNothing = true;
-        countOfBallsInMagazine++;
-      }
-      else
-      {
-        magazineController.set(ControlMode.PercentOutput, magazineSpeed);
-      }
-    }
-    if (magazineCheckForNothing)
-    {
-      if (bottomRangeFinder.getRangeInches() >= 3.0) //bottomMagazineSensor.getValue() >= 100.0
-      {
-        magazineController.set(ControlMode.PercentOutput, 0.0);
-        magazineCheckForNothing = false;
-        magazineOkay = false;
-      }
-      else
-      {
-        magazineController.set(ControlMode.PercentOutput, magazineSpeed);
-      }
-    }
   }
 
-  public void powerCellIntake(double speed) {
-    ballPickupController.set(ControlMode.PercentOutput, speed);
+  /**
+   * Starts intake mechanism to pull in power cells
+   */
+  private void powerCellIntake(double speed) 
+  {
+    ballPickupController.set(Constants.SPEED_CONTROL, speed);
   }
 
-  private void killMagazine() {
-    magazineController.set(ControlMode.PercentOutput, 0.0);
+  /**
+   * Immediately turns off magazine when called
+   */
+  private void killMagazine() 
+  {
+    magazineController.set(Constants.SPEED_CONTROL, Constants.NO_SPEED);
   }
 
-  // Turns robot right
-  private void turnRight() {
-
-    // Spark Maxs' to replace talons when chassis is ready
+  /**
+   * Turns robot right for targeting
+   */
+  private void turnRight() 
+  {
     leftFrontSparkController.set(Constants.SHOOTER_TARGETING_TURNING_SPEED);
     rightFrontSparkController.set(-Constants.SHOOTER_TARGETING_TURNING_SPEED);
     leftBackSparkController.set(Constants.SHOOTER_TARGETING_TURNING_SPEED);
@@ -384,18 +389,22 @@ public class ManipulatorSubsystem extends SubsystemBase {
 
   }
 
-  // Turns robot left
-  private void turnLeft() {
-    // Spark Max
+  /**
+   * Turns robot left for targeting
+   */
+  private void turnLeft() 
+  {
     leftFrontSparkController.set(-Constants.SHOOTER_TARGETING_TURNING_SPEED);
     rightFrontSparkController.set(Constants.SHOOTER_TARGETING_TURNING_SPEED);
     leftBackSparkController.set(-Constants.SHOOTER_TARGETING_TURNING_SPEED);
     rightBackSparkController.set(Constants.SHOOTER_TARGETING_TURNING_SPEED);
   }
 
-  // Stops the robot from moving
-  private void stopMoving() {
-    // Spark Max
+  /**
+   * Stops the robot from moving for targeting
+   */
+  private void stopMoving() 
+  {
     leftFrontSparkController.set(Constants.NO_SPEED);
     rightFrontSparkController.set(Constants.NO_SPEED);
     leftBackSparkController.set(-Constants.NO_SPEED);
