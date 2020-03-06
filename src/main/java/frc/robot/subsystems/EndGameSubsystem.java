@@ -30,10 +30,13 @@ public class EndGameSubsystem extends SubsystemBase {
   private int pitchID = 1;
 
   private boolean beginBalance = false;
+  private boolean liftStageOne = false;
+  private boolean liftStageTwo = false;
   
   private VictorSPX liftController = new VictorSPX(Constants.LIFT_VICTOR_SPX_CONTROLLER_ID);
 
-  private DoubleSolenoid liftSolenoid = new DoubleSolenoid(Constants.LIFT_SOLENOID_FORWARD_PORT_ID, Constants.LIFT_SOLENOID_BACKWARD_PORT_ID);
+  private DoubleSolenoid liftSolenoid = new DoubleSolenoid(3, 4);
+  private DoubleSolenoid brakeSolenoid = new DoubleSolenoid(1, 2);
   
   private WPI_TalonSRX balancerTalon = new WPI_TalonSRX(Constants.BALANCER_TALON_ID);
 
@@ -44,16 +47,22 @@ public class EndGameSubsystem extends SubsystemBase {
 
   public void endGame()
   {
-    /*if (assistantDriverController.getBumperPressed(Hand.kLeft))
+    if (assistantDriverController.getBumperPressed(Hand.kLeft))
     {
-      liftSolenoid.set(DoubleSolenoid.Value.kForward);
-      releaseClimbRope();
+      liftStageOne = true;
+    }
+    if (liftStageOne)
+    {
+      firstLiftStage();
     }
     if (assistantDriverController.getBumperPressed(Hand.kRight))
     {
-      liftSolenoid.set(DoubleSolenoid.Value.kReverse);
-      pullInClimbRope();
-    }*/
+      liftStageTwo = true;
+    }
+    if (liftStageTwo)
+    {
+      secondLiftStage();
+    }
 
     if (assistantDriverController.getBackButtonPressed())
     {
@@ -65,6 +74,25 @@ public class EndGameSubsystem extends SubsystemBase {
     {
       balanceWheel();
     }
+
+    if (assistantDriverController.getStartButtonPressed())
+    {
+      liftStageOne = false;
+      liftStageTwo = false;
+      beginBalance = false;
+    }
+  }
+
+  private void firstLiftStage()
+  {
+    liftSolenoid.set(DoubleSolenoid.Value.kForward);
+    //releaseClimbRope();
+  }
+
+  private void secondLiftStage()
+  {
+    liftSolenoid.set(DoubleSolenoid.Value.kReverse);
+    pullInClimbRope();
   }
 
   private void balanceWheel()
