@@ -8,20 +8,9 @@
 package frc.robot;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import com.revrobotics.ColorSensorV3;
-import edu.wpi.first.wpilibj.util.Color;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
-
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
 
 
 
@@ -141,6 +130,7 @@ public class Robot extends TimedRobot {
   {
     m_robotContainer.getManipulatorCommand().execute(); //runs manipulators
     m_robotContainer.getDriveTrainCommand().execute(); //runs drive train
+    m_robotContainer.getEndGameCommand().execute();
   }
 
   @Override
