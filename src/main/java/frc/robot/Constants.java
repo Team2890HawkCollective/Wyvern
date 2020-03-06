@@ -7,6 +7,7 @@
 
 package frc.robot;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 /**
@@ -38,4 +39,23 @@ public final class Constants {
     public static final double AUTONOMOUS_SHOOTER_SPEED_POSITION_THREE = 0.4;
 
     public static final double NO_SPEED = 0.0;
+
+    public static final double LIMELIGHT_TARGET_FOUND = 1.0;
+    public static final double LIMELIGHT_X_VALUE_RANGE = 3.0;
+    public static final double LIMELIGHT_AREA_MAXIMUM_VALUE = 3.0;
+    public static final double LIMELIGHT_AREA_MINIMUM_VALUE = 1.5;
+
+    public static final int SHOOTER_CONTROLLER_LEFT_SIDE_VICTOR_SPX_ID = 1;
+    public static final int SHOOTER_CONTROLLER_RIGHT_SIDE_VICTOR_SPX_ID = 2;
+    public static final int MAGAZINE_CONTROLLER_VICTOR_SPX_ID = 4;
+
+    /**
+     * Distances for rangefinder detecting power cells
+     */
+    public static final double RANGEFINDER_BALL_DETECTED_DISTANCE = 2.2; //2 inches is detected
+    public static final double RANGEFINDER_BALL_AWAY_DISTANCE = 4.0; //More than 4 inches is away
+
+    public static final ControlMode SPEED_CONTROL = ControlMode.PercentOutput;
+
+    public static final double SHOOTER_MAGAZINE_OUTTAKE_SPEED = 0.3;
 }

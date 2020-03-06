@@ -11,53 +11,76 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Robot;
 
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-import com.revrobotics.SparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DigitalOutput;
+import edu.wpi.first.wpilibj.Ultrasonic;
 
 public class AutonomousSubsystem extends SubsystemBase {
-  //Calls the limelight and then gathers data
+  /**
+   * Calls the limelight and gather basic data
+   */
   NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
   NetworkTableEntry limelightX = table.getEntry("tx"); //tx
   NetworkTableEntry limelightY = table.getEntry("ty"); //ty
   NetworkTableEntry limelightArea = table.getEntry("ta"); //ta
   NetworkTableEntry limelightTargetFound = table.getEntry("tv"); //tv
 
-  //Drive Train Talons --> Will need to be changed to NEOs for new drive train
-  private WPI_TalonSRX leftFrontTalon = new WPI_TalonSRX(Constants.LEFT_FRONT_TALON_ID);
-  private WPI_TalonSRX rightFrontTalon = new WPI_TalonSRX(Constants.RIGHT_FRONT_TALON_ID);
-  private WPI_TalonSRX leftBackTalon = new WPI_TalonSRX(Constants.LEFT_BACK_TALON_ID);
-  private WPI_TalonSRX rightBackTalon = new WPI_TalonSRX(Constants.RIGHT_BACK_TALON_ID);
-
+  /**
+   * Spark Max's used for drivetrain
+   */
   private CANSparkMax leftFrontSparkController = new CANSparkMax(Constants.LEFT_FRONT_SPARK_CONTROLLER_ID, Constants.BRUSHLESS_MOTOR);
   private CANSparkMax rightFrontSparkController = new CANSparkMax(Constants.RIGHT_FRONT_SPARK_CONTROLLER_ID, Constants.BRUSHLESS_MOTOR);
-  private CANSparkMax leftBackSparkController = new CANSparkMax(Constants.LEFT_FRONT_SPARK_CONTROLLER_ID, MotorType.kBrushless);
-  private CANSparkMax rightBackSparkController = new CANSparkMax(Constants.LEFT_FRONT_SPARK_CONTROLLER_ID, MotorType.kBrushless);
+  private CANSparkMax leftBackSparkController = new CANSparkMax(Constants.LEFT_FRONT_SPARK_CONTROLLER_ID, Constants.BRUSHLESS_MOTOR);
+  private CANSparkMax rightBackSparkController = new CANSparkMax(Constants.LEFT_FRONT_SPARK_CONTROLLER_ID, Constants.BRUSHLESS_MOTOR);
 
+  /**
+   * Victor SPX controllers to control magazine and shooter
+   */
+  private VictorSPX shooterLeftSideController = new VictorSPX(Constants.SHOOTER_CONTROLLER_LEFT_SIDE_VICTOR_SPX_ID);
+  private VictorSPX shooterRightSideController = new VictorSPX(Constants.SHOOTER_CONTROLLER_RIGHT_SIDE_VICTOR_SPX_ID);
+  private VictorSPX magazineController = new VictorSPX(Constants.MAGAZINE_CONTROLLER_VICTOR_SPX_ID);
   
+  /**
+   * Rangefinder used to track number of power cells leaving the bot
+   */
+  //Top
+  private DigitalInput topEcho = new DigitalInput(3);
+  private DigitalOutput topPing = new DigitalOutput(2);
+  private Ultrasonic topRangeFinder = new Ultrasonic(topPing, topEcho);
+
+  /**
+   * Booleans for determining process of operations within shooter method
+   */
+  private boolean shooterCheckForYellow = false; //Determines whether or not to check for power cell in end of magazine while shooting
+  private boolean shooterCheckForNothing = false; //Determines whether or not to check for nothing in end of magazine while shooting
+
+  /**
+   * Integer to keep count of how many balls are in the magzine
+   */
+  private int countOfBallsInMagazine = 3; //3 are initially in Autonomous
+
   /**
    * Creates a new AutonomousSubsystem.
    */
   public AutonomousSubsystem() {
-    //Sets two motors inverted to prevent motors from turning against each other
-    rightFrontTalon.setInverted(true);
-    rightBackTalon.setInverted(true);
-
-    /* Spark max inversions to replace Talons when chassis is ready
+    //Imverts motors for proper driving
     rightFrontSparkController.setInverted(true);
-    rightBackSparkController.setInverted(true);*/
+    rightBackSparkController.setInverted(true);
   }
 
-  @Override
-  public void periodic() {
+  /**
+   * Method to be called on scheduler to run autonomous
+   */
+  public void autonomous() {
     //Gather selection from Shuffleboard that was declared in Robot
     String choice = Robot.startingPositionChooser.getSelected();
-    System.out.println("Choice: " + choice); //test print to see choice
 
     //Checks to make sure there is a value
     if (choice != null)
@@ -78,42 +101,40 @@ public class AutonomousSubsystem extends SubsystemBase {
     }
   }
 
-  //System of events for Position One (Left)
+  /**
+   * Method to be called if we are in position one
+   */
   private void targetPositionOne()
   {
     //Gathers data 
     double limelightXValue = limelightX.getDouble(0.0); //tx
-    double limelightYValue = limelightY.getDouble(0.0); //ty
     double limelightAreaValue = limelightArea.getDouble(0.0); //ta
     double limelightTargetFoundValue = limelightTargetFound.getDouble(0.0); //tv
 
     //Booleans to determine proper timing of events
     boolean targetingOkay = true;
     boolean shootingOkay = false;
-
-    //Calculated distance based of area encompassed by target within Limelight
-    double distance = -2.13 * limelightAreaValue + 14.79;
     
     //Targeting process
-    if (targetingOkay == true)
+    if (targetingOkay)
     {
-      if (limelightTargetFoundValue != 1.0)
+      if (limelightTargetFoundValue != Constants.LIMELIGHT_TARGET_FOUND)
       {
         turnRight();
       }
-      else if (limelightXValue < -2.0)
+      else if (limelightXValue < -Constants.LIMELIGHT_X_VALUE_RANGE)
       {
         turnLeft();
       }
-      else if (limelightXValue > 2.0)
+      else if (limelightXValue > Constants.LIMELIGHT_X_VALUE_RANGE)
       {
         turnRight();
       }
-      else if (distance > 9.0) //Might change to just ta
+      else if (limelightAreaValue > Constants.LIMELIGHT_AREA_MAXIMUM_VALUE) 
       {
         moveBackward();
       }
-      else if (distance < 8.0)
+      else if (limelightAreaValue < Constants.LIMELIGHT_AREA_MINIMUM_VALUE)
       {
         moveForward();
       }
@@ -125,19 +146,24 @@ public class AutonomousSubsystem extends SubsystemBase {
       }
     }
     //Shooting Process
-    if (shootingOkay == true)
+    if (shootingOkay)
     {
       shootBall(Constants.AUTONOMOUS_SHOOTER_SPEED_POSITION_ONE);
-      shootingOkay = false;
+      if (countOfBallsInMagazine == 0)
+      {
+        shootingOkay = false;
+      }
     }
+    //Add white line w encoders
   }
 
-  //System for targeting from Position Two
+  /**
+   * Method for autonomous and targeting based on position two
+   */
   private void targetPositionTwo()
   {
     //Gather data
     double limelightXValue = limelightX.getDouble(0.0);
-    double limelightYValue = limelightY.getDouble(0.0);
     double limelightAreaValue = limelightArea.getDouble(0.0);
     double limelightTargetFoundValue = limelightTargetFound.getDouble(0.0);
 
@@ -145,25 +171,22 @@ public class AutonomousSubsystem extends SubsystemBase {
     boolean targetingOkay = true;
     boolean shootingOkay = false;
 
-    //Distance calculated based off of area of target within limelight
-    double distance = -2.13 * limelightAreaValue + 14.79;
-
     //Targeting Process
-    if (targetingOkay == true)
+    if (targetingOkay)
     {
-      if (limelightTargetFoundValue != 1.0)
+      if (limelightTargetFoundValue != Constants.LIMELIGHT_TARGET_FOUND)
       {
         turnRight();
       }
-      else if (limelightXValue < -2.0)
+      else if (limelightXValue < -Constants.LIMELIGHT_X_VALUE_RANGE)
       {
         turnLeft();
       }
-      else if (limelightXValue > 2.0)
+      else if (limelightXValue > Constants.LIMELIGHT_X_VALUE_RANGE)
       {
         turnRight();
       }
-      else if (limelightAreaValue < 2.2) //Will need to be changed based on calculations
+      else if (limelightAreaValue < (Constants.LIMELIGHT_AREA_MINIMUM_VALUE + 0.7)) 
       {
         moveBackward();
       }
@@ -175,14 +198,20 @@ public class AutonomousSubsystem extends SubsystemBase {
       }
     }
     //Shooting process
-    if (shootingOkay == true)
+    if (shootingOkay)
     {
       shootBall(Constants.AUTONOMOUS_SHOOTER_SPEED_POSITION_TWO);
-      shootingOkay = false;
+      if (countOfBallsInMagazine == 0)
+      {
+        shootingOkay = false;
+      }
     }
+    //Add white line w/ encoders
   }
 
-  //System for targeting from position three
+  /**
+   * Method for autonomous and targeting from position three
+   */
   private void targetPositionThree()
   {
     /** Planned path for position three, will need to be tested once we have NEOs and encoders
@@ -196,7 +225,6 @@ public class AutonomousSubsystem extends SubsystemBase {
 
     //Gather data
     double limelightXValue = limelightX.getDouble(0.0);
-    double limelightYValue = limelightY.getDouble(0.0);
     double limelightAreaValue = limelightArea.getDouble(0.0);
     double limelightTargetFoundValue = limelightTargetFound.getDouble(0.0);
 
@@ -204,9 +232,6 @@ public class AutonomousSubsystem extends SubsystemBase {
     boolean movingOkay = true;
     boolean targetingOkay = false;
     boolean shootingOkay = false;
-
-    //Distance calculated based off of area of target within limelight
-    double distance = -2.13 * limelightAreaValue + 14.79;
 
     //Movement Process
     if (movingOkay == true)
@@ -219,23 +244,19 @@ public class AutonomousSubsystem extends SubsystemBase {
       targetingOkay = true;
     }
     //Targeting Process
-    if (targetingOkay == true)
+    if (targetingOkay)
     {
-      if (limelightTargetFoundValue != 1.0)
+      if (limelightTargetFoundValue != Constants.LIMELIGHT_TARGET_FOUND)
       {
         turnLeft();
       }
-      else if (limelightXValue < -2.0)
+      else if (limelightXValue < -Constants.LIMELIGHT_X_VALUE_RANGE)
       {
         turnLeft();
       }
-      else if (limelightXValue > 2.0)
+      else if (limelightXValue > Constants.LIMELIGHT_X_VALUE_RANGE)
       {
         turnRight();
-      }
-      else if (limelightAreaValue < 2.2) //Will need to be changed based on calculations
-      {
-        moveBackward();
       }
       else
       {
@@ -245,98 +266,117 @@ public class AutonomousSubsystem extends SubsystemBase {
       }
     }
     //Shooting process
-    if (shootingOkay == true)
+    if (shootingOkay)
     {
-      shootBall(Constants.AUTONOMOUS_SHOOTER_SPEED_POSITION_TWO);
-      shootingOkay = false;
+      shootBall(Constants.AUTONOMOUS_SHOOTER_SPEED_POSITION_THREE);
+      if (countOfBallsInMagazine == 0)
+      {
+        shootingOkay = false;
+      }
     }
   }
 
-  //Turns robot right
+  /**
+   * Turns robot right for positioning 
+   */
   private void turnRight()
   {
-    leftFrontTalon.set(Constants.AUTONOMOUS_MOVEMENT_SPEED);
-    rightFrontTalon.set(-Constants.AUTONOMOUS_MOVEMENT_SPEED);
-    leftBackTalon.set(Constants.AUTONOMOUS_MOVEMENT_SPEED);
-    rightBackTalon.set(-Constants.AUTONOMOUS_MOVEMENT_SPEED);
-
-    /* Spark Maxs' to replace talons when chassis is ready
     leftFrontSparkController.set(Constants.AUTONOMOUS_MOVEMENT_SPEED);
     rightFrontSparkController.set(-Constants.AUTONOMOUS_MOVEMENT_SPEED);
     leftBackSparkController.set(Constants.AUTONOMOUS_MOVEMENT_SPEED);
-    rightBackSparkController.set(-Constants.AUTONOMOUS_MOVEMENT_SPEED);*/
+    rightBackSparkController.set(-Constants.AUTONOMOUS_MOVEMENT_SPEED);
 
   }
 
-  //Turns robot left
+  /**
+   * Turns robot left for positioning
+   */
   private void turnLeft()
   {
-    leftFrontTalon.set(-Constants.AUTONOMOUS_MOVEMENT_SPEED);
-    rightFrontTalon.set(Constants.AUTONOMOUS_MOVEMENT_SPEED);
-    leftBackTalon.set(-Constants.AUTONOMOUS_MOVEMENT_SPEED);
-    rightBackTalon.set(Constants.AUTONOMOUS_MOVEMENT_SPEED);
-
-    /* Spark Max
     leftFrontSparkController.set(-Constants.AUTONOMOUS_MOVEMENT_SPEED);
     rightFrontSparkController.set(Constants.AUTONOMOUS_MOVEMENT_SPEED);
     leftBackSparkController.set(-Constants.AUTONOMOUS_MOVEMENT_SPEED);
-    rightBackSparkController.set(Constants.AUTONOMOUS_MOVEMENT_SPEED);*/
+    rightBackSparkController.set(Constants.AUTONOMOUS_MOVEMENT_SPEED);
   }
 
-  //Moves robot forward
+  /**
+   * Moves robot forward for positioning
+   */
   private void moveForward()
   {
-    leftFrontTalon.set(Constants.AUTONOMOUS_MOVEMENT_SPEED_SLOW);
-    rightFrontTalon.set(Constants.AUTONOMOUS_MOVEMENT_SPEED_SLOW);
-    leftBackTalon.set(Constants.AUTONOMOUS_MOVEMENT_SPEED_SLOW);
-    rightBackTalon.set(Constants.AUTONOMOUS_MOVEMENT_SPEED_SLOW);
-
-    /* Spark Max
     leftFrontSparkController.set(Constants.AUTONOMOUS_MOVEMENT_SPEED);
     rightFrontSparkController.set(Constants.AUTONOMOUS_MOVEMENT_SPEED);
     leftBackSparkController.set(Constants.AUTONOMOUS_MOVEMENT_SPEED);
-    rightBackSparkController.set(Constants.AUTONOMOUS_MOVEMENT_SPEED);*/
+    rightBackSparkController.set(Constants.AUTONOMOUS_MOVEMENT_SPEED);
   }
 
-  //Moves robot backward
+  /**
+   * Moves robot backward for positioning
+   */
   private void moveBackward()
   {
-    leftFrontTalon.set(-Constants.AUTONOMOUS_MOVEMENT_SPEED_SLOW);
-    rightFrontTalon.set(-Constants.AUTONOMOUS_MOVEMENT_SPEED_SLOW);
-    leftBackTalon.set(-Constants.AUTONOMOUS_MOVEMENT_SPEED_SLOW);
-    rightBackTalon.set(-Constants.AUTONOMOUS_MOVEMENT_SPEED_SLOW);
-
-    /* Spark Max
     leftFrontSparkController.set(-Constants.AUTONOMOUS_MOVEMENT_SPEED);
     rightFrontSparkController.set(-Constants.AUTONOMOUS_MOVEMENT_SPEED);
     leftBackSparkController.set(-Constants.AUTONOMOUS_MOVEMENT_SPEED);
-    rightBackSparkController.set(-Constants.AUTONOMOUS_MOVEMENT_SPEED);*/
+    rightBackSparkController.set(-Constants.AUTONOMOUS_MOVEMENT_SPEED);
   }
 
-  //Stops the robot from moving
+  /**
+   * Stops the robot from moving after targeting is complete
+   */
   private void stopMoving()
   {
-    leftFrontTalon.set(Constants.NO_SPEED);
-    rightFrontTalon.set(Constants.NO_SPEED);
-    leftBackTalon.set(Constants.NO_SPEED);
-    rightBackTalon.set(Constants.NO_SPEED);
-
-    /* Spark Max
     leftFrontSparkController.set(Constants.NO_SPEED);
     rightFrontSparkController.set(Constants.NO_SPEED);
     leftBackSparkController.set(-Constants.NO_SPEED);
-    rightBackSparkController.set(Constants.NO_SPEED);*/
+    rightBackSparkController.set(Constants.NO_SPEED);
   }
 
-  //Shoots ball
+  /**
+   * Method to shoot power cells and determine how many power cells are left in the magazine
+   */
   private void shootBall(double speed)
   {
-    //Would be code for whichever shooter we use
+    if (countOfBallsInMagazine != 0)
+    {
+      //Sets shooter to speed and begins magazine movement
+      shooterLeftSideController.set(Constants.SPEED_CONTROL, speed);
+      shooterRightSideController.set(Constants.SPEED_CONTROL, -speed);
+      magazineController.set(Constants.SPEED_CONTROL, Constants.SHOOTER_MAGAZINE_OUTTAKE_SPEED);
+
+      //Checks for yellow to determine when ball exits 
+      if (shooterCheckForYellow)
+      {
+        if (topRangeFinder.getRangeInches() <= Constants.RANGEFINDER_BALL_DETECTED_DISTANCE)
+        {
+          countOfBallsInMagazine--;
+          shooterCheckForNothing = true;
+        }
+      }
+      //Checks for nothing so there isn't a constant subtracting of balls to the counter
+      if (shooterCheckForNothing)
+      {
+        if (topRangeFinder.getRangeInches() >= Constants.RANGEFINDER_BALL_AWAY_DISTANCE)
+        {
+          shooterCheckForYellow = true;
+          shooterCheckForNothing = false;
+        }
+      }
+    }
+    else //Ends shooting when balls is at zero
+    {
+      shooterLeftSideController.set(Constants.SPEED_CONTROL, Constants.NO_SPEED);
+      shooterRightSideController.set(Constants.SPEED_CONTROL, Constants.NO_SPEED);
+      magazineController.set(Constants.SPEED_CONTROL, Constants.NO_SPEED);
+    }
   }
 
-  //Moves robot off the line after targeting process. Will probably involve encoders
+  /**
+   * Method to move robot off the white line
+   */
   private void moveOffLine()
   {
     //Would be move forward or move backward for certain time depending on situation
+    //Unfinished. Needs encoders
   }
 }

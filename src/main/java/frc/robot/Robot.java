@@ -10,12 +10,8 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Subsystem;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
 /**
@@ -26,18 +22,11 @@ import edu.wpi.first.networktables.NetworkTableInstance;
  */
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
-  private Command m_teleopCommand;
 
   private RobotContainer m_robotContainer;
 
   public static SendableChooser<String> startingPositionChooser = new SendableChooser<>();
 
-  private NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
-    private NetworkTableEntry tx = table.getEntry("tx");
-    private NetworkTableEntry ta = table.getEntry("ta");
-    private NetworkTableEntry tv = table.getEntry("tv");
-    private NetworkTableEntry ty = table.getEntry("ty");
-    //private double x = tx.getDouble(0.0);
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -70,26 +59,6 @@ public class Robot extends TimedRobot {
     // commands, running already-scheduled commands, removing finished or interrupted commands,
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
-    CommandScheduler.getInstance().run();
-    double x = tx.getDouble(0.0);
-    double a = ta.getDouble(0.0);
-    double v = tv.getDouble(0.0);
-    double y = ty.getDouble(0.0);
-
-    double distance = -2.13 * a + 14.79;
-    double accurateDistance = (84.0 - 24.0) / (Math.tan(0.275 + Math.toRadians(y)));
-    double newDistance = (14.54)*Math.sqrt(a);
-    SmartDashboard.putNumber("tx", x);
-    SmartDashboard.putNumber("ta", a);
-    SmartDashboard.putNumber("tv", v);
-    SmartDashboard.putNumber("ty", y);
-    SmartDashboard.putNumber("Distance", distance);
-    SmartDashboard.putNumber("Accuracy Distance", accurateDistance);
-    SmartDashboard.putNumber("Sqrt distance", newDistance);
-
-
-    NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(3);
-    NetworkTableInstance.getDefault().getTable("limelight").getEntry("camMode").setNumber(0);
 
   }
 
@@ -109,8 +78,6 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
-
     // schedule the autonomous command (example)
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
@@ -122,11 +89,13 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousPeriodic() {
+    m_robotContainer.getAutonomousCommand().execute();
   }
 
   @Override
   public void teleopInit() {
 
+    //Turns off limelight when teleop starts
     NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(1);
     // This makes sure that the autonomous stops running when
     // teleop starts running. If you want the autonomous to
@@ -135,7 +104,6 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
-    //m_teleopCommand = m_robotContainer.getTeleopCommand();
   }
 
   /**
