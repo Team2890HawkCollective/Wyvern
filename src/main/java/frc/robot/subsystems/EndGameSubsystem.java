@@ -31,7 +31,8 @@ public class EndGameSubsystem extends SubsystemBase {
 
   private boolean beginBalance = false;
   private boolean liftStageOne = false;
-  private boolean liftStageTwo = false;
+  private boolean releasePneumatics = false;
+  private boolean pullUpLift = false;
   
   private VictorSPX liftController = new VictorSPX(Constants.LIFT_VICTOR_SPX_CONTROLLER_ID);
 
@@ -57,11 +58,20 @@ public class EndGameSubsystem extends SubsystemBase {
     }
     if (assistantDriverController.getBumperPressed(Hand.kRight))
     {
-      liftStageTwo = true;
+      releasePneumatics = true;
     }
-    if (liftStageTwo)
+    if (assistantDriverController.getBumperReleased(Hand.kRight))
     {
-      secondLiftStage();
+      releasePneumatics = false;
+      pullUpLift = true;
+    }
+    if (releasePneumatics)
+    {
+      stageTwoReleasePneumatics();
+    }
+    if (pullUpLift)
+    {
+      stageTwoPullUp();
     }
 
     if (assistantDriverController.getBackButtonPressed())
@@ -78,7 +88,7 @@ public class EndGameSubsystem extends SubsystemBase {
     if (assistantDriverController.getStartButtonPressed())
     {
       liftStageOne = false;
-      liftStageTwo = false;
+      releasePneumatics = false;
       beginBalance = false;
 
       liftSolenoid.set(DoubleSolenoid.Value.kOff);
@@ -92,11 +102,14 @@ public class EndGameSubsystem extends SubsystemBase {
     //releaseClimbRope();
   }
 
-  private void secondLiftStage()
+  private void stageTwoReleasePneumatics()
   {
     liftSolenoid.set(DoubleSolenoid.Value.kForward);
-    brakeSolenoid.set(DoubleSolenoid.Value.kOff);
-    pullInClimbRope();
+  }
+
+  private void stageTwoPullUp()
+  {
+    liftController.set(ControlMode.PercentOutput, 1.0);
   }
 
   private void balanceWheel()
