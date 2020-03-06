@@ -100,7 +100,7 @@ public class EndGameSubsystem extends SubsystemBase {
       beginBalance = true;
     }
     //If beginBalance is true, the bot will begin to balance
-    if (beginBalance == true)
+    if (beginBalance)
     {
       balanceWheel();
     }
@@ -113,8 +113,8 @@ public class EndGameSubsystem extends SubsystemBase {
       beginBalance = false;
       pullUpLift = false;
 
-      liftSolenoid.set(DoubleSolenoid.Value.kForward);
-      brakeSolenoid.set(DoubleSolenoid.Value.kOff);
+      liftSolenoid.set(Constants.SOLENOID_FORWARD);
+      brakeSolenoid.set(Constants.SOLENOID_OFF);
 
       liftController.set(Constants.SPEED_CONTROL, Constants.PIGEON_WHEEL_STATIONARY_SPEED);
     }
@@ -125,7 +125,7 @@ public class EndGameSubsystem extends SubsystemBase {
    */
   private void firstLiftStage()
   {
-    liftSolenoid.set(DoubleSolenoid.Value.kReverse);
+    liftSolenoid.set(Constants.SOLENOID_REVERSE);
   }
 
   /**
@@ -133,7 +133,7 @@ public class EndGameSubsystem extends SubsystemBase {
    */
   private void stageTwoReleasePneumatics()
   {
-    liftSolenoid.set(DoubleSolenoid.Value.kForward);
+    liftSolenoid.set(Constants.SOLENOID_FORWARD);
   }
 
   /**
@@ -141,7 +141,7 @@ public class EndGameSubsystem extends SubsystemBase {
    */
   private void pullInClimbRope()
   {
-    liftController.set(Constants.SPEED_CONTROL, -1.0);
+    liftController.set(Constants.SPEED_CONTROL, -Constants.LIFT_CONTROLLER_SPEED);
   }
 
   /**
@@ -149,7 +149,7 @@ public class EndGameSubsystem extends SubsystemBase {
    */
   private void releaseClimbRope()
   {
-    liftController.set(Constants.SPEED_CONTROL, 0.8);
+    liftController.set(Constants.SPEED_CONTROL, Constants.LIFT_CONTROLLER_SPEED);
   }
 
   /**

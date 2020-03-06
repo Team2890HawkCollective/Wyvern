@@ -48,4 +48,6 @@ public final class Constants {
     public static final Value SOLENOID_OFF = Value.kOff;
     public static final Value SOLENOID_FORWARD = Value.kForward;
     public static final Value SOLENOID_REVERSE = Value.kReverse;
+
+    public static final double LIFT_CONTROLLER_SPEED = 0.75;
 }
