@@ -21,51 +21,65 @@ import com.ctre.phoenix.sensors.PigeonIMU;
 
 public class EndGameSubsystem extends SubsystemBase {
 
+  /**
+   * Talon and pidgeon sensor for balancer
+   */
   private WPI_TalonSRX pidgeonTalon = new WPI_TalonSRX(Constants.PIGEON_TALON_PORT_ID);
   private PigeonIMU _pigeon = new PigeonIMU(pidgeonTalon);
 
-  private double [] yawPitchRoll = new double[3];
-
-  //Call number for yawPitchRoll array to gather yaw data, pitch data, and roll data
-  private int pitchID = 1;
-
-  private boolean beginBalance = false;
-  private boolean liftStageOne = false;
-  private boolean releasePneumatics = false;
-  private boolean pullUpLift = false;
-  
+  /**
+   * Victor motor controller to lift the climb
+   */
   private VictorSPX liftController = new VictorSPX(Constants.LIFT_VICTOR_SPX_CONTROLLER_ID);
 
-  private DoubleSolenoid liftSolenoid = new DoubleSolenoid(0, 7);
-  private DoubleSolenoid brakeSolenoid = new DoubleSolenoid(1, 2);
-  
-  private WPI_TalonSRX balancerTalon = new WPI_TalonSRX(Constants.BALANCER_TALON_ID);
-
-  private XboxController assistantDriverController = new XboxController(Constants.ASSISTANT_DRIVER_CONTROLLER_PORT_ID);
   /**
-   * Creates a new EndGameSubsytem.
+   * Solenoids to operate pneumatics 
    */
+  private DoubleSolenoid liftSolenoid = new DoubleSolenoid(0, 7); //0 and 7 are ports for the lift solenoid on the PCM
+  private DoubleSolenoid brakeSolenoid = new DoubleSolenoid(1, 2); //1 and 2 are ports for the brake solenoid on the PCM
 
+  /**
+   * Array of length 3 to gather yaw, pitch, and roll from pidgeon as well as the call number for just the pitch
+   */
+  private double [] yawPitchRoll = new double[3];
+  private int pitchID = 1;
+
+  /**
+   * Booleans to determine order of end game lift and balance
+   */
+  private boolean beginBalance = false; //Determines when to balance
+  private boolean engageLiftPneumatic = false; //Determines when to enagae the lift/heighten the lift
+  private boolean releaseLiftPneumatic = false; //Determines when to release the pneumatics to be able to pull up
+  private boolean pullUpLift = false; //Determines when to engage controller to lift bot
+
+  /**
+   * Xbox Controller for Assistant driver
+   */
+  private XboxController assistantDriverController = new XboxController(Constants.ASSISTANT_DRIVER_CONTROLLER_PORT_ID);
+
+  /**
+   * Method to be run during teleop for end game system
+   */
   public void endGame()
   {
     if (assistantDriverController.getBumperPressed(Hand.kLeft))
     {
-      liftStageOne = true;
+      engageLiftPneumatic = true;
     }
-    if (liftStageOne)
+    if (engageLiftPneumatic)
     {
       firstLiftStage();
     }
     if (assistantDriverController.getBumperPressed(Hand.kRight))
     {
-      releasePneumatics = true;
+      releaseLiftPneumatic = true;
     }
     if (assistantDriverController.getBumperReleased(Hand.kRight))
     {
-      releasePneumatics = false;
+      releaseLiftPneumatic = false;
       pullUpLift = true;
     }
-    if (releasePneumatics)
+    if (releaseLiftPneumatic)
     {
       stageTwoReleasePneumatics();
     }
@@ -87,8 +101,8 @@ public class EndGameSubsystem extends SubsystemBase {
 
     if (assistantDriverController.getStartButtonPressed())
     {
-      liftStageOne = false;
-      releasePneumatics = false;
+      engageLiftPneumatic = false;
+      releaseLiftPneumatic = false;
       beginBalance = false;
 
       liftSolenoid.set(DoubleSolenoid.Value.kForward);
