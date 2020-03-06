@@ -7,12 +7,21 @@
 
 package frc.robot;
 
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import com.revrobotics.ColorSensorV3;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 
 
 
@@ -27,6 +36,8 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
+
+
 
   /*private final I2C.Port i2cPort = I2C.Port.kOnboard;
 
@@ -45,6 +56,9 @@ public class Robot extends TimedRobot {
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
 
+
+    //joystickDriveCommand.execute();
+
   }
 
   public RobotContainer getRobotContainer()
@@ -61,6 +75,9 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
+
+    
+
     // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
     // commands, running already-scheduled commands, removing finished or interrupted commands,
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
@@ -112,16 +129,18 @@ public class Robot extends TimedRobot {
     {
       m_autonomousCommand.cancel();
     }
-    
+
+    NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(1); //Turns off limelight
   }
 
   /**
    * This function is called periodically during operator control.
    */
   @Override
-  public void teleopPeriodic() {
-    //Calls drive train
-    m_robotContainer.getDriveTrainCommand().execute();
+  public void teleopPeriodic() 
+  {
+    m_robotContainer.getManipulatorCommand().execute(); //runs manipulators
+    m_robotContainer.getDriveTrainCommand().execute(); //runs drive train
   }
 
   @Override

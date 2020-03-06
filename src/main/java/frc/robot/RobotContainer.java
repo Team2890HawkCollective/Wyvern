@@ -13,7 +13,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.commands.DriveTrainCommand;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.DriveTrainSubsystem;
+import frc.robot.commands.ManipulatorCommand;
 import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.subsystems.ManipulatorSubsystem;
 import frc.robot.Constants;
 import edu.wpi.first.wpilibj.Joystick;
 
@@ -23,7 +25,8 @@ import edu.wpi.first.wpilibj.Joystick;
  * periodic methods (other than the scheduler calls).  Instead, the structure of the robot
  * (including subsystems, commands, and button mappings) should be declared here.
  */
-public class RobotContainer {
+public class RobotContainer 
+{
   // The robot's subsystems and commands are defined here...
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
@@ -32,6 +35,9 @@ public class RobotContainer {
   private final DriveTrainSubsystem m_driveTrainSubsystem = new DriveTrainSubsystem();
   private final DriveTrainCommand m_driveTrainCommand = new DriveTrainCommand(m_driveTrainSubsystem);
 
+  //Creates a manipulator subsystem and command
+  private ManipulatorSubsystem m_manipulatorSubsystem = new ManipulatorSubsystem();
+  private ManipulatorCommand m_manipulatorCommand = new ManipulatorCommand(m_manipulatorSubsystem);
 
 
   /**
@@ -63,6 +69,16 @@ public class RobotContainer {
     //System.out.println("DRIVE TRAIN");
     return m_driveTrainCommand;
   }
+  /**
+   * Runs manipulators during teleop periodic
+   */
+  public Command getManipulatorCommand()
+  {
+    return m_manipulatorCommand;
+  }
+
+ 
+
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
