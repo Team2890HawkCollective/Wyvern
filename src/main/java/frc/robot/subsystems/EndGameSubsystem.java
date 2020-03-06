@@ -109,7 +109,7 @@ public class EndGameSubsystem extends SubsystemBase {
 
   private void stageTwoPullUp()
   {
-    liftController.set(ControlMode.PercentOutput, 1.0);
+    liftController.set(ControlMode.PercentOutput, 0.7);
   }
 
   private void balanceWheel()
