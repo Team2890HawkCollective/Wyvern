@@ -7,9 +7,7 @@
 
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -18,21 +16,14 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.Ultrasonic;
 
-import com.revrobotics.ColorSensorV3;
-
-import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DigitalOutput;
-import edu.wpi.first.wpilibj.I2C;
 
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.util.Color;
 
 public class ManipulatorSubsystem extends SubsystemBase {
   /**
@@ -61,7 +52,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
   private Ultrasonic bottomRangeFinder = new Ultrasonic(bottomPing, bottomEcho);
   //Top
   private DigitalInput topEcho = new DigitalInput(3);
-  private DigitalOutput topPing = new DigitalOutput(4);
+  private DigitalOutput topPing = new DigitalOutput(2);
   private Ultrasonic topRangeFinder = new Ultrasonic(topPing, topEcho);
 
   /**
@@ -154,7 +145,6 @@ public class ManipulatorSubsystem extends SubsystemBase {
     //If the Y button is pressed, the shooting process will begin and emptying of the magazine
     if (assistantDriverController.getYButtonPressed())
     {
-      System.out.println("Shooting");
       shooterCheckForYellow = true; 
       shootingOkay = true;
     }
@@ -188,7 +178,6 @@ public class ManipulatorSubsystem extends SubsystemBase {
   {
     //Data gathered from limelight network table
     double limelightXValue = limelightX.getDouble(0.0); // tx
-    double limelightYValue = limelightY.getDouble(0.0); // ty
     double limelightAreaValue = limelightArea.getDouble(0.0); // ta
     double limelightTargetFoundValue = limelightTargetFound.getDouble(0.0); // tv
 
@@ -276,7 +265,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
         }
       }
       //Checks for nothing so there isn't a constant subtracting of balls to the counter
-      if (shooterCheckForNothing = true)
+      if (shooterCheckForNothing)
       {
         if (topRangeFinder.getRangeInches() >= Constants.RANGEFINDER_BALL_AWAY_DISTANCE)
         {

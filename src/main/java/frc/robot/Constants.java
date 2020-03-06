@@ -88,6 +88,6 @@ public final class Constants {
     /**
      * Distances for rangefinder detecting power cells
      */
-    public static final double RANGEFINDER_BALL_DETECTED_DISTANCE = 2.0; //2 inches is detected
+    public static final double RANGEFINDER_BALL_DETECTED_DISTANCE = 2.2; //2 inches is detected
     public static final double RANGEFINDER_BALL_AWAY_DISTANCE = 4.0; //More than 4 inches is away
 }
