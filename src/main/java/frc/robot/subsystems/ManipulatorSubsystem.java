@@ -172,6 +172,14 @@ public class ManipulatorSubsystem extends SubsystemBase {
   }
 
   /**
+   * Returns count of balls in magazine
+   */
+  public int returnCountOfBallsInMagazine()
+  {
+    return countOfBallsInMagazine;
+  }
+
+  /**
    * Finds target and centers robot 
    */
   private void findTarget() 

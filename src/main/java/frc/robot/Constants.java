@@ -41,6 +41,7 @@ public final class Constants {
     /**
      * Speed modifiers for Autonomous
      */
+    public static final double AUTONOMOUS_RELEASE_INTAKE_MANIPULATOR_SPEED = 0.2;
     public static final double AUTONOMOUS_MOVEMENT_SPEED = 0.35;
     public static final double AUTONOMOUS_MOVEMENT_SPEED_SLOW = 0.2;
     public static final double AUTONOMOUS_SHOOTER_SPEED_POSITION_ONE = 0.4;

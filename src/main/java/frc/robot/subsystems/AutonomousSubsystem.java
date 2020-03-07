@@ -106,7 +106,7 @@ public class AutonomousSubsystem extends SubsystemBase {
   private void targetPositionOne()
   {
     //Gathers data 
-    double limelightXValue = limelightX.getDouble(0.0); //tx
+    double limelightXValue = limelightX.getDouble(0.0); //tx    0.0 is default speed
     double limelightAreaValue = limelightArea.getDouble(0.0); //ta
     double limelightTargetFoundValue = limelightTargetFound.getDouble(0.0); //tv
 
@@ -377,5 +377,21 @@ public class AutonomousSubsystem extends SubsystemBase {
   {
     //Would be move forward or move backward for certain time depending on situation
     //Unfinished. Needs encoders
+  }
+
+  /**
+   * Method to unleash intake mechanism 
+   */
+  public void startUp()
+  {
+    magazineController.set(Constants.SPEED_CONTROL, -Constants.AUTONOMOUS_RELEASE_INTAKE_MANIPULATOR_SPEED);
+  }
+
+  /**
+   * Method to stop unleashing the intake mechanism
+   */
+  public void stopStartUp()
+  {
+    magazineController.set(Constants.SPEED_CONTROL, Constants.NO_SPEED);
   }
 }

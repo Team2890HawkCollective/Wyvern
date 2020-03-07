@@ -7,12 +7,17 @@
 
 package frc.robot;
 
+import edu.wpi.cscore.UsbCamera;
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.subsystems.AutonomousSubsystem;
+import frc.robot.subsystems.ManipulatorSubsystem;
 
 
 
@@ -25,8 +30,15 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  */
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
+  private WaitCommand m_wait = new WaitCommand(1.0);
 
   private RobotContainer m_robotContainer;
+
+  private ManipulatorSubsystem m_manipulatorSubsystem = new ManipulatorSubsystem();
+  private AutonomousSubsystem m_autonomousSubsystem =  new AutonomousSubsystem();
+
+  private UsbCamera liftCamera = CameraServer.getInstance().startAutomaticCapture();
+  private UsbCamera intakeCamera = CameraServer.getInstance().startAutomaticCapture();
 
   public static SendableChooser<String> startingPositionChooser = new SendableChooser<>();
 
@@ -51,7 +63,11 @@ public class Robot extends TimedRobot {
     startingPositionChooser.addOption("Center Position", "Center");
     startingPositionChooser.addOption("Right Position", "Right");
 
-    Shuffleboard.getTab("Main").add("Robot Starting Position", startingPositionChooser);
+    Shuffleboard.getTab("Configuration").add("Robot Starting Position", startingPositionChooser);
+    Shuffleboard.getTab("Main").add("Lift Camera", liftCamera);
+    Shuffleboard.getTab("Main").add("Intake Camera", intakeCamera);
+    Shuffleboard.getTab("Main").add("Count of Balls in Magazine", m_manipulatorSubsystem.returnCountOfBallsInMagazine());
+
     //joystickDriveCommand.execute();
 
   }
@@ -102,6 +118,10 @@ public class Robot extends TimedRobot {
    /* if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
    */
+
+   m_autonomousSubsystem.startUp();
+   m_wait.execute();
+   m_autonomousSubsystem.stopStartUp();
   }
   
 
