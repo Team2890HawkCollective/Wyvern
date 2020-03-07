@@ -73,6 +73,12 @@ public class RobotContainer
 
   }
 
+  public AutonomousSubsystem getAutonomousSubsystem()
+  {
+    return m_autonomousSubsystem;
+  }
+
+
   /**
    * Returns the command to run drive train during teleop
    */

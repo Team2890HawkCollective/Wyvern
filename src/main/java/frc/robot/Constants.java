@@ -35,21 +35,22 @@ public final class Constants {
     public static final double TELEOP_DRIVE_SPEED_MODIFIER = 1.0;
     public static final double SHOOTER_TARGETING_TURNING_SPEED = 0.2;
     public static final double NO_SPEED = 0.0;
-    public static final double LIFT_CONTROLLER_SPEED = 0.75;
+    public static final double LIFT_CONTROLLER_RELEASE_SPEED = 0.25;
+    public static final double LIFT_CONTROLLER_INTAKE_SPEED = -0.3;
     public static final double SHOOTER_MAGAZINE_OUTTAKE_SPEED = 0.3;
 
     /**
      * Speed modifiers for Autonomous
      */
-    public static final double AUTONOMOUS_RELEASE_INTAKE_MANIPULATOR_SPEED = 0.2;
+    public static final double AUTONOMOUS_RELEASE_INTAKE_MANIPULATOR_SPEED = 0.5;
     public static final double AUTONOMOUS_MOVEMENT_SPEED = 0.35;
     public static final double AUTONOMOUS_MOVEMENT_SPEED_SLOW = 0.2;
-    public static final double AUTONOMOUS_SHOOTER_SPEED_POSITION_ONE = 0.4;
-    public static final double AUTONOMOUS_SHOOTER_SPEED_POSITION_TWO = 0.4;
-    public static final double AUTONOMOUS_SHOOTER_SPEED_POSITION_THREE = 0.4;
+    public static final double AUTONOMOUS_SHOOTER_SPEED_POSITION_ONE = 0.8;
+    public static final double AUTONOMOUS_SHOOTER_SPEED_POSITION_TWO = 0.8;
+    public static final double AUTONOMOUS_SHOOTER_SPEED_POSITION_THREE = 0.8;
 
     /**
-     * Motor types for the Spark Max Controller
+     * Motor types for the Spark Max Controlle
      */
     public static final MotorType BRUSHLESS_MOTOR = MotorType.kBrushless;
     public static final MotorType BRUSHED_MOTOR = MotorType.kBrushed;
@@ -57,7 +58,7 @@ public final class Constants {
     /**
      * Port IDs for various controllers used for driving
      */
-    public static final int XBOX_ASSISTANT_DRIVER_CONTROLLER_ID = 1;
+    public static final int XBOX_ASSISTANT_DRIVER_CONTROLLER_ID = 2;
     public static final int XBOX_DRIVER_CONTROLLER_PORT_ID = 4;
     public static final int DRIVER_JOYSTICK_X_PORT_ID = 1;
     public static final int DRIVER_JOYSTICK_Y_PORT_ID = 0;

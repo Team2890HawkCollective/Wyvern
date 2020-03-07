@@ -25,6 +25,8 @@ import edu.wpi.first.wpilibj.DigitalOutput;
 
 import edu.wpi.first.wpilibj.XboxController;
 
+import frc.robot.Robot;
+
 public class ManipulatorSubsystem extends SubsystemBase {
   /**
    * Victor SPX targets to control intake, magazine, and outtake magazines
@@ -47,13 +49,13 @@ public class ManipulatorSubsystem extends SubsystemBase {
    * Rangefinders used to track number of power cells in bot at specific time
    */
   //Bottom
-  private DigitalInput bottomEcho = new DigitalInput(1);
+  /*private DigitalInput bottomEcho = new DigitalInput(1);
   private DigitalOutput bottomPing = new DigitalOutput(0);
   private Ultrasonic bottomRangeFinder = new Ultrasonic(bottomPing, bottomEcho);
   //Top
   private DigitalInput topEcho = new DigitalInput(3);
   private DigitalOutput topPing = new DigitalOutput(2);
-  private Ultrasonic topRangeFinder = new Ultrasonic(topPing, topEcho);
+  private Ultrasonic topRangeFinder = new Ultrasonic(topPing, topEcho);*/
 
   /**
    * Booleans for determining process of operations within manipulators methods
@@ -101,8 +103,8 @@ public class ManipulatorSubsystem extends SubsystemBase {
     rightBackSparkController.setInverted(true);
 
     //Makes sure rangefinders work properly
-    bottomRangeFinder.setAutomaticMode(true);
-    topRangeFinder.setAutomaticMode(true);
+    Robot.bottomRangeFinder.setAutomaticMode(true);
+    Robot.topRangeFinder.setAutomaticMode(true);
   }
 
   /**
@@ -128,6 +130,11 @@ public class ManipulatorSubsystem extends SubsystemBase {
       magazineOkay = false;
       shootingOkay = false;
       targetingOkay = false;
+
+      magazineController.set(Constants.SPEED_CONTROL, Constants.NO_SPEED);
+      stopMoving();
+      shooterLeftSideController.set(Constants.SPEED_CONTROL, Constants.NO_SPEED);
+      shooterRightSideController.set(Constants.SPEED_CONTROL, Constants.NO_SPEED);
     }
 
     //If the B button is pressed, the targeting process will begin and shooter speed will be determined
@@ -145,13 +152,15 @@ public class ManipulatorSubsystem extends SubsystemBase {
     //If the Y button is pressed, the shooting process will begin and emptying of the magazine
     if (assistantDriverController.getYButtonPressed())
     {
-      shooterCheckForYellow = true; 
-      shootingOkay = true;
+      //shooterCheckForYellow = true; 
+      //shootingOkay = true;
+      manualShooterOn();
     }
     //Temporary stop for the shooter
     if (assistantDriverController.getYButtonReleased())
     {
-      shootingOkay = false;
+      //shootingOkay = false;
+      manualShooterOff();
     }
     //Shooting process
     if (shootingOkay)
@@ -266,7 +275,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
       //Checks for yellow to determine when ball exits 
       if (shooterCheckForYellow)
       {
-        if (topRangeFinder.getRangeInches() <= Constants.RANGEFINDER_BALL_DETECTED_DISTANCE)
+        if (Robot.topRangeFinder.getRangeInches() <= Constants.RANGEFINDER_BALL_DETECTED_DISTANCE)
         {
           countOfBallsInMagazine--;
           shooterCheckForNothing = true;
@@ -275,14 +284,14 @@ public class ManipulatorSubsystem extends SubsystemBase {
       //Checks for nothing so there isn't a constant subtracting of balls to the counter
       if (shooterCheckForNothing)
       {
-        if (topRangeFinder.getRangeInches() >= Constants.RANGEFINDER_BALL_AWAY_DISTANCE)
+        if (Robot.topRangeFinder.getRangeInches() >= Constants.RANGEFINDER_BALL_AWAY_DISTANCE)
         {
           shooterCheckForYellow = true;
           shooterCheckForNothing = false;
         }
       }
     }
-    else //Ends shooting when balls is at zero
+    else if (countOfBallsInMagazine == 0)//Ends shooting when balls is at zero
     {
       shooterLeftSideController.set(Constants.SPEED_CONTROL, Constants.NO_SPEED);
       shooterRightSideController.set(Constants.SPEED_CONTROL, Constants.NO_SPEED);
@@ -291,6 +300,22 @@ public class ManipulatorSubsystem extends SubsystemBase {
       shootingOkay = false;
     }
   }
+
+  private void manualShooterOn()
+  {
+    shooterLeftSideController.set(Constants.SPEED_CONTROL, shooterSpeed);
+    shooterRightSideController.set(Constants.SPEED_CONTROL, -shooterSpeed);
+    magazineController.set(Constants.SPEED_CONTROL, Constants.SHOOTER_MAGAZINE_OUTTAKE_SPEED);
+  }
+
+  private void manualShooterOff()
+  {
+    shooterLeftSideController.set(Constants.SPEED_CONTROL, Constants.NO_SPEED);
+    shooterRightSideController.set(Constants.SPEED_CONTROL, Constants.NO_SPEED);
+   magazineController.set(Constants.SPEED_CONTROL, Constants.NO_SPEED);
+  }
+
+
 
   /**
    * Method for intaking and spacing power cells within the magazine
@@ -303,7 +328,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
     //Checks for yellow first to determine when ball is inside the magazine
     if (magazineCheckForYellow)
     {
-      if (bottomRangeFinder.getRangeInches() <= Constants.RANGEFINDER_BALL_DETECTED_DISTANCE)
+      if (Robot.bottomRangeFinder.getRangeInches() <= Constants.RANGEFINDER_BALL_DETECTED_DISTANCE)
       {
         magazineController.set(Constants.SPEED_CONTROL, Constants.NO_SPEED);
         magazineCheckForYellow = false;
@@ -318,7 +343,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
     //Checks for nothing next to push the power cell slightly inside the magazine
     if (magazineCheckForNothing)
     {
-      if (bottomRangeFinder.getRangeInches() >= (Constants.RANGEFINDER_BALL_AWAY_DISTANCE - 1.0)) // -1.0 to create tighter range
+      if (Robot.bottomRangeFinder.getRangeInches() >= (Constants.RANGEFINDER_BALL_AWAY_DISTANCE - 1.0)) // -1.0 to create tighter range
       {
         magazineController.set(Constants.SPEED_CONTROL, Constants.NO_SPEED);
         magazineCheckForNothing = false;

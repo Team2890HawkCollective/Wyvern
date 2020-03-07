@@ -45,14 +45,16 @@ public class AutonomousSubsystem extends SubsystemBase {
   private VictorSPX shooterLeftSideController = new VictorSPX(Constants.SHOOTER_CONTROLLER_LEFT_SIDE_VICTOR_SPX_ID);
   private VictorSPX shooterRightSideController = new VictorSPX(Constants.SHOOTER_CONTROLLER_RIGHT_SIDE_VICTOR_SPX_ID);
   private VictorSPX magazineController = new VictorSPX(Constants.MAGAZINE_CONTROLLER_VICTOR_SPX_ID);
+  private VictorSPX ballPickupController = new VictorSPX(Constants.BALL_PICKUP_CONTROLLER_VICTOR_SPX_ID);
+  private VictorSPX liftController = new VictorSPX(Constants.LIFT_VICTOR_SPX_CONTROLLER_ID);
   
   /**
    * Rangefinder used to track number of power cells leaving the bot
    */
   //Top
-  private DigitalInput topEcho = new DigitalInput(3);
+  /*private DigitalInput topEcho = new DigitalInput(3);
   private DigitalOutput topPing = new DigitalOutput(2);
-  private Ultrasonic topRangeFinder = new Ultrasonic(topPing, topEcho);
+  private Ultrasonic topRangeFinder = new Ultrasonic(topPing, topEcho);*/
 
   /**
    * Booleans for determining process of operations within shooter method
@@ -85,7 +87,7 @@ public class AutonomousSubsystem extends SubsystemBase {
     if (choice != null)
     {
       //Selects position based on Shuffleboard selection
-      if (choice.equals("Left"))
+      if (choice.equals("Right"))
       {
         targetPositionOne();
       }
@@ -93,7 +95,7 @@ public class AutonomousSubsystem extends SubsystemBase {
       {
         targetPositionTwo();
       }
-      else if (choice.equals("Right"))
+      else if (choice.equals("Left"))
       {
         targetPositionThree();
       }
@@ -346,7 +348,7 @@ public class AutonomousSubsystem extends SubsystemBase {
       //Checks for yellow to determine when ball exits 
       if (shooterCheckForYellow)
       {
-        if (topRangeFinder.getRangeInches() <= Constants.RANGEFINDER_BALL_DETECTED_DISTANCE)
+        if (Robot.topRangeFinder.getRangeInches() <= Constants.RANGEFINDER_BALL_DETECTED_DISTANCE)
         {
           countOfBallsInMagazine--;
           shooterCheckForNothing = true;
@@ -355,7 +357,7 @@ public class AutonomousSubsystem extends SubsystemBase {
       //Checks for nothing so there isn't a constant subtracting of balls to the counter
       if (shooterCheckForNothing)
       {
-        if (topRangeFinder.getRangeInches() >= Constants.RANGEFINDER_BALL_AWAY_DISTANCE)
+        if (Robot.topRangeFinder.getRangeInches() >= Constants.RANGEFINDER_BALL_AWAY_DISTANCE)
         {
           shooterCheckForYellow = true;
           shooterCheckForNothing = false;
@@ -384,7 +386,9 @@ public class AutonomousSubsystem extends SubsystemBase {
    */
   public void startUp()
   {
-    magazineController.set(Constants.SPEED_CONTROL, -Constants.AUTONOMOUS_RELEASE_INTAKE_MANIPULATOR_SPEED);
+    ballPickupController.set(Constants.SPEED_CONTROL, -Constants.AUTONOMOUS_RELEASE_INTAKE_MANIPULATOR_SPEED);
+    liftController.set(Constants.SPEED_CONTROL, -0.3);
+
   }
 
   /**
@@ -392,6 +396,7 @@ public class AutonomousSubsystem extends SubsystemBase {
    */
   public void stopStartUp()
   {
+    ballPickupController.set(Constants.SPEED_CONTROL, Constants.NO_SPEED);
     magazineController.set(Constants.SPEED_CONTROL, Constants.NO_SPEED);
   }
 }

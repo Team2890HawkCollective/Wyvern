@@ -10,7 +10,10 @@ package frc.robot;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Ultrasonic;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -30,15 +33,21 @@ import frc.robot.subsystems.ManipulatorSubsystem;
  */
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
-  private WaitCommand m_wait = new WaitCommand(1.0);
+  private WaitCommand m_wait = new WaitCommand(2.0);
 
   private RobotContainer m_robotContainer;
 
-  private ManipulatorSubsystem m_manipulatorSubsystem = new ManipulatorSubsystem();
-  private AutonomousSubsystem m_autonomousSubsystem =  new AutonomousSubsystem();
-
   private UsbCamera liftCamera = CameraServer.getInstance().startAutomaticCapture();
   private UsbCamera intakeCamera = CameraServer.getInstance().startAutomaticCapture();
+
+  //Bottom
+  public static DigitalInput bottomEcho = new DigitalInput(1);
+  public static DigitalOutput bottomPing = new DigitalOutput(0);
+  public static Ultrasonic bottomRangeFinder = new Ultrasonic(bottomPing, bottomEcho);
+  //Top
+  public static DigitalInput topEcho = new DigitalInput(3);
+  public static DigitalOutput topPing = new DigitalOutput(2);
+  public static Ultrasonic topRangeFinder = new Ultrasonic(topPing, topEcho);
 
   public static SendableChooser<String> startingPositionChooser = new SendableChooser<>();
 
@@ -66,7 +75,7 @@ public class Robot extends TimedRobot {
     Shuffleboard.getTab("Configuration").add("Robot Starting Position", startingPositionChooser);
     Shuffleboard.getTab("Main").add("Lift Camera", liftCamera);
     Shuffleboard.getTab("Main").add("Intake Camera", intakeCamera);
-    Shuffleboard.getTab("Main").add("Count of Balls in Magazine", m_manipulatorSubsystem.returnCountOfBallsInMagazine());
+    Shuffleboard.getTab("Main").add("Count of Balls in Magazine", 0);
 
     //joystickDriveCommand.execute();
 
@@ -112,16 +121,16 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
-   // m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+   m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+
+   m_robotContainer.getAutonomousSubsystem().startUp();
+   m_wait.execute();
+   m_robotContainer.getAutonomousSubsystem().stopStartUp();
 
     // schedule the autonomous command (example)
-   /* if (m_autonomousCommand != null) {
+    if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
-   */
-
-   m_autonomousSubsystem.startUp();
-   m_wait.execute();
-   m_autonomousSubsystem.stopStartUp();
+    }
   }
   
 
@@ -131,7 +140,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() 
   {
-    m_robotContainer.getAutonomousCommand().execute();
+    //m_robotContainer.getAutonomousCommand().execute();
   }
 
   @Override

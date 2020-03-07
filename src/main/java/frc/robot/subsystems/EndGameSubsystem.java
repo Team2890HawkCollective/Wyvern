@@ -10,6 +10,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
+import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
@@ -23,25 +24,25 @@ public class EndGameSubsystem extends SubsystemBase {
   /**
    * Talon and pidgeon sensor for balancer
    */
-  private final WPI_TalonSRX pidgeonTalon = new WPI_TalonSRX(Constants.PIGEON_TALON_PORT_ID);
-  private final PigeonIMU _pigeon = new PigeonIMU(pidgeonTalon);
+  private WPI_TalonSRX pidgeonTalon = new WPI_TalonSRX(Constants.PIGEON_TALON_PORT_ID);
+  private PigeonIMU _pigeon = new PigeonIMU(pidgeonTalon);
 
   /**
    * Victor motor controller to lift the climb
    */
-  private final VictorSPX liftController = new VictorSPX(Constants.LIFT_VICTOR_SPX_CONTROLLER_ID);
+  private VictorSPX liftController = new VictorSPX(Constants.LIFT_VICTOR_SPX_CONTROLLER_ID);
 
   /**
    * Solenoids to operate pneumatics 
    */
-  private final DoubleSolenoid liftSolenoid = new DoubleSolenoid(Constants.LIFT_SOLENOID_FORWARD_PORT_ID, Constants.LIFT_SOLENOID_BACKWARD_PORT_ID); 
-  private final DoubleSolenoid brakeSolenoid = new DoubleSolenoid(Constants.BRAKE_SOLENOID_FORWARD_PORT_ID, Constants.LIFT_SOLENOID_BACKWARD_PORT_ID); 
+  private DoubleSolenoid liftSolenoid = new DoubleSolenoid(Constants.LIFT_SOLENOID_FORWARD_PORT_ID, Constants.LIFT_SOLENOID_BACKWARD_PORT_ID); 
+  private DoubleSolenoid brakeSolenoid = new DoubleSolenoid(Constants.BRAKE_SOLENOID_FORWARD_PORT_ID, Constants.BRAKE_SOLENOID_BACKWARD_PORT_ID); 
 
   /**
    * Array of length 3 to gather yaw, pitch, and roll from pidgeon as well as the call number for just the pitch
    */
-  private final double [] yawPitchRoll = new double[3];
-  private final int pitchID = 1;
+  private double [] yawPitchRoll = new double[3];
+  private int pitchID = 1;
 
   /**
    * Booleans to determine order of end game lift and balance
@@ -58,10 +59,19 @@ public class EndGameSubsystem extends SubsystemBase {
    */
   public void endGame()
   {
+    brakeSolenoid.get();
     //If the left bumper is pressed, then the bot will rise up to the bar
     if (assistantDriverController.getBumperPressed(Hand.kLeft))
     {
       engageLiftPneumatic();
+    }
+    if (assistantDriverController.getPOV() == 270)
+    {
+      releaseClimbRope();
+    }
+    if (assistantDriverController.getPOV() == -1)
+    {
+      stopClimbRope();
     }
     //If the left bumper is released, the lift pneumatic will release
     if (assistantDriverController.getBumperReleased(Hand.kLeft))
@@ -132,7 +142,12 @@ public class EndGameSubsystem extends SubsystemBase {
    */
   private void pullInClimbRope()
   {
-    liftController.set(Constants.SPEED_CONTROL, -Constants.LIFT_CONTROLLER_SPEED);
+    liftController.set(Constants.SPEED_CONTROL, Constants.LIFT_CONTROLLER_INTAKE_SPEED);
+  }
+
+  private void releaseClimbRope()
+  {
+    liftController.set(Constants.SPEED_CONTROL, Constants.LIFT_CONTROLLER_RELEASE_SPEED);
   }
 
   /**
