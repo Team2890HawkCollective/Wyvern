@@ -168,6 +168,15 @@ public class ManipulatorSubsystem extends SubsystemBase {
       shootPowerCell();
     }
 
+    if (assistantDriverController.getPOV() == 0)
+    {
+      magazineController.set(Constants.SPEED_CONTROL, Constants.SHOOTER_MAGAZINE_OUTTAKE_SPEED);
+    }
+    if (assistantDriverController.getPOV() == -1)
+    {
+      magazineController.set(Constants.SPEED_CONTROL, Constants.NO_SPEED);
+    }
+
     //If the X button is held, the intake system will be run
     if (assistantDriverController.getXButton())
     {
@@ -305,14 +314,14 @@ public class ManipulatorSubsystem extends SubsystemBase {
   {
     shooterLeftSideController.set(Constants.SPEED_CONTROL, shooterSpeed);
     shooterRightSideController.set(Constants.SPEED_CONTROL, -shooterSpeed);
-    magazineController.set(Constants.SPEED_CONTROL, Constants.SHOOTER_MAGAZINE_OUTTAKE_SPEED);
+    //magazineController.set(Constants.SPEED_CONTROL, Constants.SHOOTER_MAGAZINE_OUTTAKE_SPEED);
   }
 
   private void manualShooterOff()
   {
     shooterLeftSideController.set(Constants.SPEED_CONTROL, Constants.NO_SPEED);
     shooterRightSideController.set(Constants.SPEED_CONTROL, Constants.NO_SPEED);
-   magazineController.set(Constants.SPEED_CONTROL, Constants.NO_SPEED);
+   //magazineController.set(Constants.SPEED_CONTROL, Constants.NO_SPEED);
   }
 
 
@@ -429,7 +438,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
   {
     leftFrontSparkController.set(Constants.NO_SPEED);
     rightFrontSparkController.set(Constants.NO_SPEED);
-    leftBackSparkController.set(-Constants.NO_SPEED);
+    leftBackSparkController.set(Constants.NO_SPEED);
     rightBackSparkController.set(Constants.NO_SPEED);
   }
 }

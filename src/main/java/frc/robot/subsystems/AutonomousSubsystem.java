@@ -13,13 +13,12 @@ import frc.robot.Robot;
 
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANEncoder;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.DigitalOutput;
-import edu.wpi.first.wpilibj.Ultrasonic;
+import edu.wpi.first.wpilibj.Timer;
 
 public class AutonomousSubsystem extends SubsystemBase {
   /**
@@ -36,8 +35,10 @@ public class AutonomousSubsystem extends SubsystemBase {
    */
   private CANSparkMax leftFrontSparkController = new CANSparkMax(Constants.LEFT_FRONT_SPARK_MAX_ID, Constants.BRUSHLESS_MOTOR);
   private CANSparkMax rightFrontSparkController = new CANSparkMax(Constants.RIGHT_FRONT_SPARK_MAX_ID, Constants.BRUSHLESS_MOTOR);
-  private CANSparkMax leftBackSparkController = new CANSparkMax(Constants.LEFT_FRONT_SPARK_MAX_ID, Constants.BRUSHLESS_MOTOR);
-  private CANSparkMax rightBackSparkController = new CANSparkMax(Constants.LEFT_FRONT_SPARK_MAX_ID, Constants.BRUSHLESS_MOTOR);
+  private CANSparkMax leftBackSparkController = new CANSparkMax(Constants.LEFT_BACK_SPARK_MAX_ID, Constants.BRUSHLESS_MOTOR);
+  private CANSparkMax rightBackSparkController = new CANSparkMax(Constants.RIGHT_BACK_SPARK_MAX_ID, Constants.BRUSHLESS_MOTOR);
+
+  private CANEncoder leftFrontSparkEncoder = new CANEncoder(leftFrontSparkController);
 
   /**
    * Victor SPX controllers to control magazine and shooter
@@ -46,26 +47,29 @@ public class AutonomousSubsystem extends SubsystemBase {
   private VictorSPX shooterRightSideController = new VictorSPX(Constants.SHOOTER_CONTROLLER_RIGHT_SIDE_VICTOR_SPX_ID);
   private VictorSPX magazineController = new VictorSPX(Constants.MAGAZINE_CONTROLLER_VICTOR_SPX_ID);
   private VictorSPX ballPickupController = new VictorSPX(Constants.BALL_PICKUP_CONTROLLER_VICTOR_SPX_ID);
-  private VictorSPX liftController = new VictorSPX(Constants.LIFT_VICTOR_SPX_CONTROLLER_ID);
   
-  /**
-   * Rangefinder used to track number of power cells leaving the bot
-   */
-  //Top
-  /*private DigitalInput topEcho = new DigitalInput(3);
-  private DigitalOutput topPing = new DigitalOutput(2);
-  private Ultrasonic topRangeFinder = new Ultrasonic(topPing, topEcho);*/
+  private boolean positionThreeMovingOkay = true;
+
+  private boolean positionOneTargetingOkay = true;
+  private boolean positionOneShootingOkay = false;
+  private boolean positionOneMovingOkay = false;
+
+  private boolean positionTwoTargetingOkay = true;
+  private boolean positionTwoShootingOkay = false;
+  private boolean positionTwoMovingOkay = false;
 
   /**
    * Booleans for determining process of operations within shooter method
    */
   private boolean shooterCheckForYellow = false; //Determines whether or not to check for power cell in end of magazine while shooting
   private boolean shooterCheckForNothing = false; //Determines whether or not to check for nothing in end of magazine while shooting
-
+  private boolean startUpCheck = true;
   /**
    * Integer to keep count of how many balls are in the magzine
    */
   private int countOfBallsInMagazine = 3; //3 are initially in Autonomous
+
+  private Timer timer = new Timer();
 
   /**
    * Creates a new AutonomousSubsystem.
@@ -74,6 +78,7 @@ public class AutonomousSubsystem extends SubsystemBase {
     //Imverts motors for proper driving
     rightFrontSparkController.setInverted(true);
     rightBackSparkController.setInverted(true);
+    leftFrontSparkEncoder.setPosition(0.0);
   }
 
   /**
@@ -83,21 +88,28 @@ public class AutonomousSubsystem extends SubsystemBase {
     //Gather selection from Shuffleboard that was declared in Robot
     String choice = Robot.startingPositionChooser.getSelected();
 
-    //Checks to make sure there is a value
-    if (choice != null)
+    if (startUpCheck)
     {
-      //Selects position based on Shuffleboard selection
-      if (choice.equals("Right"))
+      startUp();
+    }
+    else
+    {
+      //Checks to make sure there is a value
+      if (choice != null)
       {
-        targetPositionOne();
-      }
-      else if (choice.equals("Center"))
-      {
-        targetPositionTwo();
-      }
-      else if (choice.equals("Left"))
-      {
-        targetPositionThree();
+        //Selects position based on Shuffleboard selection
+        if (choice.equals("Right"))
+        {
+          targetPositionOne();
+        }
+        else if (choice.equals("Center"))
+        {
+          targetPositionTwo();
+        }
+        else if (choice.equals("Left"))
+        {
+          targetPositionThree();
+        }
       }
     }
   }
@@ -111,13 +123,9 @@ public class AutonomousSubsystem extends SubsystemBase {
     double limelightXValue = limelightX.getDouble(0.0); //tx    0.0 is default speed
     double limelightAreaValue = limelightArea.getDouble(0.0); //ta
     double limelightTargetFoundValue = limelightTargetFound.getDouble(0.0); //tv
-
-    //Booleans to determine proper timing of events
-    boolean targetingOkay = true;
-    boolean shootingOkay = false;
     
     //Targeting process
-    if (targetingOkay)
+    if (positionOneTargetingOkay)
     {
       if (limelightTargetFoundValue != Constants.LIMELIGHT_TARGET_FOUND)
       {
@@ -131,31 +139,44 @@ public class AutonomousSubsystem extends SubsystemBase {
       {
         turnRight();
       }
-      else if (limelightAreaValue > Constants.LIMELIGHT_AREA_FOUND_MAXIMUM) 
+      /*else if (limelightAreaValue > Constants.LIMELIGHT_AREA_FOUND_MAXIMUM) 
       {
         moveBackward();
       }
       else if (limelightAreaValue < Constants.LIMELIGHT_AREA_FOUND_MINIMUM)
       {
         moveForward();
-      }
+      }*/
       else
       {
         stopMoving();
-        targetingOkay = false;
-        shootingOkay = true;
+        positionOneTargetingOkay = false;
+        positionOneShootingOkay = true;
       }
     }
     //Shooting Process
-    if (shootingOkay)
+    if (positionOneShootingOkay)
     {
       shootBall(Constants.AUTONOMOUS_SHOOTER_SPEED_POSITION_ONE);
       if (countOfBallsInMagazine == 0)
       {
-        shootingOkay = false;
+        positionOneShootingOkay = false;
+        leftFrontSparkEncoder.setPosition(0.0);
+        positionOneMovingOkay = true;
       }
     }
-    //Add white line w encoders
+    if (positionOneMovingOkay)
+    {
+      if (leftFrontSparkEncoder.getPosition() <= -15.0)
+      {
+        stopMoving();
+        positionOneMovingOkay = false;
+      }
+      else if (leftFrontSparkEncoder.getPosition() >= -15.0)
+      {
+        moveForward();
+      }
+    }
   }
 
   /**
@@ -168,12 +189,8 @@ public class AutonomousSubsystem extends SubsystemBase {
     double limelightAreaValue = limelightArea.getDouble(0.0);
     double limelightTargetFoundValue = limelightTargetFound.getDouble(0.0);
 
-    //Booleans to determine order of autonomous
-    boolean targetingOkay = true;
-    boolean shootingOkay = false;
-
     //Targeting Process
-    if (targetingOkay)
+    if (positionTwoTargetingOkay)
     {
       if (limelightTargetFoundValue != Constants.LIMELIGHT_TARGET_FOUND)
       {
@@ -187,27 +204,43 @@ public class AutonomousSubsystem extends SubsystemBase {
       {
         turnRight();
       }
-      else if (limelightAreaValue < (Constants.LIMELIGHT_AREA_FOUND_MINIMUM + 0.9)) 
+      else if (limelightAreaValue < (Constants.LIMELIGHT_AREA_FOUND_MINIMUM)) 
+      {
+        moveForward();
+      }
+      else if (limelightAreaValue > Constants.LIMELIGHT_AREA_FOUND_MAXIMUM) 
       {
         moveBackward();
       }
       else
       {
         stopMoving();
-        targetingOkay = false;
-        shootingOkay = true;
+        positionTwoTargetingOkay = false;
+        positionTwoShootingOkay = true;
       }
     }
     //Shooting process
-    if (shootingOkay)
+    if (positionTwoShootingOkay)
     {
       shootBall(Constants.AUTONOMOUS_SHOOTER_SPEED_POSITION_TWO);
       if (countOfBallsInMagazine == 0)
       {
-        shootingOkay = false;
+        positionTwoShootingOkay = false;
+        positionTwoMovingOkay = true;
       }
     }
-    //Add white line w/ encoders
+    if (positionTwoMovingOkay)
+    {
+      if (leftFrontSparkEncoder.getPosition() <= -15.0)
+      {
+        stopMoving();
+        positionTwoMovingOkay = false;
+      }
+      else if (leftFrontSparkEncoder.getPosition() >= -15.0)
+      {
+        moveForward();
+      }
+    }
   }
 
   /**
@@ -215,65 +248,78 @@ public class AutonomousSubsystem extends SubsystemBase {
    */
   private void targetPositionThree()
   {
-    /** Planned path for position three, will need to be tested once we have NEOs and encoders
-     * Move backwards 
-     * Turn Right
-     * Move forward (moves across field)
-     * Being targeting by locating target by turning left
-     * Find target
-     * Shoot
-     */
+    // /** Planned path for position three, will need to be tested once we have NEOs and encoders
+    //  * Move backwards 
+    //  * Turn Right
+    //  * Move forward (moves across field)
+    //  * Being targeting by locating target by turning left
+    //  * Find target
+    //  * Shoot
+    //  */
 
-    //Gather data
-    double limelightXValue = limelightX.getDouble(0.0);
-    double limelightAreaValue = limelightArea.getDouble(0.0);
-    double limelightTargetFoundValue = limelightTargetFound.getDouble(0.0);
+    // //Gather data
+    // /*double limelightXValue = limelightX.getDouble(0.0);
+    // double limelightAreaValue = limelightArea.getDouble(0.0);
+    // double limelightTargetFoundValue = limelightTargetFound.getDouble(0.0);*/
 
-    //Booleans to determine order of autonomous
-    boolean movingOkay = true;
-    boolean targetingOkay = false;
-    boolean shootingOkay = false;
+    // //Booleans to determine order of autonomous
+    // boolean movingOkay = true;
+    // boolean targetingOkay = false;
+    // boolean shootingOkay = false;
 
-    //Movement Process
-    if (movingOkay == true)
+    // //Movement Process
+    // /*if (movingOkay == true)
+    // {
+    //   //Encoder logic will need to be here 
+    //   //moveBackward();
+    //   //turnRight();
+    //   //moveForward();
+    //   movingOkay = false;
+    //   targetingOkay = true;
+    // }
+    // //Targeting Process
+    // if (targetingOkay)
+    // {
+    //   if (limelightTargetFoundValue != Constants.LIMELIGHT_TARGET_FOUND)
+    //   {
+    //     turnLeft();
+    //   }
+    //   else if (limelightXValue < -Constants.LIMELIGHT_X_RANGE_MAXIMUM)
+    //   {
+    //     turnLeft();
+    //   }
+    //   else if (limelightXValue > Constants.LIMELIGHT_X_RANGE_MAXIMUM)
+    //   {
+    //     turnRight();
+    //   }
+    //   else
+    //   {
+    //     stopMoving();
+    //     targetingOkay = false;
+    //     shootingOkay = true;
+    //   }
+    // }
+    // //Shooting process
+    // if (shootingOkay)
+    // {
+    //   shootBall(Constants.AUTONOMOUS_SHOOTER_SPEED_POSITION_THREE);
+    //   if (countOfBallsInMagazine == 0)
+    //   {
+    //     shootingOkay = false;
+    //   }
+    // }*/
+    System.out.println(leftFrontSparkEncoder.getPosition());
+    if (positionThreeMovingOkay)
     {
-      //Encoder logic will need to be here 
-      //moveBackward();
-      //turnRight();
-      //moveForward();
-      movingOkay = false;
-      targetingOkay = true;
-    }
-    //Targeting Process
-    if (targetingOkay)
-    {
-      if (limelightTargetFoundValue != Constants.LIMELIGHT_TARGET_FOUND)
-      {
-        turnLeft();
-      }
-      else if (limelightXValue < -Constants.LIMELIGHT_X_RANGE_MAXIMUM)
-      {
-        turnLeft();
-      }
-      else if (limelightXValue > Constants.LIMELIGHT_X_RANGE_MAXIMUM)
-      {
-        turnRight();
-      }
-      else
-      {
-        stopMoving();
-        targetingOkay = false;
-        shootingOkay = true;
-      }
-    }
-    //Shooting process
-    if (shootingOkay)
-    {
-      shootBall(Constants.AUTONOMOUS_SHOOTER_SPEED_POSITION_THREE);
-      if (countOfBallsInMagazine == 0)
-      {
-        shootingOkay = false;
-      }
+       if (leftFrontSparkEncoder.getPosition() <= -15.0)
+       {
+         stopMoving();
+         positionThreeMovingOkay = false;
+       }
+       else if (leftFrontSparkEncoder.getPosition() >= -15.0)
+       {
+         moveForward();
+       }
     }
   }
 
@@ -305,9 +351,11 @@ public class AutonomousSubsystem extends SubsystemBase {
    */
   private void moveForward()
   {
-    leftFrontSparkController.set(Constants.AUTONOMOUS_MOVEMENT_SPEED);
+
+
+    leftFrontSparkController.set(-Constants.AUTONOMOUS_MOVEMENT_SPEED);
     rightFrontSparkController.set(Constants.AUTONOMOUS_MOVEMENT_SPEED);
-    leftBackSparkController.set(Constants.AUTONOMOUS_MOVEMENT_SPEED);
+    leftBackSparkController.set(-Constants.AUTONOMOUS_MOVEMENT_SPEED);
     rightBackSparkController.set(Constants.AUTONOMOUS_MOVEMENT_SPEED);
   }
 
@@ -379,6 +427,7 @@ public class AutonomousSubsystem extends SubsystemBase {
   {
     //Would be move forward or move backward for certain time depending on situation
     //Unfinished. Needs encoders
+
   }
 
   /**
@@ -387,8 +436,9 @@ public class AutonomousSubsystem extends SubsystemBase {
   public void startUp()
   {
     ballPickupController.set(Constants.SPEED_CONTROL, -Constants.AUTONOMOUS_RELEASE_INTAKE_MANIPULATOR_SPEED);
-    liftController.set(Constants.SPEED_CONTROL, -0.3);
-
+    timer.delay(3.0);
+    stopStartUp();
+    startUpCheck = false;
   }
 
   /**
@@ -397,6 +447,5 @@ public class AutonomousSubsystem extends SubsystemBase {
   public void stopStartUp()
   {
     ballPickupController.set(Constants.SPEED_CONTROL, Constants.NO_SPEED);
-    magazineController.set(Constants.SPEED_CONTROL, Constants.NO_SPEED);
   }
 }

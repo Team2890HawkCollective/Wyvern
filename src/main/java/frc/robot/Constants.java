@@ -35,15 +35,15 @@ public final class Constants {
     public static final double TELEOP_DRIVE_SPEED_MODIFIER = 1.0;
     public static final double SHOOTER_TARGETING_TURNING_SPEED = 0.2;
     public static final double NO_SPEED = 0.0;
-    public static final double LIFT_CONTROLLER_RELEASE_SPEED = 0.25;
-    public static final double LIFT_CONTROLLER_INTAKE_SPEED = -0.3;
+    public static final double LIFT_CONTROLLER_RELEASE_SPEED = 0.4;
+    public static final double LIFT_CONTROLLER_INTAKE_SPEED = -1.0;
     public static final double SHOOTER_MAGAZINE_OUTTAKE_SPEED = 0.3;
 
     /**
      * Speed modifiers for Autonomous
      */
-    public static final double AUTONOMOUS_RELEASE_INTAKE_MANIPULATOR_SPEED = 0.5;
-    public static final double AUTONOMOUS_MOVEMENT_SPEED = 0.35;
+    public static final double AUTONOMOUS_RELEASE_INTAKE_MANIPULATOR_SPEED = 0.15;
+    public static final double AUTONOMOUS_MOVEMENT_SPEED = 0.2;
     public static final double AUTONOMOUS_MOVEMENT_SPEED_SLOW = 0.2;
     public static final double AUTONOMOUS_SHOOTER_SPEED_POSITION_ONE = 0.8;
     public static final double AUTONOMOUS_SHOOTER_SPEED_POSITION_TWO = 0.8;
@@ -83,15 +83,15 @@ public final class Constants {
      * Distances and area calculations used for limelight targeting
      */
     public static final double LIMELIGHT_TARGET_FOUND = 1.0; //tv
-    public static final double LIMELIGHT_X_RANGE_MAXIMUM = 5.0; //range for which limelight is considered centered
-    public static final double LIMELIGHT_AREA_FOUND_MINIMUM = 1.2; //minimum area for target to be considered found
-    public static final double LIMELIGHT_AREA_FOUND_MAXIMUM = 3.0; //maximum area where target is reachable
-    public static final double LIMELIGHT_TARGETING_AREA_LARGE_VALUE = 3.0; //11-15 ft away ta value
-    public static final double LIMELIGHT_TARGETING_AREA_MEDIUM_VALUE = 2.9; //9-11 ft away ta value
-    public static final double LIMELIGHT_TARGETING_AREA_SMALL_VALUE = 2.3; //7-9 ft awat ta value
-    public static final double SHOOTER_SPEED_LIMELIGHT_TARGETING_AREA_LARGE_VALUE = 1.0; //11-15 ft shooter speed
+    public static final double LIMELIGHT_X_RANGE_MAXIMUM = 3.0; //range for which limelight is considered centered
+    public static final double LIMELIGHT_AREA_FOUND_MINIMUM = 1.0; //minimum area for target to be considered found
+    public static final double LIMELIGHT_AREA_FOUND_MAXIMUM = 2.5; //maximum area where target is reachable
+    public static final double LIMELIGHT_TARGETING_AREA_LARGE_VALUE = 1.0; //11-15 ft away ta value
+    public static final double LIMELIGHT_TARGETING_AREA_MEDIUM_VALUE = 1.5; //9-11 ft away ta value
+    public static final double LIMELIGHT_TARGETING_AREA_SMALL_VALUE = 1.7; //7-9 ft awat ta value
+    public static final double SHOOTER_SPEED_LIMELIGHT_TARGETING_AREA_LARGE_VALUE = 0.8; //11-15 ft shooter speed
     public static final double SHOOTER_SPEED_LIMELIGHT_TARGETING_AREA_MEDIUM_VALUE = 0.8; //9-11 ft shooter speed
-    public static final double SHOOTER_SPEED_LIMELIGHT_TARGETING_AREA_SMALL_VALUE = 0.7; //7-9 ft shooter speed
+    public static final double SHOOTER_SPEED_LIMELIGHT_TARGETING_AREA_SMALL_VALUE = 0.8; //7-9 ft shooter speed
 
     /**
      * Codes used to turn limelight camera on and off throughout the match
@@ -117,7 +117,7 @@ public final class Constants {
      * Speeds for pigeon balancer at end of game
      */
     public static final double PIGEON_WHEEL_FAST_TALON_SPEED = 1.0;
-    public static final double PIGEON_WHEEL_SLOW_TALON_SPEED = 0.5;
+    public static final double PIGEON_WHEEL_SLOW_TALON_SPEED = 0.8;
     public static final double PIGEON_WHEEL_STATIONARY_SPEED = 0.0;
 
     /**

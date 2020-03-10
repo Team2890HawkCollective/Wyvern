@@ -121,11 +121,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
-   m_autonomousCommand = m_robotContainer.getAutonomousCommand();
-
-   m_robotContainer.getAutonomousSubsystem().startUp();
-   m_wait.execute();
-   m_robotContainer.getAutonomousSubsystem().stopStartUp();
+   //m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
     if (m_autonomousCommand != null) {
@@ -140,7 +136,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() 
   {
-    //m_robotContainer.getAutonomousCommand().execute();
+    m_robotContainer.getAutonomousCommand().execute();
   }
 
   @Override

@@ -65,14 +65,14 @@ public class EndGameSubsystem extends SubsystemBase {
     {
       engageLiftPneumatic();
     }
-    if (assistantDriverController.getPOV() == 270)
+    /*if (assistantDriverController.getPOV() == 270)
     {
       releaseClimbRope();
     }
     if (assistantDriverController.getPOV() == -1)
     {
       stopClimbRope();
-    }
+    }*/
     //If the left bumper is released, the lift pneumatic will release
     if (assistantDriverController.getBumperReleased(Hand.kLeft))
     {
@@ -83,6 +83,7 @@ public class EndGameSubsystem extends SubsystemBase {
     if (assistantDriverController.getBumperPressed(Hand.kRight))
     {
       pullInClimbRope();
+      releaseBreakPneumatic();
     }
     //If the right bumper is released, the bot will brake and stay stationary while hanging
     if (assistantDriverController.getBumperReleased(Hand.kRight))
@@ -91,15 +92,33 @@ public class EndGameSubsystem extends SubsystemBase {
       engageBreakPneumatic();
     }
 
+    if (assistantDriverController.getPOV() == 180)
+    {
+      releaseBreakPneumatic();
+    }
+
     //If the back button is pressed, the bot will begin to balance
-    if (assistantDriverController.getBackButtonPressed())
+    /*if (assistantDriverController.getBackButtonPressed())
     {
       beginBalance = true;
-    }
+    }*/
     //If beginBalance is true, the bot will begin to balance
     if (beginBalance)
     {
       balanceWheel();
+    }
+
+    if (assistantDriverController.getTriggerAxis(Hand.kLeft) >= 0.2)
+    {
+      pidgeonTalon.set(1.0);
+    }
+    else if (assistantDriverController.getTriggerAxis(Hand.kRight) >= 0.2)
+    {
+      pidgeonTalon.set(-1.0);
+    }
+    else
+    {
+      pidgeonTalon.set(0.0);
     }
 
     //If the start button is pressed, all systems will be turned off and stopped
@@ -135,6 +154,11 @@ public class EndGameSubsystem extends SubsystemBase {
   private void engageBreakPneumatic()
   {
     brakeSolenoid.set(Constants.SOLENOID_FORWARD);
+  }
+
+  private void releaseBreakPneumatic()
+  {
+    brakeSolenoid.set(Constants.SOLENOID_REVERSE);
   }
 
   /**
