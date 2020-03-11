@@ -64,7 +64,9 @@ public class EndGameSubsystem extends SubsystemBase {
     if (assistantDriverController.getBumperPressed(Hand.kLeft))
     {
       engageLiftPneumatic();
+      //releaseClimbRope();
     }
+    //if (assistantDriverController.getBumper)
     /*if (assistantDriverController.getPOV() == 270)
     {
       releaseClimbRope();
@@ -77,24 +79,40 @@ public class EndGameSubsystem extends SubsystemBase {
     if (assistantDriverController.getBumperReleased(Hand.kLeft))
     {
       releaseLiftPneumatic();
+      //stopClimbRope();
     }
 
     //If the right bumper is pressed, the lift will begin to pull the bot up
     if (assistantDriverController.getBumperPressed(Hand.kRight))
     {
       pullInClimbRope();
-      releaseBreakPneumatic();
+      //releaseBreakPneumatic();
     }
     //If the right bumper is released, the bot will brake and stay stationary while hanging
     if (assistantDriverController.getBumperReleased(Hand.kRight))
     {
       stopClimbRope();
-      engageBreakPneumatic();
+      //engageBreakPneumatic();
     }
 
     if (assistantDriverController.getPOV() == 180)
     {
       releaseBreakPneumatic();
+    }
+
+    if (assistantDriverController.getPOV() == 90)
+    {
+      engageBreakPneumatic();
+    }
+
+    if (assistantDriverController.getPOV() == 270)
+    {
+      releaseClimbRope();
+    }
+
+    if (assistantDriverController.getPOV() == 0)
+    {
+      stopClimbRope();
     }
 
     //If the back button is pressed, the bot will begin to balance

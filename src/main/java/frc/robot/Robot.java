@@ -12,6 +12,7 @@ import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DigitalOutput;
+import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Ultrasonic;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -51,6 +52,9 @@ public class Robot extends TimedRobot {
 
   public static SendableChooser<String> startingPositionChooser = new SendableChooser<>();
 
+  public static Servo hookServo = new Servo(0);
+
+
   /*private final I2C.Port i2cPort = I2C.Port.kOnboard;
 
   private final ColorSensorV3 m_colorSensor = new ColorSensorV3(i2cPort);*/
@@ -68,9 +72,9 @@ public class Robot extends TimedRobot {
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
 
-    startingPositionChooser.addOption("Left Position", "Left");
-    startingPositionChooser.addOption("Center Position", "Center");
-    startingPositionChooser.addOption("Right Position", "Right");
+    startingPositionChooser.addOption("Move Off Line", "Move");
+    startingPositionChooser.addOption("Target", "Target");
+    startingPositionChooser.addOption("Test", "Test");
 
     Shuffleboard.getTab("Configuration").add("Robot Starting Position", startingPositionChooser);
     Shuffleboard.getTab("Main").add("Lift Camera", liftCamera);
@@ -95,9 +99,6 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-
-    
-
     // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
     // commands, running already-scheduled commands, removing finished or interrupted commands,
     // and running subsystem periodic() methods.  This must be called from the robot's periodic

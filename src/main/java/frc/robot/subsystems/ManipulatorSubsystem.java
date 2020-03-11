@@ -113,7 +113,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
   public void controlManipulators()
   {
     //If the A button is pressed, the magazine intake process will begin 
-    if (assistantDriverController.getAButtonPressed())
+    /*if (assistantDriverController.getAButtonPressed())
     {
       magazineOkay = true;
       magazineCheckForYellow = true;
@@ -122,7 +122,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
     if (magazineOkay)
     {
       magazineIntake();
-    }
+    }*/
 
     //If the start button is pressed, all systems will be immediately stopped
     if (assistantDriverController.getStartButtonPressed())
@@ -168,11 +168,11 @@ public class ManipulatorSubsystem extends SubsystemBase {
       shootPowerCell();
     }
 
-    if (assistantDriverController.getPOV() == 0)
+    if (assistantDriverController.getAButtonPressed())
     {
       magazineController.set(Constants.SPEED_CONTROL, Constants.SHOOTER_MAGAZINE_OUTTAKE_SPEED);
     }
-    if (assistantDriverController.getPOV() == -1)
+    if (assistantDriverController.getAButtonReleased())
     {
       magazineController.set(Constants.SPEED_CONTROL, Constants.NO_SPEED);
     }
