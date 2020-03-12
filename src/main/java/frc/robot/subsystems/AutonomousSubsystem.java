@@ -18,7 +18,6 @@ import com.revrobotics.CANEncoder;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.Timer;
 
 public class AutonomousSubsystem extends SubsystemBase {
@@ -27,7 +26,6 @@ public class AutonomousSubsystem extends SubsystemBase {
    */
   NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
   NetworkTableEntry limelightX = table.getEntry("tx"); //tx
-  NetworkTableEntry limelightY = table.getEntry("ty"); //ty
   NetworkTableEntry limelightArea = table.getEntry("ta"); //ta
   NetworkTableEntry limelightTargetFound = table.getEntry("tv"); //tv
 
@@ -55,10 +53,6 @@ public class AutonomousSubsystem extends SubsystemBase {
   private boolean movingOkay = false;
   private boolean determineSpeedOkay = false;
 
-  private boolean positionTwoTargetingOkay = true;
-  private boolean positionTwoShootingOkay = false;
-  private boolean positionTwoMovingOkay = false;
-
   private double shooterSpeed = 0.8;
 
   /**
@@ -72,16 +66,20 @@ public class AutonomousSubsystem extends SubsystemBase {
    */
   private int countOfBallsInMagazine = 3; //3 are initially in Autonomous
 
+  /**
+   * Timer to time autonomous methods
+   */
   private Timer timer = new Timer();
-
 
   /**
    * Creates a new AutonomousSubsystem.
    */
   public AutonomousSubsystem() {
-    //Imverts motors for proper driving
+    //Imverts motors for p0oper driving
     leftFrontSparkController.setInverted(true);
     leftBackSparkController.setInverted(true);
+
+    //Sets encoder to 0 for accurate distance measure
     leftFrontSparkEncoder.setPosition(0.0);
   }
 
@@ -92,25 +90,26 @@ public class AutonomousSubsystem extends SubsystemBase {
     //Gather selection from Shuffleboard that was declared in Robot
     String choice = Robot.startingPositionChooser.getSelected();
 
+    //Runs start up command to release intake and move servo
     if (startUpCheck)
     {
       startUp();
     }
     else 
     {
-      //Checks to make sure there is a value
+      //Checks to make sure there is a value from shuffleboard
       if (choice != null)
       {
         //Selects position based on Shuffleboard selection
-        if (choice.equals("Move"))
+        if (choice.equals("Move")) //Moves bot off white line
         {
           moveOffLine();
         }
-        else if (choice.equals("Target"))
+        else if (choice.equals("Target")) //Targets, shoots, and move off line
         {
           target();
         }
-        else if (choice.equals("Test"))
+        else if (choice.equals("Test")) //Used for testing purposes only
         {
           testServo();
         }
@@ -124,7 +123,7 @@ public class AutonomousSubsystem extends SubsystemBase {
   private void target()
   {
     //Gathers data 
-    double limelightXValue = limelightX.getDouble(0.0); //tx    0.0 is default speed
+    double limelightXValue = limelightX.getDouble(0.0); //tx  0.0 is default value
     double limelightAreaValue = limelightArea.getDouble(0.0); //ta
     double limelightTargetFoundValue = limelightTargetFound.getDouble(0.0); //tv
     
@@ -150,6 +149,7 @@ public class AutonomousSubsystem extends SubsystemBase {
         determineSpeedOkay = true;
       }
     }
+    //Determines speed based off distance from target
     if (determineSpeedOkay)
     {
       determineShooterSpeed(limelightAreaValue);
@@ -157,9 +157,10 @@ public class AutonomousSubsystem extends SubsystemBase {
     //Shooting Process
     if (shootingOkay)
     {
-      shootBall(shooterSpeed, 0.3);
-      timer.delay(5.0);
-      shootBall(0.0, 0.0);
+      //Shoots ball
+      shootBall(shooterSpeed, Constants.SHOOTER_MAGAZINE_OUTTAKE_SPEED); //Turns on shooter and magazine
+      timer.delay(5.0); //Pauses for 5 seconds 
+      shootBall(Constants.NO_SPEED, Constants.NO_SPEED); //Stops shooter
       shootingOkay = false;
       movingOkay = true;
       leftFrontSparkEncoder.setPosition(0.0);
@@ -170,81 +171,17 @@ public class AutonomousSubsystem extends SubsystemBase {
         movingOkay = true;
       }*/
     }
+    //Move bot off line process
     if (movingOkay)
     {
-      System.out.println(leftFrontSparkEncoder.getPosition());
-      if (leftFrontSparkEncoder.getPosition() >= 15.0)
+      if (leftFrontSparkEncoder.getPosition() >= Constants.AUTONOMOUS_ENCODER_DISTANCE)
       {
         stopMoving();
         movingOkay = false;
       }
-      else if (leftFrontSparkEncoder.getPosition() <= 15.0)
+      else if (leftFrontSparkEncoder.getPosition() <= Constants.AUTONOMOUS_ENCODER_DISTANCE)
       {
         moveBackward();
-      }
-    }
-  }
-
-  /**
-   * Method for autonomous and targeting based on position two
-   */
-  private void targetPositionTwo()
-  {
-    //Gather data
-    double limelightXValue = limelightX.getDouble(0.0);
-    double limelightAreaValue = limelightArea.getDouble(0.0);
-    double limelightTargetFoundValue = limelightTargetFound.getDouble(0.0);
-
-    //Targeting Process
-    if (positionTwoTargetingOkay)
-    {
-      if (limelightTargetFoundValue != Constants.LIMELIGHT_TARGET_FOUND)
-      {
-        turnRight();
-      }
-      else if (limelightXValue < -Constants.LIMELIGHT_X_RANGE_MAXIMUM)
-      {
-        turnLeft();
-      }
-      else if (limelightXValue > Constants.LIMELIGHT_X_RANGE_MAXIMUM)
-      {
-        turnRight();
-      }
-      else if (limelightAreaValue < (Constants.LIMELIGHT_AREA_FOUND_MINIMUM)) 
-      {
-        moveForward();
-      }
-      else if (limelightAreaValue > Constants.LIMELIGHT_AREA_FOUND_MAXIMUM) 
-      {
-        moveBackward();
-      }
-      else
-      {
-        stopMoving();
-        positionTwoTargetingOkay = false;
-        positionTwoShootingOkay = true;
-      }
-    }
-    //Shooting process
-    if (positionTwoShootingOkay)
-    {
-      //shootBall(Constants.AUTONOMOUS_SHOOTER_SPEED_POSITION_TWO);
-      if (countOfBallsInMagazine == 0)
-      {
-        positionTwoShootingOkay = false;
-        positionTwoMovingOkay = true;
-      }
-    }
-    if (positionTwoMovingOkay)
-    {
-      if (leftFrontSparkEncoder.getPosition() <= -15.0)
-      {
-        stopMoving();
-        positionTwoMovingOkay = false;
-      }
-      else if (leftFrontSparkEncoder.getPosition() >= -15.0)
-      {
-        moveForward();
       }
     }
   }
@@ -254,77 +191,18 @@ public class AutonomousSubsystem extends SubsystemBase {
    */
   private void moveOffLine()
   {
-    System.out.println(leftFrontSparkEncoder.getPosition());
     if (moveOffLineOkay)
     {
-       if (leftFrontSparkEncoder.getPosition() >= 15.0)
+       if (leftFrontSparkEncoder.getPosition() >= Constants.AUTONOMOUS_ENCODER_DISTANCE)
        {
          stopMoving();
          moveOffLineOkay = false;
        }
-       else if (leftFrontSparkEncoder.getPosition() <= 15.0)
+       else if (leftFrontSparkEncoder.getPosition() <= Constants.AUTONOMOUS_ENCODER_DISTANCE)
        {
          moveBackward();
        }
     }
-  }
-
-  /**
-   * Turns robot right for positioning 
-   */
-  private void turnRight()
-  {
-    leftFrontSparkController.set(-Constants.AUTONOMOUS_MOVEMENT_SPEED);
-    rightFrontSparkController.set(-Constants.AUTONOMOUS_MOVEMENT_SPEED);
-    leftBackSparkController.set(-Constants.AUTONOMOUS_MOVEMENT_SPEED);
-    rightBackSparkController.set(-Constants.AUTONOMOUS_MOVEMENT_SPEED);
-
-  }
-
-  /**
-   * Turns robot left for positioning
-   */
-  private void turnLeft()
-  {
-    leftFrontSparkController.set(Constants.AUTONOMOUS_MOVEMENT_SPEED);
-    rightFrontSparkController.set(Constants.AUTONOMOUS_MOVEMENT_SPEED);
-    leftBackSparkController.set(Constants.AUTONOMOUS_MOVEMENT_SPEED);
-    rightBackSparkController.set(Constants.AUTONOMOUS_MOVEMENT_SPEED);
-  }
-
-  /**
-   * Moves robot forward for positioning
-   */
-  private void moveForward()
-  {
-
-
-    leftFrontSparkController.set(-Constants.AUTONOMOUS_MOVEMENT_SPEED);
-    rightFrontSparkController.set(Constants.AUTONOMOUS_MOVEMENT_SPEED);
-    leftBackSparkController.set(-Constants.AUTONOMOUS_MOVEMENT_SPEED);
-    rightBackSparkController.set(Constants.AUTONOMOUS_MOVEMENT_SPEED);
-  }
-
-  /**
-   * Moves robot backward for positioning
-   */
-  private void moveBackward()
-  {
-    leftFrontSparkController.set(Constants.AUTONOMOUS_MOVEMENT_SPEED);
-    rightFrontSparkController.set(-Constants.AUTONOMOUS_MOVEMENT_SPEED);
-    leftBackSparkController.set(Constants.AUTONOMOUS_MOVEMENT_SPEED);
-    rightBackSparkController.set(-Constants.AUTONOMOUS_MOVEMENT_SPEED);
-  }
-
-  /**
-   * Stops the robot from moving after targeting is complete
-   */
-  private void stopMoving()
-  {
-    leftFrontSparkController.set(Constants.NO_SPEED);
-    rightFrontSparkController.set(Constants.NO_SPEED);
-    leftBackSparkController.set(-Constants.NO_SPEED);
-    rightBackSparkController.set(Constants.NO_SPEED);
   }
 
   /**
@@ -365,34 +243,8 @@ public class AutonomousSubsystem extends SubsystemBase {
   }
 
   /**
-   * Method to unleash intake mechanism 
+   * Determines shooter speed based off of area value from limelight
    */
-  public void startUp()
-  {
-    Robot.hookServo.setPosition(0.0);
-    ballPickupController.set(Constants.SPEED_CONTROL, -Constants.AUTONOMOUS_RELEASE_INTAKE_MANIPULATOR_SPEED);
-    timer.delay(3.0);
-    stopStartUp();
-    startUpCheck = false;
-  }
-
-  /**
-   * Method to stop unleashing the intake mechanism
-   */
-  public void stopStartUp()
-  {
-    ballPickupController.set(Constants.SPEED_CONTROL, Constants.NO_SPEED);
-  }
-
-  private void testServo()
-  {
-    Robot.hookServo.setPosition(0.0);
-    timer.delay(3.0);
-    //Robot.hookServo.setPosition(0.75);
-
-    //System.out.println(Robot.hookServo.getPosition());
-  }
-
   private void determineShooterSpeed(double areaValue)
   {
     //11-15 ft
@@ -413,5 +265,86 @@ public class AutonomousSubsystem extends SubsystemBase {
 
     determineSpeedOkay = false; //Ends targeting process
     shootingOkay = true;
+  }
+
+  /**
+   * Method to unleash intake mechanism 
+   */
+  public void startUp()
+  {
+    Robot.hookServo.setPosition(Constants.SOLENOID_REST_VALUE);
+    ballPickupController.set(Constants.SPEED_CONTROL, -Constants.AUTONOMOUS_RELEASE_INTAKE_MANIPULATOR_SPEED);
+    timer.delay(3.0);
+    stopStartUp();
+    startUpCheck = false;
+  }
+
+  /**
+   * Method to stop unleashing the intake mechanism
+   */
+  public void stopStartUp()
+  {
+    ballPickupController.set(Constants.SPEED_CONTROL, Constants.NO_SPEED);
+  }
+
+  /**
+   * Turns robot right for targeting positioning 
+   */
+  private void turnRight()
+  {
+    leftFrontSparkController.set(-Constants.AUTONOMOUS_MOVEMENT_SPEED);
+    rightFrontSparkController.set(-Constants.AUTONOMOUS_MOVEMENT_SPEED);
+    leftBackSparkController.set(-Constants.AUTONOMOUS_MOVEMENT_SPEED);
+    rightBackSparkController.set(-Constants.AUTONOMOUS_MOVEMENT_SPEED);
+  }
+
+  /**
+   * Turns robot left for targeting positioning
+   */
+  private void turnLeft()
+  {
+    leftFrontSparkController.set(Constants.AUTONOMOUS_MOVEMENT_SPEED);
+    rightFrontSparkController.set(Constants.AUTONOMOUS_MOVEMENT_SPEED);
+    leftBackSparkController.set(Constants.AUTONOMOUS_MOVEMENT_SPEED);
+    rightBackSparkController.set(Constants.AUTONOMOUS_MOVEMENT_SPEED);
+  }
+
+  /**
+   * Moves robot forward for moving off the line
+   */
+  private void moveForward()
+  {
+    leftFrontSparkController.set(-Constants.AUTONOMOUS_MOVEMENT_SPEED);
+    rightFrontSparkController.set(Constants.AUTONOMOUS_MOVEMENT_SPEED);
+    leftBackSparkController.set(-Constants.AUTONOMOUS_MOVEMENT_SPEED);
+    rightBackSparkController.set(Constants.AUTONOMOUS_MOVEMENT_SPEED);
+  }
+
+  /**
+   * Moves robot backward for moving off the line
+   */
+  private void moveBackward()
+  {
+    leftFrontSparkController.set(Constants.AUTONOMOUS_MOVEMENT_SPEED);
+    rightFrontSparkController.set(-Constants.AUTONOMOUS_MOVEMENT_SPEED);
+    leftBackSparkController.set(Constants.AUTONOMOUS_MOVEMENT_SPEED);
+    rightBackSparkController.set(-Constants.AUTONOMOUS_MOVEMENT_SPEED);
+  }
+
+  /**
+   * Stops the robot from moving after targeting is complete
+   */
+  private void stopMoving()
+  {
+    leftFrontSparkController.set(Constants.NO_SPEED);
+    rightFrontSparkController.set(Constants.NO_SPEED);
+    leftBackSparkController.set(-Constants.NO_SPEED);
+    rightBackSparkController.set(Constants.NO_SPEED);
+  }
+
+  //Temporary testing for positioning of servo
+  private void testServo()
+  {
+    Robot.hookServo.setPosition(Constants.SOLENOID_REST_VALUE);
   }
 }

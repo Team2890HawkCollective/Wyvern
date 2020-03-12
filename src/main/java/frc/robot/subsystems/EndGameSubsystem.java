@@ -12,12 +12,15 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Robot;
 
 import com.ctre.phoenix.sensors.PigeonIMU;
+import com.revrobotics.EncoderType;
 
 public class EndGameSubsystem extends SubsystemBase {
 
@@ -48,6 +51,7 @@ public class EndGameSubsystem extends SubsystemBase {
    * Booleans to determine order of end game lift and balance
    */
   private boolean beginBalance = false; //Determines when to balance
+  private boolean engagePneumatics = false;
 
   /**
    * Xbox Controller for Assistant driver
@@ -59,43 +63,63 @@ public class EndGameSubsystem extends SubsystemBase {
    */
   public void endGame()
   {
-    brakeSolenoid.get();
     //If the left bumper is pressed, then the bot will rise up to the bar
     if (assistantDriverController.getBumperPressed(Hand.kLeft))
     {
-      engageLiftPneumatic();
-      //releaseClimbRope();
-    }
-    //if (assistantDriverController.getBumper)
-    /*if (assistantDriverController.getPOV() == 270)
-    {
       releaseClimbRope();
     }
-    if (assistantDriverController.getPOV() == -1)
-    {
-      stopClimbRope();
-    }*/
-    //If the left bumper is released, the lift pneumatic will release
+    //If the left bumper is released, the bot will stop releasing the rope
     if (assistantDriverController.getBumperReleased(Hand.kLeft))
     {
-      releaseLiftPneumatic();
-      //stopClimbRope();
+      stopClimbRope();
     }
 
     //If the right bumper is pressed, the lift will begin to pull the bot up
     if (assistantDriverController.getBumperPressed(Hand.kRight))
     {
       pullInClimbRope();
-      //releaseBreakPneumatic();
+      if (Robot.liftRangeFinder.getRangeInches() >= Constants.RANGEFINDER_LIFT_DISTANCE_MINIMUM) //Supposed to shut off pneumatics after certain height from rangefinder
+      {
+        engagePneumatics = false;
+      }
     }
     //If the right bumper is released, the bot will brake and stay stationary while hanging
     if (assistantDriverController.getBumperReleased(Hand.kRight))
     {
       stopClimbRope();
-      //engageBreakPneumatic();
     }
 
-    if (assistantDriverController.getPOV() == 180)
+    if (assistantDriverController.getPOV() == 90)
+    {
+      releaseLiftPneumatic();
+    }
+    if (assistantDriverController.getPOV() == 270)
+    {
+      engageLiftPneumatic();
+    }
+    //Every press of the start button changes the state of the pneumatics
+    /*if (assistantDriverController.getBackButtonPressed())
+    {
+      if (!engagePneumatics)
+      {
+        engagePneumatics = true;
+      }
+      else if (engagePneumatics)
+      {
+        engagePneumatics = false;
+      }
+    }
+
+    if (engagePneumatics)
+    {
+      engageLiftPneumatic();
+    }
+    else if (!engagePneumatics)
+    {
+      releaseLiftPneumatic();
+    }*/
+
+    /*if (assistantDriverController.getPOV() == 180)
     {
       releaseBreakPneumatic();
     }
@@ -108,11 +132,15 @@ public class EndGameSubsystem extends SubsystemBase {
     if (assistantDriverController.getPOV() == 270)
     {
       releaseClimbRope();
-    }
+    }*/
 
     if (assistantDriverController.getPOV() == 0)
     {
-      stopClimbRope();
+      engageBreakPneumatic();
+    }
+    if (assistantDriverController.getPOV() == 180)
+    {
+      releaseBreakPneumatic();
     }
 
     //If the back button is pressed, the bot will begin to balance
@@ -121,10 +149,10 @@ public class EndGameSubsystem extends SubsystemBase {
       beginBalance = true;
     }*/
     //If beginBalance is true, the bot will begin to balance
-    if (beginBalance)
+    /*if (beginBalance)
     {
       balanceWheel();
-    }
+    }*/
 
     if (assistantDriverController.getTriggerAxis(Hand.kLeft) >= 0.2)
     {
@@ -142,10 +170,8 @@ public class EndGameSubsystem extends SubsystemBase {
     //If the start button is pressed, all systems will be turned off and stopped
     if (assistantDriverController.getStartButtonPressed())
     {
-
       liftSolenoid.set(Constants.SOLENOID_OFF);
       brakeSolenoid.set(Constants.SOLENOID_OFF);
-
       liftController.set(Constants.SPEED_CONTROL, Constants.PIGEON_WHEEL_STATIONARY_SPEED);
     }
   }

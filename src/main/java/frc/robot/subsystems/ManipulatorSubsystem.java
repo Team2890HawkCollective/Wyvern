@@ -37,25 +37,20 @@ public class ManipulatorSubsystem extends SubsystemBase {
   private VictorSPX magazineController = new VictorSPX(Constants.MAGAZINE_CONTROLLER_VICTOR_SPX_ID);
 
   /**
+   * Spark Max's used for drive train
+   */
+  private CANSparkMax leftFrontSparkController = new CANSparkMax(Constants.LEFT_FRONT_SPARK_MAX_ID, Constants.BRUSHLESS_MOTOR);
+  private CANSparkMax rightFrontSparkController = new CANSparkMax(Constants.RIGHT_FRONT_SPARK_MAX_ID, Constants.BRUSHLESS_MOTOR);
+  private CANSparkMax leftBackSparkController = new CANSparkMax(Constants.LEFT_BACK_SPARK_MAX_ID, Constants.BRUSHLESS_MOTOR);
+  private CANSparkMax rightBackSparkController = new CANSparkMax(Constants.RIGHT_BACK_SPARK_MAX_ID, Constants.BRUSHLESS_MOTOR);
+
+  /**
    * Limelight and Data values produced from the Network table
    */
   private NetworkTable limelightTable = NetworkTableInstance.getDefault().getTable("limelight"); //limelight network table
   private NetworkTableEntry limelightX = limelightTable.getEntry("tx"); // tx
-  private NetworkTableEntry limelightY = limelightTable.getEntry("ty"); // ty
   private NetworkTableEntry limelightArea = limelightTable.getEntry("ta"); // ta
   private NetworkTableEntry limelightTargetFound = limelightTable.getEntry("tv"); // tv
-
-  /**
-   * Rangefinders used to track number of power cells in bot at specific time
-   */
-  //Bottom
-  /*private DigitalInput bottomEcho = new DigitalInput(1);
-  private DigitalOutput bottomPing = new DigitalOutput(0);
-  private Ultrasonic bottomRangeFinder = new Ultrasonic(bottomPing, bottomEcho);
-  //Top
-  private DigitalInput topEcho = new DigitalInput(3);
-  private DigitalOutput topPing = new DigitalOutput(2);
-  private Ultrasonic topRangeFinder = new Ultrasonic(topPing, topEcho);*/
 
   /**
    * Booleans for determining process of operations within manipulators methods
@@ -75,19 +70,16 @@ public class ManipulatorSubsystem extends SubsystemBase {
   private boolean shootingOkay = false; //Determines whether or not to shoot and empty the magazine
 
   /**
-   * Numbers
+   * Speeds for manipulators
    */
   private double magazineSpeed = 0.2; //Speed determined for magazine whilst loading balls
   private double shooterSpeed = 0.8; //Speed for the shooter determined after targeting
-  private int countOfBallsInMagazine = 0; //Keeps track of how many balls are in the magazine at a given time
 
   /**
-   * Spark Max's used for drive train
+   * Counts how many cells more like kiersten is smooth  brain
+   * lol
    */
-  private CANSparkMax leftFrontSparkController = new CANSparkMax(Constants.LEFT_FRONT_SPARK_MAX_ID, Constants.BRUSHLESS_MOTOR);
-  private CANSparkMax rightFrontSparkController = new CANSparkMax(Constants.RIGHT_FRONT_SPARK_MAX_ID, Constants.BRUSHLESS_MOTOR);
-  private CANSparkMax leftBackSparkController = new CANSparkMax(Constants.LEFT_BACK_SPARK_MAX_ID, Constants.BRUSHLESS_MOTOR);
-  private CANSparkMax rightBackSparkController = new CANSparkMax(Constants.RIGHT_BACK_SPARK_MAX_ID, Constants.BRUSHLESS_MOTOR);
+  private int countOfBallsInMagazine = 0; 
 
   /**
    * Xbox controller used by the assistant driver
@@ -132,15 +124,16 @@ public class ManipulatorSubsystem extends SubsystemBase {
       targetingOkay = false;
 
       magazineController.set(Constants.SPEED_CONTROL, Constants.NO_SPEED);
-      stopMoving();
       shooterLeftSideController.set(Constants.SPEED_CONTROL, Constants.NO_SPEED);
       shooterRightSideController.set(Constants.SPEED_CONTROL, Constants.NO_SPEED);
+
+      stopMoving();
     }
 
     //If the B button is pressed, the targeting process will begin and shooter speed will be determined
     if (assistantDriverController.getBButtonPressed())
     {
-      findTargetOkay = true;
+      findTargetOkay = true; //Turns on targeting
       targetingOkay = true;
     }
     //Target process
@@ -156,7 +149,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
       //shootingOkay = true;
       manualShooterOn();
     }
-    //Temporary stop for the shooter
+    //If the Y button is released, the shooting process will end
     if (assistantDriverController.getYButtonReleased())
     {
       //shootingOkay = false;
@@ -168,10 +161,12 @@ public class ManipulatorSubsystem extends SubsystemBase {
       shootPowerCell();
     }
 
+    //If the A button is pressed, the magazine will turn on
     if (assistantDriverController.getAButtonPressed())
     {
       magazineController.set(Constants.SPEED_CONTROL, Constants.SHOOTER_MAGAZINE_OUTTAKE_SPEED);
     }
+    //If the A button is released, the magazine will turn off
     if (assistantDriverController.getAButtonReleased())
     {
       magazineController.set(Constants.SPEED_CONTROL, Constants.NO_SPEED);
@@ -180,12 +175,12 @@ public class ManipulatorSubsystem extends SubsystemBase {
     //If the X button is held, the intake system will be run
     if (assistantDriverController.getXButton())
     {
-      powerCellIntake(0.275);
+      powerCellIntake(Constants.INTAKE_SPEED);
     }
     //When the X button is released, the intake will stop rotating
     if (assistantDriverController.getXButtonReleased())
     {
-      powerCellIntake(0.0);
+      powerCellIntake(Constants.NO_SPEED);
     }
   }
 
@@ -310,24 +305,27 @@ public class ManipulatorSubsystem extends SubsystemBase {
     }
   }
 
+  /**
+   * Turns shooter on for manual control
+   */
   private void manualShooterOn()
   {
     shooterLeftSideController.set(Constants.SPEED_CONTROL, shooterSpeed);
     shooterRightSideController.set(Constants.SPEED_CONTROL, -shooterSpeed);
-    //magazineController.set(Constants.SPEED_CONTROL, Constants.SHOOTER_MAGAZINE_OUTTAKE_SPEED);
   }
 
+  /**
+   * Turns shooter off for manual control
+   */
   private void manualShooterOff()
   {
     shooterLeftSideController.set(Constants.SPEED_CONTROL, Constants.NO_SPEED);
     shooterRightSideController.set(Constants.SPEED_CONTROL, Constants.NO_SPEED);
-   //magazineController.set(Constants.SPEED_CONTROL, Constants.NO_SPEED);
   }
-
-
 
   /**
    * Method for intaking and spacing power cells within the magazine
+   * Automatic
    */
   private void magazineIntake() 
   {
@@ -417,7 +415,6 @@ public class ManipulatorSubsystem extends SubsystemBase {
     rightFrontSparkController.set(-Constants.SHOOTER_TARGETING_TURNING_SPEED);
     leftBackSparkController.set(Constants.SHOOTER_TARGETING_TURNING_SPEED);
     rightBackSparkController.set(-Constants.SHOOTER_TARGETING_TURNING_SPEED);
-
   }
 
   /**

@@ -35,9 +35,10 @@ public final class Constants {
     public static final double TELEOP_DRIVE_SPEED_MODIFIER = 1.0;
     public static final double SHOOTER_TARGETING_TURNING_SPEED = 0.2;
     public static final double NO_SPEED = 0.0;
-    public static final double LIFT_CONTROLLER_RELEASE_SPEED = 0.5;
+    public static final double LIFT_CONTROLLER_RELEASE_SPEED = 0.25;
     public static final double LIFT_CONTROLLER_INTAKE_SPEED = -1.0;
     public static final double SHOOTER_MAGAZINE_OUTTAKE_SPEED = 0.3;
+    public static final double INTAKE_SPEED = 0.275;
 
     /**
      * Speed modifiers for Autonomous
@@ -48,6 +49,7 @@ public final class Constants {
     public static final double AUTONOMOUS_SHOOTER_SPEED_POSITION_ONE = 0.8;
     public static final double AUTONOMOUS_SHOOTER_SPEED_POSITION_TWO = 0.8;
     public static final double AUTONOMOUS_SHOOTER_SPEED_POSITION_THREE = 0.8;
+    public static final double AUTONOMOUS_ENCODER_DISTANCE = 15.0;
 
     /**
      * Motor types for the Spark Max Controlle
@@ -108,10 +110,10 @@ public final class Constants {
     /**
      * Port Ids for Solenoids off of PCM
      */
-    public static final int LIFT_SOLENOID_FORWARD_PORT_ID = 0;
+    public static final int LIFT_SOLENOID_FORWARD_PORT_ID = 4;
     public static final int LIFT_SOLENOID_BACKWARD_PORT_ID = 7;
-    public static final int BRAKE_SOLENOID_FORWARD_PORT_ID = 1; 
-    public static final int BRAKE_SOLENOID_BACKWARD_PORT_ID = 2;
+    public static final int BRAKE_SOLENOID_FORWARD_PORT_ID = 5; 
+    public static final int BRAKE_SOLENOID_BACKWARD_PORT_ID = 6;
 
     /**
      * Speeds for pigeon balancer at end of game
@@ -132,4 +134,10 @@ public final class Constants {
     public static final Value SOLENOID_OFF = Value.kOff;
     public static final Value SOLENOID_FORWARD = Value.kForward;
     public static final Value SOLENOID_REVERSE = Value.kReverse;
+
+    public static final double SOLENOID_REST_VALUE = 0.2;
+    public static final double RANGEFINDER_LIFT_DISTANCE_MINIMUM = 8.0;
+
+    public static final int XBOX_TOP_DPAD_BUTTON = 0;
+    public static final int XBOX_RIGHT_DPAD_BUTTON = 90;
 }

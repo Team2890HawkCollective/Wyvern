@@ -7,11 +7,14 @@
 
 package frc.robot;
 
+import com.revrobotics.CANEncoder;
+
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DigitalOutput;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Ultrasonic;
@@ -49,6 +52,10 @@ public class Robot extends TimedRobot {
   public static DigitalInput topEcho = new DigitalInput(3);
   public static DigitalOutput topPing = new DigitalOutput(2);
   public static Ultrasonic topRangeFinder = new Ultrasonic(topPing, topEcho);
+
+  public static DigitalInput liftEcho = new DigitalInput(5);
+  public static DigitalOutput liftPing = new DigitalOutput(4);
+  public static Ultrasonic liftRangeFinder = new Ultrasonic(liftPing, liftEcho);
 
   public static SendableChooser<String> startingPositionChooser = new SendableChooser<>();
 
@@ -99,6 +106,8 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
+
+    System.out.println(liftRangeFinder.getRangeInches());
     // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
     // commands, running already-scheduled commands, removing finished or interrupted commands,
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
@@ -123,6 +132,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
    //m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+   NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(3);
 
     // schedule the autonomous command (example)
     if (m_autonomousCommand != null) {
